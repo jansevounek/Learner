@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background-color: black
+}
+@layer components {
+    .main-container {
+        @apply relative top-16 font-mono mx-4;
+    }
+    .title-container {
+        @apply top-16 relative mb-2;
+    }
+    .ascii-container {
+        @apply font-mono text-center;
+    }
+    .title-warning-text {
+        @apply text-red-400 font-mono text-center mx-4 underline;
+    }
+    .title-ps-text {
+        @apply text-white text-sm mt-2 text-center mx-4 font-mono;
+    }
+    .title-hr {
+        @apply mx-4 text-white mt-2
+    }
+}

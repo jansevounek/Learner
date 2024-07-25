@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer components {
+    .selections-container {
+        @apply font-mono text-green-600 relative flex flex-col mx-2 mb-10;
+    }
+    .selections-item {
+        @apply w-[100%] h-16 border-x-2 border-b-2 border-green-700 flex flex-row items-center;
+    }
+    .selections-item-content {
+        @apply mx-auto;
+    }
+    .selections-item-details {
+        @apply border-x-2 border-b-2 border-green-700 w-[100%] flex flex-col;
+    }
+    .item-details-commands {
+        @apply flex flex-row relative items-center;
+    }
+    .item-details-title {
+        @apply text-lg text-center text-red-600 underline;
+    }
+    .selected {
+        @apply bg-white text-black font-bold;
+    }
+    .firstitem {
+        @apply border-t-2;
+    }
+    .start-lesson-button {
+        @apply text-red-600 underline mb-2 relative lg:hidden;
+    }
+    .start-lesson-text {
+        @apply text-red-600 underline mb-2 hidden lg:inline-block text-center;
+    }
+}

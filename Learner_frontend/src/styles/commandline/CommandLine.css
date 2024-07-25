@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .cmd-line-container {
+        @apply relative h-[100%] flex flex-col;
+    }
+    .cmd-line-input-container {
+        @apply relative flex flex-row w-[100%] text-green-600 mb-0 lg:mb-12;
+    }
+    .cmd-input {
+        @apply bg-inherit w-40 outline-none ml-2 font-mono;
+    }
+    .cmd-input-mobile-btn {
+        @apply bg-inherit text-blue-500 inline-block lg:hidden mb-12;
+    }
+    .cmd-output-container {
+        @apply whitespace-pre-line text-green-600;
+    }
+
+    /* login */
+    .cmd-credential-input {
+        @apply flex flex-col
+    }
+    .cmd-credential-name {
+        @apply text-green-600 font-mono
+    }
+    .cmd-password-strength-container {
+        @apply flex flex-row text-white items-center justify-center;
+    }
+    .cmd-strength-indicator {
+        @apply mx-2 text-green-500
+    }
+}

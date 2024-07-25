@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .navbar-bottom {
+        @apply h-10 w-screen flex flex-col fixed font-mono text-white bg-black z-50 bottom-0 left-0;
+    }
+    .navbar-bottom-item-container {
+        @apply w-screen flex flex-row;
+    }
+    .navbar-bottom-item {
+        @apply font-mono mx-auto flex flex-col justify-center items-center;
+    }
+    .navbar-bottom-spliter {
+        @apply ml-4 mr-4;
+    }
+}

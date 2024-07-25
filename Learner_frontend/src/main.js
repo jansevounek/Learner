@@ -1,0 +1,16 @@
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+
+// css imports
+import './styles/views/Title.css';
+import './styles/navbar/NavBarTop.css';
+import './styles/navbar/NavBarBottom.css';
+import './styles/commandline/CommandLine.css';
+import './styles/selector/Selector.css';
+
+const app = createApp(App)
+
+app.use(router)
+
+app.mount('#app')
