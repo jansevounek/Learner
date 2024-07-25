@@ -66,11 +66,6 @@ function executeCommand() {
             window.location.replace("https://www.youtube.com/watch?v=xvFZjo5PgG0");
             break
 
-        // TODO remove
-        case "Test":
-            test()
-            break
-
         // Essentials
         case "clear":
             clearLines()
@@ -128,30 +123,5 @@ function handleKeyDown(event) {
 // handles if the user clicks somewhere
 function handleClick() {
     document.getElementById('cmd-input').focus();
-}
-
-
-// Test thing
-async function test() {
-    const { data: { user } } = await supabase.auth.getUser()
-
-    const response = await fetch("http://127.0.0.1:5000/create-container", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user.id),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    
-    const responseData = await response.json();
-    console.log(responseData);
-}
-
-function asikjbdsa(kajbas) {
-    console.log(kajbas)
 }
 </script>
