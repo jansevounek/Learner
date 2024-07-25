@@ -18,6 +18,9 @@
     .cmd-output-container {
         @apply whitespace-pre-line text-green-600;
     }
+    .cmd-loading-bar {
+        @apply text-green-600 flex flex-col items-center;
+    }
 
     /* login */
     .cmd-credential-input {

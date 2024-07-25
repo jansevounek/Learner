@@ -103,7 +103,6 @@ function executeCommand() {
         executedCommands.value = ''
         cmdinput.value = ''
     } else if (output === '') {
-        console.log('now')
         executedCommands.value += 'user@linuxlearning:~$ \n'
         cmdinput.value = ''
     } else {

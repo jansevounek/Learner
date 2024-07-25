@@ -15,20 +15,33 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 load_dotenv()
 
-app.config["SUPABASE_URL"] = os.getenv("SUPABASE_URL")
-app.config['SUPABASE_KEY'] = os.getenv("SUPABASE_KEY")
+app.config["SUPABASE_URL"] = os.getenv("VITE_SUPABASE_URL")
+app.config['SUPABASE_KEY'] = os.getenv("VITE_SUPABASE_KEY")
 supabase = Supabase(app)
 
 client = docker.from_env()
+
+@app.route('/start-container', methods=['POST'])
+def start_container():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+        print(json)
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    extra = getExtra(json)
+    print(extra)
+    response = startContainer(extra)
+    return jsonify({'status': response})
 
 @app.route('/create-container', methods=['POST'])
 def create_container():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         json = request.json
-        print(json)
     else:
-        return 'Content-Type not supported!'
+        return jsonify({'status': 'Content-Type not supported!'})
     
     response = createExtra(json)
 
@@ -51,7 +64,7 @@ def createExtra(json):
     return setupContainer(container_code, container_login, container_password, json)
 
 def setupContainer(code, login, password, json):
-    response = supabase.client.from_("user_extra").select("id").eq("user_id", json).execute()
+    response = supabase.client.from_("user_extra").select("id").eq("user_id", id).execute()
     id = 0
     data = response.data
     if(len(data) != 1):
@@ -78,6 +91,22 @@ def setupContainer(code, login, password, json):
         name=code
     )
     return "done"
+
+def startContainer(extra):
+    container = client.containers.get(extra[0].get("container_code"))
+    if (container.status != "running"):
+        container.start()
+        supabase.client.table("user_extra").update({"container_started": "true"}).eq("user_id", extra[0].get("user_id")).execute()
+        return "started"
+    elif (container.status == "running"):
+        return "already_started"
+    else:
+        supabase.client.table("user_extra").update({"container_started": "false"}).eq("user_id", extra[0].get("user_id")).execute()
+        return "problem"
+
+def getExtra(id):
+    response = supabase.client.from_("user_extra").select("*").eq("user_id", id).execute()
+    return response.data
 
 if __name__ == '__main__':
     app.run(debug=True)
