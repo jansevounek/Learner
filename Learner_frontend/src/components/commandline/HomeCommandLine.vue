@@ -23,6 +23,8 @@ const router = useRouter()
 
 const cmdinput = ref('');
 let executedCommands = ref('')
+const executedList = ref([])
+let executedIndex = ref(0)
 
 // mounting handlers for shortcuts
 onMounted(() => {
@@ -38,6 +40,10 @@ onUnmounted(() => {
 
 // function that checks all the commands
 function executeCommand() {
+    if (cmdinput.value !== ''){
+        executedList.value.push(cmdinput.value)
+        executedIndex.value = executedList.value.length
+    }
     let output = ''
     let command = cmdinput.value
     switch (command) {
@@ -123,12 +129,12 @@ function getHelp() {
     return 'To navigate and use this application you can use these commands: \n' +
             '\n' +
             ' "help" - this command displayed this info about how to use the app \n' +
-            ' "navbar " + number - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
+            ' ("navbar " + number) / (The name written below the number "Home", etc.) - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
             ' "clear" - using this command simply clears the lines that you writing your commands created \n' +
             '\n' +
             'further information about other parts of the app will be provided as soon as you get there :) \n' + 
             '\n' +
-            "You will be able to learn as soon as you log in. \n"
+            "You will be able to learn and use the app as soon as you sign up/log in. \n"
 }
 
 // returns a string containing info about the company
@@ -141,7 +147,21 @@ function handleKeyDown(event) {
     if (event.ctrlKey && event.key === 'l') {
         event.preventDefault(); // Prevent the default action (e.g., focusing the browser's address bar)
         clearLines()    
+    } else if (event.key === 'ArrowUp') {
+        if((executedIndex.value - 1) >= 0) {
+            executedIndex.value--
+            changeCommand()
+        }
+    } else if (event.key === 'ArrowDown') {
+        if((executedIndex.value + 1) <= executedList.value.length) {
+            executedIndex.value++
+            changeCommand()
+        }
     }
+}
+
+function changeCommand(){
+    cmdinput.value = executedList.value[executedIndex.value]
 }
 
 // handles if the user clicks somewhere
@@ -154,7 +174,6 @@ async function checkUser() {
 
     if (user) {
         if(await extraExists(user) === false) {
-            console.log("fetching")
             setUpUser(user)
         }
     }

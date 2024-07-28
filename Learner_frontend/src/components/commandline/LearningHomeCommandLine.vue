@@ -30,6 +30,8 @@ let executedCommands = ref('')
 let preparingContainer = ref(false)
 let loadingBar = ref('[---------------------------------]')
 let loadingName = ref('Loading...')
+const executedList = ref([])
+let executedIndex = ref(0)
 
 // mounting handlers for shortcuts
 onMounted(() => {
@@ -43,6 +45,10 @@ onUnmounted(() => {
 })
 
 function executeCommand() {
+    if (cmdinput.value !== ''){
+        executedList.value.push(cmdinput.value)
+        executedIndex.value = executedList.value.length
+    }
     switch(cmdinput.value) {
         case "Home":
         case "navbar 1":
@@ -115,7 +121,10 @@ function clearLines() {
 
 function getHelp() {
     executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
-                                'TODO help - command "help"' + "\n \n"
+                                'To use the learning part of this application use commands: \n' + '\n' +
+                                ' "Lections" - this command lets you choose between many lections we provide \n' +
+                                ' "Practice" - this command lets you start your practice container (use this command visely as you only have a limited time daily to use it) \n \n' +
+                                'You can additionally use all the other commands from the homapage \n \n'
     cmdinput.value = ""
 }
 
@@ -131,6 +140,14 @@ function commandError() {
 }
 
 async function preparePractice() {
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data, error } = await supabase
+        .from('user_extra')
+        .select('container_used')
+        .eq('user_id', user.id);
+
+    console.log(data[0].container_used)
+
     preparingContainer.value = true
 
     // taken from https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
@@ -138,10 +155,21 @@ async function preparePractice() {
     loadingBar.value = '[############---------------------]'
 
     loadingName.value = 'Preparing enviroment'
-    const status = await startContainer()
-    loadingBar.value = '[######################-----------]'
 
-    loadingName.value = 'You will be redirected in a moment'
+    let status = 'used'
+    if (!data[0].container_used) {
+        status = await startContainer(user)
+        const { error } = await supabase
+            .from("user_extra")
+            .update({"container_used" : true})
+            .eq("user_id", user.id)
+        if (error) {
+            console.log('error: ' + error)
+        }
+        loadingBar.value = '[######################-----------]'
+    }
+
+    loadingName.value = 'Your learning command line will be prepared soon'
     await new Promise(r => setTimeout(r, 500));
     loadingBar.value = '[#################################]'
     await new Promise(r => setTimeout(r, 500));
@@ -149,10 +177,16 @@ async function preparePractice() {
     preparingContainer.value = false
     if (status == "started") {
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
-                                'Your container is prepared and running type the command "credentials" to see your login credentials for it and to use it type "attach"\n \n'
+                                'Your container is prepared and running type the command "credentials" to see your login credentials for it and to use it type "attach"\n \n' +
+                                'Your container will be automatically turned off when 30 minutes pass (you have only 30 minutes of learning time daily) \n \n'
     } else if (status == "already_started") {
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
-                                'Your container was already prepared and running (you do not need to retype this command if it is already started) type the command "credentials" to see your login credentials for it and to use it type "attach"\n \n'
+                                'Your container was already prepared and running (you do not need to retype this command if it is already started) type the command "credentials" to see your login credentials for it and to use it type "attach"\n \n' +
+                                'Your container will be automatically turned off when 30 minutes pass (you have only 30 minutes of learning time daily) \n \n'
+    } else if (status == "used") {
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
+                                'You already used the runtime of your container today\n \n' +
+                                'You will have your runtime back tomorrow \n \n'
     } else {
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
                                 'There was a problem starting your container - please contact support\n'  + "\n"
@@ -160,8 +194,7 @@ async function preparePractice() {
     cmdinput.value = ''
 }
 
-async function startContainer() {
-    const { data: { user } } = await supabase.auth.getUser()
+async function startContainer(user) {
 
     const response = await fetch("http://127.0.0.1:5000/start-container", {
       method: 'POST',
@@ -213,9 +246,22 @@ function handleKeyDown(event) {
         clearLines()    
     } else if (event.ctrlKey && event.key === 'c') {
         location.reload()
+    }  else if (event.key === 'ArrowUp') {
+        if((executedIndex.value - 1) >= 0) {
+            executedIndex.value--
+            changeCommand()
+        }
+    } else if (event.key === 'ArrowDown') {
+        if((executedIndex.value + 1) <= executedList.value.length) {
+            executedIndex.value++
+            changeCommand()
+        }
     }
 }
 
+function changeCommand(){
+    cmdinput.value = executedList.value[executedIndex.value]
+}
 // handles if the user clicks somewhere
 function handleClick() {
     document.getElementById('cmd-input').focus();
