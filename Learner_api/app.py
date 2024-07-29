@@ -64,7 +64,7 @@ def createExtra(json):
     return setupContainer(container_code, container_login, container_password, json)
 
 def setupContainer(code, login, password, json):
-    response = supabase.client.from_("user_extra").select("id").eq("user_id", id).execute()
+    response = supabase.client.from_("user_extra").select("id").eq("user_id", json).execute()
     id = 0
     data = response.data
     if(len(data) != 1):
@@ -77,7 +77,8 @@ def setupContainer(code, login, password, json):
         "SIAB_USER" : login,
         "SIAB_SUDO" : "false",
         "SIAB_SSL" : "false", #TODO change this
-        "SIAB_PORT" : p
+        "SIAB_PORT" : p,
+        "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173"
     }
 
     ports = {

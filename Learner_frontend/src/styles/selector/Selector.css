@@ -29,9 +29,6 @@
         @apply border-t-2;
     }
     .start-lesson-button {
-        @apply text-red-600 underline mb-2 relative lg:hidden;
-    }
-    .start-lesson-text {
-        @apply text-red-600 underline mb-2 hidden lg:inline-block text-center;
+        @apply text-red-600 underline mb-2 relative;
     }
 }

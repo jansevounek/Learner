@@ -1,5 +1,5 @@
 Source https://hub.docker.com/r/garo/shellinabox
-Clutch command: sudo docker run -p 4200:4200 -e SIAB_PASSWORD=janse -e SIAB_USER=janse -e SIAB_SUDO=true -e SIAB_SSL=false garo/shellinabox:latest
+Clutch command: sudo docker run -p 4200:4200 -e SIAB_PASSWORD=janse -e SIAB_USER=janse -e SIAB_SUDO=true -e SIAB_SSL=false -e SIAB_MESSAGES_ORIGIN="127.0.0.1:5173" garo/shellinabox:latest
 supabase db passwd: Kiblicek007
-sudo service docker restart
+sudo service docker restart &&
 sudo chmod 666 /var/run/docker.sock

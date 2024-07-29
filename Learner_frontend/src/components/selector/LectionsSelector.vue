@@ -12,15 +12,11 @@
                 <h1 class="item-details-title">{{ item.name }}</h1>
                 <p class="text-center underline">Commands to learn:</p>
                 <div class="item-details-commands">
-                    <p class="selections-item-content text-blue-600">ls / ls -a</p>
-                    <p class="selections-item-content text-blue-600">pwd</p>
-                    <p class="selections-item-content text-blue-600">whoami</p>
-                    <p class="selections-item-content text-blue-600">cd</p>
+                    <p class="selections-item-content text-blue-600" v-for="(command) in item.commands">{{ command }}</p>
                 </div>
                 <p class="text-center underline">What you will learn:</p>
                 <p class="mx-2 lg:mx-80 mb-2 text-center">{{ item.description }}</p>
-                <button class="start-lesson-button" @click="startLesson">Start lesson</button>
-                <p class="start-lesson-text">To start lesson press enter again</p>
+                <button class="start-lesson-button" @click="startLesson(item.id)">Click here to start lesson</button>
             </div>
         </div>
         <span class="mb-12"></span>
@@ -59,12 +55,7 @@ function handleKeyDown(event) {
         currentIndex.value = (currentIndex.value - 1 + items.value.length) % items.value.length;
         updateSelection(currentIndex.value);
     } else if (event.key === 'Enter') {
-        if (displayDetails.value) {
-            //TODO lekce
-            router.push('/')
-        } else {
-            displayDetails.value = true
-        }
+        displayDetails.value = !displayDetails.value
     } else if (event.key === 'Escape') {
         displayDetails.value = false
     } else if (event.ctrlKey && event.key === 'c') {
@@ -88,7 +79,7 @@ function updateSelection(index) {
     currentIndex.value = index;
 }
 
-function startLesson() {
-    console.log('start')
+function startLesson(id) {
+    router.push('/learning/lection/' + id)
 }
 </script>

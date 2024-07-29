@@ -159,10 +159,6 @@ async function preparePractice() {
     let status = 'used'
     if (!data[0].container_used) {
         status = await startContainer(user)
-        const { error } = await supabase
-            .from("user_extra")
-            .update({"container_used" : true})
-            .eq("user_id", user.id)
         if (error) {
             console.log('error: ' + error)
         }
@@ -234,9 +230,16 @@ async function attach() {
         .select('*')
         .eq('user_id', user.id)
         .single();
-
-    const port = 8000 + data.id
-    window.location.replace("http://127.0.0.1:" + port + "/");
+    
+    if(!data.container_used) {
+        const port = 8000 + data.id
+        router.push("/learning/container/" + port)
+    } else {
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
+                                'You already used the runtime of your container today\n \n' +
+                                'You will have your runtime back tomorrow \n \n'
+        cmdinput.value = ''
+    }
 }
 
 // handels the "ctrl + c" shortcut

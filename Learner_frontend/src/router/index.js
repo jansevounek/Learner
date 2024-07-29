@@ -7,6 +7,8 @@ import LearningHomePage from '../views/LearningHomePage.vue'
 import ResetPasswordPage from '../views/auth/ResetPasswordPage.vue'
 import UpdateUserPage from '../views/auth/UpdateUserPage.vue'
 import LectionsPage from '../views/LectionsPage.vue'
+import LectionPage from '../views/LectionPage.vue'
+import ContainerPage from '../views/ContainerPage.vue'
 
 let localUser;
 
@@ -50,6 +52,17 @@ const router = createRouter({
       path: '/learning/lections',
       name: 'lections',
       component: LectionsPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/learning/container/:port',
+      component: ContainerPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      // taken from https://router.vuejs.org/guide/essentials/dynamic-matching.html
+      path: '/learning/lection/:id',
+      component: LectionPage,
       meta: { requiresAuth: true },
     }
   ]
