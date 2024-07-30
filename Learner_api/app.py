@@ -78,7 +78,8 @@ def setupContainer(code, login, password, json):
         "SIAB_SUDO" : "false",
         "SIAB_SSL" : "false", #TODO change this
         "SIAB_PORT" : p,
-        "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173"
+        "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173",
+        "SIAB_PKGS" : "nano"
     }
 
     ports = {

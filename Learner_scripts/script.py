@@ -31,7 +31,7 @@ def checkContainers():
                 start = state['FinishedAt']
                 start_time = parse_timestamp(start)
                 # taken from https://stackoverflow.com/questions/2591845/comparing-a-time-delta-in-python
-                if (datetime.now(timezone.utc) - start_time > timedelta(minutes=30)):
+                if (datetime.now(timezone.utc) - start_time > timedelta(minutes=1)):
                     print("stoping a container")
                     container.stop()
                     supabase.table("user_extra").update({"container_started": False, "container_used": True}).eq("container_code", container.name).execute()

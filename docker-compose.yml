@@ -1,0 +1,32 @@
+services:
+  api:
+    build:
+      context: ./Learner_api
+    ports:
+      - "5000:5000"
+    env_file: ".env"
+    volumes:
+      - ./Learner_api:/app
+      # from https://stackoverflow.com/questions/40961073/starting-and-stopping-docker-container-from-other-container
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+
+  frontend:
+    build:
+      context: ./Learner_frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./Learner_frontend:/app
+    environment:
+      - NODE_ENV=production
+  
+  script:
+    build:
+      context: ./Learner_scripts
+    volumes:
+      - ./Learner_scripts:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file: ".env"
