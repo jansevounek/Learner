@@ -191,8 +191,8 @@ async function preparePractice() {
 }
 
 async function startContainer(user) {
-
-    const response = await fetch("http://127.0.0.1:5000/start-container", {
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/start-container", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

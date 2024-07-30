@@ -200,7 +200,8 @@ async function extraExists(user) {
 }
 
 async function setUpUser(user) {
-    const response = await fetch("http://127.0.0.1:5000/create-container", {
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/create-container", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
