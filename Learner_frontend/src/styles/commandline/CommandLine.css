@@ -23,10 +23,10 @@
     }
 
     /* login */
-    .cmd-credential-input {
+    .cmd-arrow-input {
         @apply flex flex-col
     }
-    .cmd-credential-name {
+    .cmd-arrow-name {
         @apply text-green-600 font-mono
     }
     .cmd-password-strength-container {

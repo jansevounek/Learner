@@ -3,8 +3,8 @@
         <div class="cmd-output-container">
             {{ executedCommands }}
         </div>
-        <div class="cmd-credential-input">
-            <p class="cmd-credential-name">{{ inputName }}</p>
+        <div class="cmd-arrow-input">
+            <p class="cmd-arrow-name">{{ inputName }}</p>
             <div class="cmd-line-input-container">
                 <h1>></h1>
                 <input :type="currentStep > 0 && currentStep < 3 ? 'password' : 'text'" class="cmd-input"  
