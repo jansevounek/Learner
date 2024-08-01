@@ -8,7 +8,8 @@ import ResetPasswordPage from '../views/auth/ResetPasswordPage.vue'
 import UpdateUserPage from '../views/auth/UpdateUserPage.vue'
 import LectionsPage from '../views/LectionsPage.vue'
 import LectionPage from '../views/LectionPage.vue'
-import ContainerPage from '../views/ContainerPage.vue'
+import PracticeContainerPage from '../views/PracticeContainerPage.vue'
+import FullScreenContainerPage from '../views/FullScreenContainerPage.vue'
 
 let localUser;
 
@@ -56,7 +57,12 @@ const router = createRouter({
     },
     {
       path: '/learning/container/:port',
-      component: ContainerPage,
+      component: PracticeContainerPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/container/:port',
+      component: FullScreenContainerPage,
       meta: { requiresAuth: true },
     },
     {

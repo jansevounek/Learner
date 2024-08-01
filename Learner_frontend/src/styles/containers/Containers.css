@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components { 
+    .practice-quit-container {
+        @apply h-12 flex items-center justify-center border-2 border-green-600 text-red-500;
+    }
+    .selected-container {
+        @apply bg-white;
+    }
+    .practice-cmd-container {
+        @apply h-60 mt-2 border-green-600 border-2 flex items-center justify-center;
+    }
+    .practice-cmd {
+        @apply p-2 ;
+    }
+    .fullscreen-container {
+        @apply top-16 mx-2 relative h-[80dvh];
+    }
+}

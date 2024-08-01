@@ -8,18 +8,18 @@ _________              .___
  \______  /__|_|  /\____ | 
         \/      \/      \/
         </pre>
-        <p class="title-warning-text">Dont worry you are on the right page - dont run away and try typing "help"</p>
-        <p class="title-ps-text">PS: this site is meant to look like this and you will soon see why</p>
+        <p class="title-warning-text">Here you are below is your practice container</p>
+        <p class="title-ps-text">Time left: TODO</p>
         <hr class="title-hr">
     </div>
     <div class="main-container">
-        <PracticeCommandLine />
+        <PracticeContainer />
     </div>
         <!--<iframe :src="url" width="100%" height="100%" frameborder="0" ></iframe>-->
 </template>
 
 <script setup>
-import PracticeCommandLine from '../components/commandline/PracticeCommandLine.vue'
+import PracticeContainer from '../components/containers/PracticeContainer.vue'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()

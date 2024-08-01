@@ -8,6 +8,7 @@ import './styles/navbar/NavBarTop.css';
 import './styles/navbar/NavBarBottom.css';
 import './styles/commandline/CommandLine.css';
 import './styles/selector/Selector.css';
+import './styles/containers/Containers.css';
 
 const app = createApp(App)
 

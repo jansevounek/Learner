@@ -1,33 +1,37 @@
 <template>
     <div class="navbar-top">
         <div class="navbar-top-item-container">
-            <div class="navbar-top-item text-orange-500" v-if="currentRoute !== '/'">
+            <div class="navbar-top-item text-orange-500" v-if="currentRoute !== '/' && !isWithoutCmd">
                 <h1>1</h1>
                 <h1>Home</h1>
             </div>
-            <div class="navbar-top-item text-blue-500" v-if="currentRoute !== '/login' && !localUser">
+            <div class="navbar-top-item text-blue-500" v-if="currentRoute !== '/login' && !localUser && !isWithoutCmd">
                 <h1>2</h1>
                 <h1>Login</h1>
             </div>
-            <div class="navbar-top-item text-red-500" v-if="currentRoute !== '/signup' && !localUser">
+            <div class="navbar-top-item text-red-500" v-if="currentRoute !== '/signup' && !localUser && !isWithoutCmd">
                 <h1>3</h1>
                 <h1>Signup</h1>
             </div>
-            <div class="navbar-top-item text-purple-500" v-if="currentRoute == '/'">
+            <div class="navbar-top-item text-purple-500" v-if="currentRoute == '/' && !isWithoutCmd">
                 <h1>4</h1>
                 <h1>About us</h1>
             </div>
-            <div class="navbar-top-item text-pink-500" v-if="!localUser && currentRoute !== '/resetpassword'">
+            <div class="navbar-top-item text-pink-500" v-if="!localUser && currentRoute !== '/resetpassword' && !isWithoutCmd">
                 <h1>5</h1>
                 <h1>Forgot Password?</h1>
             </div>
-            <div class="navbar-top-item text-red-500" v-if="localUser">
+            <div class="navbar-top-item text-red-500" v-if="localUser && !isWithoutCmd">
                 <h1>6</h1>
                 <h1>Logout</h1>
             </div>
-            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/lections'">
+            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/lections' && !isWithoutCmd">
                 <h1>7</h1>
                 <h1>Lets Learn</h1>
+            </div>
+            <div class="navbar-top-item text-red-500" v-if="localUser && isWithoutCmd">
+                <h1>Use ctrl + c</h1>
+                <h1>to go back</h1>
             </div>
         </div>
         <hr class="navbar-top-spliter mt-2">
@@ -51,6 +55,15 @@ const currentRoute = computed(() => {
     return route.path
 })
 
+const isWithoutCmd = computed(() => {
+    const regex1 = /^\/container\/\d+$/;
+    const regex2 = /^\/learning\/container\/\d+$/;
+    if (regex1.test(currentRoute.value) || currentRoute.value === '/learning/lections' || regex2.test(currentRoute.value)){
+        return true
+    }
+    return false
+})
+
 async function getUser() {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
@@ -59,6 +72,7 @@ async function getUser() {
         localUser.value = false
     }
 }
+
 
 onMounted(() => {
     getUser()
