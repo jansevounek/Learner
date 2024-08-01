@@ -2,12 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fseekicon.com%2Ffree-icon-download%2Fcommand-line_1.png&f=1&nofb=1&ipt=41d02a9846384fee5f34435c24db8af4d77b20134b98a05f05669caa41e4053f&ipo=images">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <title>Lets learn!</title>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+          const originalTitle = document.title;
+
+          document.addEventListener('visibilitychange', () => {
+              if (document.hidden) {
+                  document.title = 'Come back :( and learn!';
+              } else {
+                  document.title = originalTitle;
+              }
+          });
+      });
+  </script>
   </body>
 </html>
