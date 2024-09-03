@@ -97,6 +97,9 @@ function executeCommand() {
         case "License":
             window.location.replace("https://www.youtube.com/watch?v=xvFZjo5PgG0");
             break
+        case "Get Premium":
+            router.push('/getpremium')
+            break
 
         // other possibilities
         case "":

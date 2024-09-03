@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.44.4",
+    "@vue-stripe/vue-stripe": "^4.5.0",
     "figlet": "^1.7.0",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"

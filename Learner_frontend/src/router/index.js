@@ -10,6 +10,7 @@ import LectionsPage from '../views/LectionsPage.vue'
 import LectionPage from '../views/LectionPage.vue'
 import PracticeContainerPage from '../views/PracticeContainerPage.vue'
 import FullScreenContainerPage from '../views/FullScreenContainerPage.vue'
+import SquarePaymentPage from '../views/SquarePaymentPage.vue'
 
 let localUser;
 
@@ -44,6 +45,12 @@ const router = createRouter({
       component: UpdateUserPage,
     },
     {
+      path: '/getpremium',
+      name: 'getpremium',
+      component: SquarePaymentPage,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/learning/homepage',
       name: 'learninghome',
       component: LearningHomePage,
@@ -57,17 +64,20 @@ const router = createRouter({
     },
     {
       path: '/learning/container/:port',
+      name: 'practicecontainer',
       component: PracticeContainerPage,
       meta: { requiresAuth: true },
     },
     {
       path: '/container/:port',
+      name: 'fullscreencontainer',
       component: FullScreenContainerPage,
       meta: { requiresAuth: true },
     },
     {
       // taken from https://router.vuejs.org/guide/essentials/dynamic-matching.html
       path: '/learning/lection/:id',
+      name: 'lectionpage',
       component: LectionPage,
       meta: { requiresAuth: true },
     }
