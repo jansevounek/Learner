@@ -271,9 +271,8 @@ function handleKeyDown(event) {
     if (event.ctrlKey && event.key === 'l') {
         event.preventDefault();
         clearLines()    
-    } else if (event.ctrlKey && event.key === 'i') {
+    } else if (event.ctrlKey && event.key === 'i' && (currentStep.value > 0 && currentStep.value < 3)) {
         showPassword.value = !showPassword.value
-        console.log(showPassword.value)
     }
 }
 
