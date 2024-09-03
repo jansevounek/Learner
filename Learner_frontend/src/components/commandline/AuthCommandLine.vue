@@ -7,7 +7,7 @@
             <p class="cmd-arrow-name">{{ inputName }}</p>
             <div class="cmd-line-input-container">
                 <h1>></h1>
-                <input :type="currentStep > 0 && currentStep < 3 ? 'password' : 'text'" class="cmd-input"  
+                <input :type="!showText ? 'password' : 'text'" class="cmd-input"  
                 :class="[{'text-red-600': isEmail === false}]" id="cmd-input"
                  v-on:keyup.enter="executeCommand" v-model="cmdinput" autofocus>
             </div>
@@ -30,6 +30,7 @@ import { supabase } from '../../supabase/init.js'
 
 // import a setup of the router
 import { useRouter, useRoute } from 'vue-router'
+import { errorMessages } from 'vue/compiler-sfc';
 const router = useRouter()
 const route = useRoute()
 
@@ -51,6 +52,8 @@ const inputName = ref('Email:')
 
 const credentials = ref([])
 const currentStep = ref(0)
+
+const showPassword = ref(false)
 
 // function that checks all the commands
 function executeCommand() {
@@ -228,6 +231,17 @@ const strengthLevel = computed(() => {
     }
 })
 
+const showText = computed(() => {
+    if (currentStep.value > 0 && currentStep.value < 3) {
+        if (showPassword.value == true) {
+            return true
+        }
+        return false
+    }
+    
+    return true
+})
+
 const showStrength = computed(() => {
     return currentStep.value == 1 && route.path !== '/login'
 })
@@ -252,10 +266,14 @@ function getHelp() {
 }
 
 // handles the "ctrl + c" shortcut
+// TODO nobody knows what ctrl + i does
 function handleKeyDown(event) {
     if (event.ctrlKey && event.key === 'l') {
         event.preventDefault();
         clearLines()    
+    } else if (event.ctrlKey && event.key === 'i') {
+        showPassword.value = !showPassword.value
+        console.log(showPassword.value)
     }
 }
 
@@ -277,13 +295,27 @@ function auth() {
     }
 }
 
+function errorMessage() {
+    credentials.value = []
+    currentStep.value = 0
+
+    executedCommands.value += inputName.value + "\n" + "> " + cmdinput.value + "\n" + "No such account exists - try again"
+
+    inputName.value = "Email:"
+    cmdinput.value = ""
+}
+
 async function login() {
     const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.value[0],
         password: credentials.value[1]
     })
     if (error) {
-        alert(error.message)
+        switch (error.message) {
+            case "Invalid login credentials":
+                errorMessage()
+                break
+        }
     } else {
         router.push('/')
         location.reload()
