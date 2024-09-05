@@ -47,6 +47,12 @@ def create_container():
 
     return jsonify({'status': response})
 
+@app.route('/payment-successfull', methods=['POST'])
+def payment_successful():
+    
+
+    return jsonify({'status': 'done'})
+
 def createExtra(json):
     container_code = str(uuid.uuid4())
     c = str(uuid.uuid4()).split("-")

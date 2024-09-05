@@ -10,7 +10,7 @@ import LectionsPage from '../views/LectionsPage.vue'
 import LectionPage from '../views/LectionPage.vue'
 import PracticeContainerPage from '../views/PracticeContainerPage.vue'
 import FullScreenContainerPage from '../views/FullScreenContainerPage.vue'
-import SquarePaymentPage from '../views/SquarePaymentPage.vue'
+import PaymentPage from '../views/PaymentPage.vue'
 
 let localUser;
 
@@ -47,7 +47,7 @@ const router = createRouter({
     {
       path: '/getpremium',
       name: 'getpremium',
-      component: SquarePaymentPage,
+      component: PaymentPage,
       meta: { requiresAuth: true },
     },
     {

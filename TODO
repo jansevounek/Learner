@@ -3,3 +3,4 @@ Clutch command: sudo docker run -p 4200:4200 -e SIAB_PASSWORD=janse -e SIAB_USER
 supabase db passwd: Kiblicek007
 sudo service docker restart &&
 sudo chmod 666 /var/run/docker.sock
+stripe listen --forward-to localhost:5000/payment-successful = test stripe command (very good)
