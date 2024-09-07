@@ -7,6 +7,7 @@ import uuid
 import secrets
 import string
 import docker
+import stripe
 
 import os
 
@@ -20,6 +21,13 @@ app.config['SUPABASE_KEY'] = os.getenv("VITE_SUPABASE_KEY")
 supabase = Supabase(app)
 
 client = docker.from_env()
+
+
+#from https://docs.stripe.com/api/connected-accounts?lang=python
+stripe.api_key = os.getenv("STRIPE_API_KEY")
+
+#TODO must be changed everytime while testing
+endpoint_secret= "whsec_e3d7b620f48b92afc2e8088c8104d249ed3f659475ee649ae3e07a862f1a3b51"
 
 @app.route('/start-container', methods=['POST'])
 def start_container():
@@ -49,9 +57,47 @@ def create_container():
 
 @app.route('/payment-successfull', methods=['POST'])
 def payment_successful():
-    
+    payload = request.data
+    sig_header = request.headers.get('Stripe-Signature')
+
+    event = stripe.Webhook.construct_event(
+        payload, sig_header, endpoint_secret
+    )
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+
+        user_id = session['metadata']['userId']
+
+        supabase.client.table("user_extra").update({"premium": "true"}).eq("user_id", user_id).execute()
+        print("done")
 
     return jsonify({'status': 'done'})
+
+@app.route('/create-stripe-session', methods=['POST'])
+def create_session():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    id = str(json)
+
+    session = stripe.checkout.Session.create(
+        mode="payment",
+        success_url="http://localhost:5173/success",
+        cancel_url="http://localhost:5173/failiure",
+        line_items=[{
+            "price": os.getenv("STRIPE_PRICE_ID"),
+            "quantity": 1
+        }],
+        metadata= {
+            "userId": id
+        }
+    )
+
+    return jsonify({'sessionId': session.id})
 
 def createExtra(json):
     container_code = str(uuid.uuid4())

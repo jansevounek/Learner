@@ -15,30 +15,16 @@
         <hr class="title-hr">
     </div>
     <div class="top-16 relative w-screen">
-        <StripeCheckout ref="checkoutRef" mode="payment" :pk="publishableKey" :line-items="lineItems" :success-url="successURL" :cancel-url="cancelURL" :metadata="meta" @loading="v => loading = v"/>
-        <button @click="submit">Pay now</button>
+        <button @click="createCheckout">Pay now</button>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { StripeCheckout } from '@vue-stripe/vue-stripe';
-import { supabase } from '../../supabase/init.js'
+import { onMounted } from 'vue'
+import { loadStripe } from '@stripe/stripe-js';
+import { supabase } from '../supabase/init.js'
 
-const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-const lineItems = ref([
-    {
-        price:import.meta.env.VITE_STRIPE_PRICE_ID,
-        quantity: 1,
-    }
-])
-const successURL = 'http://localhost:5173/success'
-const cancelURL = 'http://localhost:5173/failiure'
-const checkoutRef = ref(null)
-let meta = null
-
-let loading = ref(false)
-
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
 // generates the random color for the title
 onMounted(() => {
@@ -51,11 +37,28 @@ onMounted(() => {
 // taken from https://docs.vuestripe.com/vue-stripe/stripe-checkout/one-time-payment and https://www.youtube.com/watch?v=g2Dtt4_dQQ4
 //TODO steup webhook on stripe
 async function submit() {
-    await setMeta()
-    checkoutRef.value.redirectToCheckout()
+    const { data: { user } } = await supabase.auth.getUser()
+    checkoutRef.value.redirectToCheckout({
+        metadata: user.id
+    })
 }
 
-async function setMeta() {
-
+async function createCheckout() {
+    const { data: { user } } = await supabase.auth.getUser()
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/create-stripe-session", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user.id),
+    });
+    
+    if (response) {
+        const stripe = await stripePromise
+        const data = await response.json()
+        const sessionId = data.sessionId
+        await stripe.redirectToCheckout({ sessionId });
+    }
 }
 </script>

@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^4.4.0",
     "@supabase/supabase-js": "^2.44.4",
     "@vue-stripe/vue-stripe": "^4.5.0",
     "figlet": "^1.7.0",
