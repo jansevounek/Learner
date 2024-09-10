@@ -24,6 +24,16 @@ const router = useRouter()
 let executedCommands = ref('Please enter your email adress:')
 let cmdinput = ref('')
 
+onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('click', handleClick);
+})
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+    document.removeEventListener('click', handleClick);
+})
+
 function executeCommand() {
     switch(cmdinput.value) {
         case "Signup":
@@ -89,20 +99,7 @@ function testEmail(email) {
 }
 
 // clears all the lines of output
-function clearLines() {
-    executedCommands.value = 'Please enter your email adress:'
-    cmdinput.value = ''
-}
-
-onMounted(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('click', handleClick);
-})
-
-onUnmounted(() => {
-    window.removeEventListener('keydown', handleKeyDown);
-    document.removeEventListener('click', handleClick);
-})
+v
 
 // handles the "ctrl + c" shortcut
 function handleKeyDown(event) {
