@@ -4,3 +4,6 @@ supabase db passwd: Kiblicek007
 sudo service docker restart &&
 sudo chmod 666 /var/run/docker.sock
 stripe listen --forward-to localhost:5000/payment-successful = test stripe command (very good)
+
+- Remove testing upgrading containers button, etc..
+- 

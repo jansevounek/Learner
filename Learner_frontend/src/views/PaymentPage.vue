@@ -31,7 +31,7 @@ ______  ______ ______   _____  ______   _____
     </div>
     <div class="main-container">
         <PaymentCommandLine/>
-        <button @click="createCheckout">Pay now</button>
+        <button @click="testApi">Pay now</button>
     </div>
 </template>
 
@@ -49,4 +49,24 @@ onMounted(() => {
     ascii1.classList.add(colors1[random])
     ascii2.classList.add(colors2[random])
 })
+
+//TODO remove it and the button
+import { supabase } from '../supabase/init.js'
+async function testApi() {
+    const { data: { user } } = await supabase.auth.getUser()
+    const apiurl = import.meta.env.VITE_API_URL
+    
+    const response = await fetch(apiurl + "/test", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user.id),
+    });
+
+    if (response) {
+        console.log(response)
+    }
+}
+
 </script>

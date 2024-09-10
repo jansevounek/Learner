@@ -70,7 +70,21 @@ def payment_successful():
         user_id = session['metadata']['userId']
 
         supabase.client.table("user_extra").update({"premium": "true"}).eq("user_id", user_id).execute()
-        print("done")
+        
+        updateToPremiumContainer(user_id)
+
+    return jsonify({'status': 'done'})
+
+#TODO remove
+@app.route('/test', methods=['POST'])
+def test():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    updateToPremiumContainer(json)
 
     return jsonify({'status': 'done'})
 
@@ -100,7 +114,7 @@ def create_session():
     return jsonify({'sessionId': session.id})
 
 def createExtra(json):
-    container_code = str(uuid.uuid4())
+    container_code = "free-" + str(uuid.uuid4())
     c = str(uuid.uuid4()).split("-")
     container_login = "guest" + c[0]
     # taken from https://stackoverflow.com/questions/3854692/generate-password-in-python
@@ -115,8 +129,8 @@ def createExtra(json):
     supabase.client.table("user_extra").insert(data).execute()
     return setupContainer(container_code, container_login, container_password, json)
 
-def setupContainer(code, login, password, json):
-    response = supabase.client.from_("user_extra").select("id").eq("user_id", json).execute()
+def setupContainer(code, login, password, user_id):
+    response = supabase.client.from_("user_extra").select("id").eq("user_id", user_id).execute()
     id = 0
     data = response.data
     if(len(data) != 1):
@@ -157,6 +171,68 @@ def startContainer(extra):
     else:
         supabase.client.table("user_extra").update({"container_started": "false"}).eq("user_id", extra[0].get("user_id")).execute()
         return "problem"
+    
+def updateToPremiumContainer(user_id):
+    extra = getExtra(user_id)
+
+    if extra[0].get("premium"):
+        print("oh hello")
+        container = client.containers.get(extra[0].get("container_code"))
+
+        if container.status == "running":
+            container.stop()
+        
+        container.remove()
+
+        # update the supabase container data
+        container_code = "premium-" + str(uuid.uuid4())
+        c = str(uuid.uuid4()).split("-")
+        container_login = "guest" + c[0]
+        # taken from https://stackoverflow.com/questions/3854692/generate-password-in-python
+        alphabet = string.ascii_letters + string.digits
+        container_password = ''.join(secrets.choice(alphabet) for i in range(20))
+        data = {
+            "container_started": "false",
+            "container_used": "false",
+            "container_code": container_code,
+            "container_login": container_login,
+            "container_password": container_password
+        }
+
+        supabase.client.table("user_extra").update(data).eq("user_id", user_id).execute()
+
+        setupPremiumContainer(container_code, container_login, container_password, user_id)
+
+def setupPremiumContainer(code, login, password, user_id):
+    data = getExtra(user_id)
+    id = 0
+    if(len(data) != 1):
+        return "error"
+    else:
+        id = data[0].get("id")
+    p = 8000 + id
+    env_var = {
+        "SIAB_PASSWORD" : password,
+        "SIAB_USER" : login,
+        "SIAB_SUDO" : "false",
+        "SIAB_SSL" : "false", #TODO change this
+        "SIAB_PORT" : p,
+        "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173",
+        "SIAB_PKGS" : "nano"
+    }
+
+    ports = {
+        str(p) + '/tcp': p,
+    }
+    container = client.containers.create(
+        'garo/shellinabox:latest',
+        detach=True,
+        environment=env_var,
+        ports=ports,
+        name=code
+    )
+    container.start()
+
 
 def getExtra(id):
     response = supabase.client.from_("user_extra").select("*").eq("user_id", id).execute()
