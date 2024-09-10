@@ -75,19 +75,6 @@ def payment_successful():
 
     return jsonify({'status': 'done'})
 
-#TODO remove
-@app.route('/test', methods=['POST'])
-def test():
-    content_type = request.headers.get('Content-Type')
-    if (content_type == 'application/json'):
-        json = request.json
-    else:
-        return jsonify({'status': 'Content-Type not supported!'})
-    
-    updateToPremiumContainer(json)
-
-    return jsonify({'status': 'done'})
-
 @app.route('/create-stripe-session', methods=['POST'])
 def create_session():
     content_type = request.headers.get('Content-Type')
