@@ -25,7 +25,7 @@ def checkContainers():
         containers = client.containers.list(all=True)
 
         for container in containers:
-            if (container.image.id == "sha256:e3bfc0ed8a671eae5b9e082413bbfe65feb157512a94285230397b541fc80f09" and container.status == "running"):
+            if (container.name.startswith("free-") and container.status == "running"):
                 container.reload()
                 state = container.attrs['State']
                 start = state['FinishedAt']
