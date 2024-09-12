@@ -58,32 +58,32 @@ function executeCommand() {
 
         // Navbar top
         case "Lets Learn":
-        case "navbar 7":
+        case "go 7":
             router.push('/learning/homepage')
             break
         case "Logout":
-        case "navbar 6":
+        case "go 6":
             logout()
             break
         case "Forgot Password?":
-        case "navbar 5":
+        case "go 5":
             router.push('/resetpassword')
             break
         case "About us":
-        case "navbar 4":
+        case "go 4":
             router.push('/')
             output = getAboutUs()
             break
         case "Signup":
-        case "navbar 3":
+        case "go 3":
             router.push('/signup')
             break
         case "Login":
-        case "navbar 2":
+        case "go 2":
             router.push('/login')
             break
         case "Home":
-        case "navbar 1":
+        case "go 1":
             router.push('/')
             break
 
@@ -132,7 +132,7 @@ function getHelp() {
     return 'To navigate and use this application you can use these commands: \n' +
             '\n' +
             ' "help" - this command displayed this info about how to use the app \n' +
-            ' ("navbar " + number) / (The name written below the number "Home", etc.) - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
+            ' ("go " + number) / (The name written below the number "Home", etc.) - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
             ' "clear" - using this command simply clears the lines that you writing your commands created \n' +
             '\n' +
             'further information about other parts of the app will be provided as soon as you get there :) \n' + 

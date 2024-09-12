@@ -40,15 +40,15 @@ onUnmounted(() => {
 function executeCommand() {
     switch(cmdinput.value) {
         case "Logout":
-        case "navbar 6":
+        case "go 6":
             logout()
             break
         case "Lets Learn":
-        case "navbar 7":
+        case "go 7":
             router.push('/learning/homepage')
             break
         case "Home":
-        case "navbar 1":
+        case "go 1":
             router.push('/')
             break
 

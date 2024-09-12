@@ -25,6 +25,7 @@ def checkContainers():
         containers = client.containers.list(all=True)
 
         for container in containers:
+            # taken from https://stackoverflow.com/questions/8802860/checking-whether-a-string-starts-with-xxxx
             if (container.name.startswith("free-") and container.status == "running"):
                 container.reload()
                 state = container.attrs['State']

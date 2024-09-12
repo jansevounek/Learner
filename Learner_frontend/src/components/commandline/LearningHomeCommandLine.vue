@@ -51,11 +51,11 @@ function executeCommand() {
     }
     switch(cmdinput.value) {
         case "Home":
-        case "navbar 1":
+        case "go 1":
             router.push('/')
             break
         case "Logout":
-        case "navbar 6":
+        case "go 6":
             logout()
             router.push('/')
             break

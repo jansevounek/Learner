@@ -58,22 +58,22 @@ function executeCommand() {
 
         // navbar commands
         case "Home":
-        case "navbar 1":
+        case "go 1":
             router.push('/')
             break
         case "Login":
-        case "navbar 2":
+        case "go 2":
             router.push('/login')
             break
         case "Signup":
-        case "navbar 3":
+        case "go 3":
             router.push('/signup')
             break
         case "Forgot Password?":
-        case "navbar 5":
+        case "go 5":
             router.push('/resetpassword')
             break
-        case "navbar 6":
+        case "go 6":
             logout()
             break
 
