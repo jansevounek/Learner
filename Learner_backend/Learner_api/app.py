@@ -51,9 +51,9 @@ def create_container():
     else:
         return jsonify({'status': 'Content-Type not supported!'})
     
-    response = createExtra(json)
+    createExtra(json)
 
-    return jsonify({'status': response})
+    return jsonify({'status': "done"})
 
 @app.route('/payment-successfull', methods=['POST'])
 def payment_successful():
@@ -100,6 +100,49 @@ def create_session():
 
     return jsonify({'sessionId': session.id})
 
+@app.route('/reset-container', methods=['POST'])
+def reset_container():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    extra = getExtra(json)
+
+    status = "failed"
+
+    if extra[0].get("premium") and extra[0].get("reseted") < 5:
+        resetContainer(extra)
+        status = "done"
+    elif extra[0].get("premium") == False and extra[0].get("reseted") < 1:
+        resetContainer(extra)
+        status = "done"
+
+    return jsonify({'status': status})
+
+def resetContainer(extra):
+    container = client.containers.get(extra[0].get("container_code"))
+
+    if container.status == "running":
+        container.stop()
+    
+    container.remove()
+
+    data = {
+        "id": extra[0].get("id"),
+        "container_code": extra[0].get("container_code"),
+        "container_login": extra[0].get("container_login"),
+        "container_password": extra[0].get("container_password")
+    }
+    createContainer(data)
+
+    times_reseted = extra[0].get("reseted")
+    times_reseted += 1
+    supabase.client.table("user_extra").update({"reseted": times_reseted}).eq("user_id", extra[0].get("user_id")).execute()
+
+    return jsonify({'status': 'done'})
+
 def createExtra(json):
     container_code = "free-" + str(uuid.uuid4())
     c = str(uuid.uuid4()).split("-")
@@ -107,45 +150,23 @@ def createExtra(json):
     # taken from https://stackoverflow.com/questions/3854692/generate-password-in-python
     alphabet = string.ascii_letters + string.digits
     container_password = ''.join(secrets.choice(alphabet) for i in range(20))
-    data = {
+    data1 = {
         "user_id": json,
         "container_code": container_code,
         "container_login": container_login,
         "container_password": container_password
     }
-    supabase.client.table("user_extra").insert(data).execute()
-    return setupContainer(container_code, container_login, container_password, json)
+    supabase.client.table("user_extra").insert(data1).execute()
+    extra = getExtra(json)
 
-def setupContainer(code, login, password, user_id):
-    response = supabase.client.from_("user_extra").select("id").eq("user_id", user_id).execute()
-    id = 0
-    data = response.data
-    if(len(data) != 1):
-        return "error"
-    else:
-        id = data[0].get("id")
-    p = 8000 + id
-    env_var = {
-        "SIAB_PASSWORD" : password,
-        "SIAB_USER" : login,
-        "SIAB_SUDO" : "false",
-        "SIAB_SSL" : "false", #TODO change this
-        "SIAB_PORT" : p,
-        "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173",
-        "SIAB_PKGS" : "nano"
+    data2 = {
+        "id": extra[0].get("id"),
+        "container_code": container_code,
+        "container_login": container_login,
+        "container_password": container_password
     }
+    createContainer(data2)
 
-    ports = {
-        str(p) + '/tcp': p,
-    }
-    client.containers.create(
-        'garo/shellinabox:latest',
-        detach=True,
-        environment=env_var,
-        ports=ports,
-        name=code
-    )
-    return "done"
 
 def startContainer(extra):
     container = client.containers.get(extra[0].get("container_code"))
@@ -163,7 +184,6 @@ def updateToPremiumContainer(user_id):
     extra = getExtra(user_id)
 
     if extra[0].get("premium"):
-        print("oh hello")
         container = client.containers.get(extra[0].get("container_code"))
 
         if container.status == "running":
@@ -178,7 +198,7 @@ def updateToPremiumContainer(user_id):
         # taken from https://stackoverflow.com/questions/3854692/generate-password-in-python
         alphabet = string.ascii_letters + string.digits
         container_password = ''.join(secrets.choice(alphabet) for i in range(20))
-        data = {
+        data1 = {
             "container_started": "false",
             "container_used": "false",
             "container_code": container_code,
@@ -186,21 +206,22 @@ def updateToPremiumContainer(user_id):
             "container_password": container_password
         }
 
-        supabase.client.table("user_extra").update(data).eq("user_id", user_id).execute()
+        supabase.client.table("user_extra").update(data1).eq("user_id", user_id).execute()
 
-        setupPremiumContainer(container_code, container_login, container_password, user_id)
+        extra = getExtra(user_id)
+        data2 = {
+            "id": extra[0].get("id"),
+            "container_code": container_code,
+            "container_login": container_login,
+            "container_password": container_password
+        }
+        createContainer(data2)
 
-def setupPremiumContainer(code, login, password, user_id):
-    data = getExtra(user_id)
-    id = 0
-    if(len(data) != 1):
-        return "error"
-    else:
-        id = data[0].get("id")
-    p = 8000 + id
+def createContainer(data):
+    p = 8000 + data["id"]
     env_var = {
-        "SIAB_PASSWORD" : password,
-        "SIAB_USER" : login,
+        "SIAB_PASSWORD" : data["container_password"],
+        "SIAB_USER" : data["container_login"],
         "SIAB_SUDO" : "false",
         "SIAB_SSL" : "false", #TODO change this
         "SIAB_PORT" : p,
@@ -216,10 +237,11 @@ def setupPremiumContainer(code, login, password, user_id):
         detach=True,
         environment=env_var,
         ports=ports,
-        name=code
+        name=data["container_code"]
     )
-    container.start()
 
+    if data["container_code"].startswith("premium-"):
+        container.start()
 
 def getExtra(id):
     response = supabase.client.from_("user_extra").select("*").eq("user_id", id).execute()

@@ -78,6 +78,10 @@ function executeCommand() {
         case "Attach":
             attach()
             break
+        case "reset machine":
+        case "Reset machine":
+            resetContainer()
+            break
 
         // Navbar Bottom
         case "Github":
@@ -241,6 +245,32 @@ async function attach() {
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
                                 'You already used the runtime of your container today\n \n' +
                                 'You will have your runtime back tomorrow \n \n'
+        cmdinput.value = ''
+    }
+}
+
+async function resetContainer() {
+    const { data: { user } } = await supabase.auth.getUser()
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/reset-container", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user.id),
+    });
+
+    const responseData = await response.json();
+
+    if (responseData.status === "done") {
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
+                                'Your container has been reseted\n \n' +
+                                'It is ready for further operations \n \n'
+        cmdinput.value = ''
+    } else {
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
+                                'You have already reached your limit on resets of your containers for today \n \n' +
+                                'Come back tomorrow if you need more resets \n \n'
         cmdinput.value = ''
     }
 }
