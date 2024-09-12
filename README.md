@@ -12,7 +12,7 @@ clone this repository:
 git clone https://github.com/jansevounek/Password.git
 ```
 
-Add to the .env files all the informations - good luck (you need to create accounts by some companies - these include stripe, supabase, ...)
+Add to the .env files all the informations - good luck (you need to create accounts by some companies - these include stripe, supabase, ...) 
 
 ```sh
 VITE_SUPABASE_URL=
