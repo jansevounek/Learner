@@ -15,7 +15,6 @@ _________              .___
     <div class="main-container">
         <PracticeContainer />
     </div>
-        <!--<iframe :src="url" width="100%" height="100%" frameborder="0" ></iframe>-->
 </template>
 
 <script setup>

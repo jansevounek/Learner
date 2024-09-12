@@ -17,7 +17,6 @@ const route = useRoute()
 const router = useRouter()
 
 let currentIndex = ref(1)
-let fullsreen = ref(false)
 
 onMounted(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -36,6 +35,8 @@ function handleKeyDown(event) {
         updateSelection(currentIndex.value);
     } else if (event.key === 'Enter') {
         executeSelected()
+    } else if (event.ctrlKey && event.key === 'c') {
+        router.push('/learning/homepage')
     }
 }
 
