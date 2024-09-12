@@ -98,7 +98,7 @@ function executeCommand() {
             window.location.replace("https://www.youtube.com/watch?v=xvFZjo5PgG0");
             break
         case "Get Premium":
-            router.push('/getpremium')
+            router.push('/payment/getpremium')
             break
 
         // other possibilities

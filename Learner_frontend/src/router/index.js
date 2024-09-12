@@ -10,7 +10,9 @@ import LectionsPage from '../views/LectionsPage.vue'
 import LectionPage from '../views/LectionPage.vue'
 import PracticeContainerPage from '../views/PracticeContainerPage.vue'
 import FullScreenContainerPage from '../views/FullScreenContainerPage.vue'
-import PaymentPage from '../views/PaymentPage.vue'
+import PaymentPage from '../views/payments/PaymentPage.vue'
+import PaymentCanceledPage from '../views/payments/PaymentCanceledPage.vue'
+import PaymentSuccessfullPage from '../views/payments/PaymentSuccessfullPage.vue'
 
 let localUser;
 
@@ -45,9 +47,21 @@ const router = createRouter({
       component: UpdateUserPage,
     },
     {
-      path: '/getpremium',
+      path: '/payment/getpremium',
       name: 'getpremium',
       component: PaymentPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/payment/failiure',
+      name: 'payment-failiure',
+      component: PaymentCanceledPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/payment/success',
+      name: 'payment-success',
+      component: PaymentSuccessfullPage,
       meta: { requiresAuth: true },
     },
     {

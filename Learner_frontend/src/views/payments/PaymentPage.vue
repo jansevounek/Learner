@@ -14,7 +14,6 @@ ______  ______ ______   _____  ______   _____
                           |___|/               
         </pre>
         <pre class="ascii-container text-[10px]" id="ascii-art2">
-
  ____  ____     ___  ___ ___  ____  __ __  ___ ___ 
 |    \|    \   /  _]|   |   ||    ||  |  ||   |   |
 |  o  )  D  ) /  [_ | _   _ | |  | |  |  || _   _ |
@@ -23,7 +22,6 @@ ______  ______ ______   _____  ______   _____
 |  |  |  .  \|     ||   |   | |  | |     ||   |   |
 |__|  |__|\_||_____||___|___||____| \__,_||___|___|
                                                    
-
         </pre>
         <p class="title-warning-text">Here you can pay for the premium version of our application</p>
         <p class="title-ps-text">It includes ...</p>
@@ -36,7 +34,7 @@ ______  ______ ______   _____  ______   _____
 
 <script setup>
 import { onMounted } from 'vue'
-import PaymentCommandLine from '../components/commandline/PaymentCommandLine.vue'
+import PaymentCommandLine from '../../components/commandline/PaymentCommandLine.vue'
 
 // generates the random color for the title
 onMounted(() => {
