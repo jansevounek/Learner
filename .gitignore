@@ -33,4 +33,6 @@ coverage
 venv/
 .vscode/
 
+commands.txt
+
 TODO
