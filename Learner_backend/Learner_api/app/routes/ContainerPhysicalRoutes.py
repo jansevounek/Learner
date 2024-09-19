@@ -10,18 +10,19 @@ def create_container():
         json = request.json
     else:
         return jsonify({'status': 'Content-Type not supported!'})
-    user_id = json
 
-    print(len(getUserContainers(user_id)))
+    print(len(getUserExtra(json["user_id"])))
     
     return jsonify({"done":"done"})
 
 # gets users extra information
 def getUserExtra(id):
-    response = supabase.client.from_("user_extra").select("*").eq("user_id", id).execute()
+    #response = supabase.client.table("user_extra").select("*").eq("user_id", id).execute()
+    response = supabase.client.table("user_extra").select("*").execute()
     return response.data
 
 # gets all of users containers
 def getUserContainers(id):
-    response = supabase.client.from_("user_container").select("*").eq("user_id", id).execute()
+    #response = supabase.client.table("user_container").select("*").eq("user_id", id).execute()
+    response = supabase.client.table("user_extra").select("*").execute()
     return response.data

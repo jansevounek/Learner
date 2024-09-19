@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from ..services.stripe_service import stripe
-from app import supabase
 import os
+from app import supabase
 
 bp = Blueprint('payments', __name__, url_prefix='/payments')
 

@@ -141,14 +141,18 @@ function startContainer() {
 async function createContainer(input) {
     let name = input.replace("container create ", "")
     if (name) {
-        const user = getUser()
+        const user = await getUser()
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/physical/create-container", {
           method: 'POST',
           headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify("hello"),
+          body: JSON.stringify({
+                user_id: user.id,
+                container_name: name
+            })
         });
 
         const data = await response.json()
