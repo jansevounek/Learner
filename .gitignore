@@ -32,6 +32,7 @@ coverage
 .env
 venv/
 .vscode/
+__pycache__/
 
 commands.txt
 

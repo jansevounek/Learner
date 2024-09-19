@@ -43,8 +43,8 @@ def start_container():
     response = startContainer(extra)
     return jsonify({'status': response})
 
-@app.route('/create-container', methods=['POST'])
-def create_container():
+@app.route('/create-container1', methods=['POST'])
+def create_container1():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         json = request.json

@@ -60,11 +60,6 @@ function executeCommand() {
             router.push('/')
             break
 
-        case "lections":
-        case "Lections":
-            router.push('/learning/lections')
-            break
-
         // practice stuff
         case "practice":
         case "Practice":
@@ -129,7 +124,6 @@ function clearLines() {
 function getHelp() {
     executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
                                 'To use the learning part of this application use commands: \n' + '\n' +
-                                ' "Lections" - this command lets you choose between many lections we provide \n' +
                                 ' "Practice" - this command lets you start your practice container (use this command visely as you only have a limited time daily to use it) \n \n' +
                                 'You can additionally use all the other commands from the homapage \n \n'
     cmdinput.value = ""

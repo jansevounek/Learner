@@ -25,7 +25,7 @@
                 <h1>6</h1>
                 <h1>Logout</h1>
             </div>
-            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/lections' && !isWithoutCmd">
+            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/manage' && !isWithoutCmd">
                 <h1>7</h1>
                 <h1>Lets Learn</h1>
             </div>
@@ -58,10 +58,8 @@ const currentRoute = computed(() => {
 const isWithoutCmd = computed(() => {
     const regex1 = /^\/container\/\d+$/;
     const regex2 = /^\/learning\/container\/\d+$/;
-    const regex3 = /^\/learning\/lection\/\d+$/;
     if (regex1.test(currentRoute.value) 
         || currentRoute.value === '/learning/lections'
-        || regex3.test(currentRoute.value)
         || regex2.test(currentRoute.value)){
         return true
     }

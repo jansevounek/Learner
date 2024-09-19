@@ -11,6 +11,7 @@ import FullScreenContainerPage from '../views/FullScreenContainerPage.vue'
 import PaymentPage from '../views/payments/PaymentPage.vue'
 import PaymentCanceledPage from '../views/payments/PaymentCanceledPage.vue'
 import PaymentSuccessfullPage from '../views/payments/PaymentSuccessfullPage.vue'
+import ManageContainersPage from '../views/ManageContainersPage.vue'
 
 let localUser;
 
@@ -66,6 +67,12 @@ const router = createRouter({
       path: '/learning/homepage',
       name: 'learninghome',
       component: LearningHomePage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/learning/manage',
+      name: 'manage',
+      component: ManageContainersPage,
       meta: { requiresAuth: true },
     },
     {

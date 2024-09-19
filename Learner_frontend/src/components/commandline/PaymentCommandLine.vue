@@ -118,7 +118,7 @@ async function logout(){
 async function createCheckout() {
     const { data: { user } } = await supabase.auth.getUser()
     const apiurl = import.meta.env.VITE_API_URL
-    const response = await fetch(apiurl + "/create-stripe-session", {
+    const response = await fetch(apiurl + "/payments/create-stripe-session", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
