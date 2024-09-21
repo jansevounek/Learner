@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from ..services.stripe_service import stripe
 import os
-from app import supabase
+from ..services.supabase_service import supabase
 
 bp = Blueprint('payments', __name__, url_prefix='/payments')
 
@@ -47,6 +47,7 @@ def payment_successful():
 
         user_id = session['metadata']['userId']
 
-        supabase.client.table("user_extra").update({"premium": "true"}).eq("user_id", user_id).execute()
+        #TODO try statment
+        supabase.table("user_extra").update({"premium": "true"}).eq("user_id", user_id).execute()
 
     return jsonify({'status': 'done'})
