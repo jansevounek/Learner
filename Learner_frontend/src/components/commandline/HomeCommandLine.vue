@@ -59,7 +59,7 @@ function executeCommand() {
         // Navbar top
         case "Lets Learn":
         case "go 7":
-            router.push('/learning/homepage')
+            router.push('/learning/manage')
             break
         case "Logout":
         case "go 6":

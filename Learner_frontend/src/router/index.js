@@ -3,7 +3,6 @@ import { supabase } from '../supabase/init.js'
 import HomePage from '../views/HomePage.vue'
 import LoginPage from '../views/auth/LoginPage.vue'
 import SignupPage from '../views/auth/SignupPage.vue'
-import LearningHomePage from '../views/LearningHomePage.vue'
 import ResetPasswordPage from '../views/auth/ResetPasswordPage.vue'
 import UpdateUserPage from '../views/auth/UpdateUserPage.vue'
 import PracticeContainerPage from '../views/PracticeContainerPage.vue'
@@ -61,12 +60,6 @@ const router = createRouter({
       path: '/payment/success',
       name: 'payment-success',
       component: PaymentSuccessfullPage,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/learning/homepage',
-      name: 'learninghome',
-      component: LearningHomePage,
       meta: { requiresAuth: true },
     },
     {
