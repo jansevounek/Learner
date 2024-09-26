@@ -37,3 +37,10 @@ __pycache__/
 commands.txt
 
 TODO
+
+supabase/
+
+# Mine development commands
+backend.sh
+frontend.sh
+supabase_down.sh

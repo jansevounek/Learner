@@ -10,15 +10,19 @@ def create_container():
         json = request.json
     else:
         return jsonify({'status': 'Content-Type not supported!'})
+    
+    extra = getUserExtra(json["user_id"])[0]
+    containers = getUserContainers(extra.get("id"))
 
-    print(getUserExtra(json["user_id"]))
+    if extra.get("containers_allowed") >= len(containers):
+        print("do please")
     
     return jsonify({"done":"done"})
 
 # gets users extra information
 def getUserExtra(id):
     try:
-        response = supabase.table("user_extra").select("*").execute()
+        response = supabase.table("user").select("*").eq("user_id", id).execute()
         return response.data
     except Exception as e:
         print(f"Error during Supabase query: {e}")
@@ -26,6 +30,9 @@ def getUserExtra(id):
 
 # gets all of users containers
 def getUserContainers(id):
-    #response = supabase.client.table("user_container").select("*").eq("user_id", id).execute()
-    #response = supabase.table("user_extra").select("*").execute()
-    return "gg"
+    try:
+        response = supabase.table("container").select("*").eq("id", id).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error during Supabase query: {e}")
+        return "Error occured", 500

@@ -48,6 +48,6 @@ def payment_successful():
         user_id = session['metadata']['userId']
 
         #TODO try statment
-        supabase.table("user_extra").update({"premium": "true"}).eq("user_id", user_id).execute()
+        supabase.table("user").update({"premium": "true"}).eq("user_id", user_id).execute()
 
     return jsonify({'status': 'done'})

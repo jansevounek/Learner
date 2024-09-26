@@ -38,7 +38,7 @@ async function getUser() {
 
 async function getPremiumStatus(user) {
     const { data, error } = await supabase
-        .from('user_extra')
+        .from('user')
         .select('premium')
         .eq('user_id', user.id);
     if (data) {
