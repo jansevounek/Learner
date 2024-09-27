@@ -44,3 +44,4 @@ supabase/
 backend.sh
 frontend.sh
 supabase_down.sh
+supabase_up.sh

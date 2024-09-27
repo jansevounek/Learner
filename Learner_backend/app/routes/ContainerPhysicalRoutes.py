@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, request
 from ..services.supabase_service import supabase
+import uuid
+import string
+import secrets
 
 bp = Blueprint('physical', __name__, url_prefix='/physical')
 
@@ -11,22 +14,88 @@ def create_container():
     else:
         return jsonify({'status': 'Content-Type not supported!'})
     
-    extra = getUserExtra(json["user_id"])[0]
+    e = getUserExtra(user_id=json["user_id"])
+    extra = e[0]
     containers = getUserContainers(extra.get("id"))
 
     if extra.get("containers_allowed") >= len(containers):
-        print("do please")
-    
+        if(createNonSudoContainer(json["container_name"], id=1)):
+            print("success")
+
     return jsonify({"done":"done"})
 
-# gets users extra information
-def getUserExtra(id):
+# creates the non sudo container
+# parameter name mandatory
+# parameter id or extra mandatory
+def createNonSudoContainer(name, **kwargs):
+    id = kwargs.get("id")
+    extra = kwargs.get("extra")
+    # https://stackoverflow.com/questions/9390126/pythonic-way-to-check-if-something-exists
+    if not extra and id:
+        e = getUserExtra(extra_id=id)
+        extra = e[0]
+    elif not id and not extra:
+        # taken from https://stackoverflow.com/questions/2052390/manually-raising-throwing-an-exception-in-python
+        raise ValueError('id or user extra not provided - failed to create container.')
+    
+    if(nameExists(name)):
+        return False
+
+    c = str(uuid.uuid4()).split("-")
+    login = "guest" + c[0]
+    # taken from https://stackoverflow.com/questions/3854692/generate-password-in-python
+    alphabet = string.ascii_letters + string.digits
+    passw = ''.join(secrets.choice(alphabet) for i in range(20))
+
+    data = {
+        "extra_id": extra.get("id"),
+        "name": name,
+        "login": login,
+        "pass": passw
+    }
     try:
-        response = supabase.table("user").select("*").eq("user_id", id).execute()
-        return response.data
+        supabase.table("container").insert(data).execute()
     except Exception as e:
-        print(f"Error during Supabase query: {e}")
+        print(f"Error during Supabase insert (creating a user container): {e}")
         return "Error occured", 500
+
+def nameExists(name):
+    data = []
+    try:
+        response = supabase.table("container").select("*").execute()
+        data = response.data
+        print(len(data))
+    except Exception as e:
+        print(f"Error during Supabase query (during getting user containers in veryfing name originality): {e}")
+        return "Error occured", 500
+    
+    if len(data) > 0:
+        return True
+    else:
+        return False
+    
+
+# gets users extra information
+# one of extra_id or user_id is mandatory
+def getUserExtra(**kwargs):
+    extra_id = kwargs.get("extra_id")
+    user_id = kwargs.get("user_id")
+    if user_id:
+        try:
+            response = supabase.table("user").select("*").eq("user_id", user_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting user extra): {e}")
+            return "Error occured", 500
+    elif extra_id:
+        try:
+            response = supabase.table("user").select("*").eq("id", extra_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting user extra): {e}")
+            return "Error occured", 500
+    else:
+        raise ValueError("user_id or extra info id not provided - failed to fetch user extra")
 
 # gets all of users containers
 def getUserContainers(id):
@@ -34,5 +103,5 @@ def getUserContainers(id):
         response = supabase.table("container").select("*").eq("id", id).execute()
         return response.data
     except Exception as e:
-        print(f"Error during Supabase query: {e}")
+        print(f"Error during Supabase query (during getting users containers): {e}")
         return "Error occured", 500

@@ -48,6 +48,10 @@ def payment_successful():
         user_id = session['metadata']['userId']
 
         #TODO try statment
-        supabase.table("user").update({"premium": "true"}).eq("user_id", user_id).execute()
+        try:
+            supabase.table("user").update({"premium": "true"}).eq("user_id", user_id).execute()
+        except Exception as e:
+            print(f"Error during Supabase input (premium update): {e}")
+            return "Error occured", 500
 
     return jsonify({'status': 'done'})
