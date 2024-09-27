@@ -19,15 +19,21 @@ def create_container():
     containers = getUserContainers(extra.get("id"))
 
     if extra.get("containers_allowed") >= len(containers):
-        if(createNonSudoContainer(json["container_name"], id=1)):
-            print("success")
+        data = prepareContainerData(json["container_name"], id=1)
+        if(data):
+            createContainer(data)
+        else:
+            return jsonify({
+                    "status": False,
+                    "msg": "Failed to create container due to matching names"
+                })
 
-    return jsonify({"done":"done"})
+    return jsonify({"status":"done"})
 
 # creates the non sudo container
 # parameter name mandatory
 # parameter id or extra mandatory
-def createNonSudoContainer(name, **kwargs):
+def prepareContainerData(name, **kwargs):
     id = kwargs.get("id")
     extra = kwargs.get("extra")
     # https://stackoverflow.com/questions/9390126/pythonic-way-to-check-if-something-exists
@@ -51,20 +57,24 @@ def createNonSudoContainer(name, **kwargs):
         "extra_id": extra.get("id"),
         "name": name,
         "login": login,
-        "pass": passw
+        "pass": passw,
+        "sudo" : False
     }
+
     try:
         supabase.table("container").insert(data).execute()
     except Exception as e:
         print(f"Error during Supabase insert (creating a user container): {e}")
         return "Error occured", 500
+    
+    return data
 
+# checks if user is inserting a originall name not contained in the database
 def nameExists(name):
     data = []
     try:
-        response = supabase.table("container").select("*").execute()
+        response = supabase.table("container").select("*").eq("name", name).execute()
         data = response.data
-        print(len(data))
     except Exception as e:
         print(f"Error during Supabase query (during getting user containers in veryfing name originality): {e}")
         return "Error occured", 500
@@ -73,6 +83,10 @@ def nameExists(name):
         return True
     else:
         return False
+
+#TODO to be continued
+def createContainer(data):
+    pass
     
 
 # gets users extra information
