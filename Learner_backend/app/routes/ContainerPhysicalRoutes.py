@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ..services.supabase_service import supabase
+from ..services.docker_service import docker
 import uuid
 import string
 import secrets
@@ -16,16 +17,24 @@ def create_container():
     
     e = getUserExtra(user_id=json["user_id"])
     extra = e[0]
-    containers = getUserContainers(extra.get("id"))
+    containers = getUserContainers(extra_id=extra.get("id"))
 
-    if extra.get("containers_allowed") >= len(containers):
-        data = prepareContainerData(json["container_name"], id=1)
+    print(len(containers))
+    print(extra.get("containers_allowed"))
+
+    if extra.get("containers_allowed") > len(containers):
+        data = prepareContainerData(json["container_name"], id=extra.get("id"))
         if(data):
             createContainer(data)
         else:
             return jsonify({
                     "status": False,
-                    "msg": "Failed to create container due to matching names"
+                   "msg": "Failed to create container due to matching names"
+                })
+    else:
+        return jsonify({
+                    "status": False,
+                    "msg": "User has max containers"
                 })
 
     return jsonify({"status":"done"})
@@ -86,7 +95,29 @@ def nameExists(name):
 
 #TODO to be continued
 def createContainer(data):
-    pass
+    p = 10000 + int(data["extra_id"])
+    env_var = {
+        "SIAB_PASSWORD" : data["pass"],
+        "SIAB_USER" : data["login"],
+        "SIAB_SUDO" : data["sudo"],
+        "SIAB_SSL" : "false", #TODO change this
+        "SIAB_PORT" : p,
+        "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173",
+        "SIAB_PKGS" : "nano"
+    }
+
+    ports = {
+        str(p) + '/tcp': p,
+    }
+    container = docker.containers.create(
+        'garo/shellinabox:latest',
+        detach=True,
+        environment=env_var,
+        ports=ports,
+        name=data["name"]
+    )
+
+    container.start()
     
 
 # gets users extra information
@@ -112,10 +143,32 @@ def getUserExtra(**kwargs):
         raise ValueError("user_id or extra info id not provided - failed to fetch user extra")
 
 # gets all of users containers
-def getUserContainers(id):
-    try:
-        response = supabase.table("container").select("*").eq("id", id).execute()
-        return response.data
-    except Exception as e:
-        print(f"Error during Supabase query (during getting users containers): {e}")
-        return "Error occured", 500
+def getUserContainers(**kwargs):
+    extra_id = kwargs.get("extra_id")
+    user_id = kwargs.get("user_id")
+    id = kwargs.get("id")
+    if id:
+        try:
+            response = supabase.table("container").select("*").eq("id", id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting users containers): {e}")
+            return "Error occured", 500
+    elif user_id:
+        try:
+            r = supabase.table("user").select("*").eq("user_id", user_id).execute()
+            i = r.data[0].get("id")
+            response = supabase.table("container").select("*").eq("extra_id", i).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting users containers): {e}")
+            return "Error occured", 500
+    elif extra_id:
+        try:
+            response = supabase.table("container").select("*").eq("extra_id", extra_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting users containers): {e}")
+            return "Error occured", 500
+    else:
+        raise ValueError("user_id, extra_id, or id not provided - failed to fetch users containers")
