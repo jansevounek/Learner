@@ -130,8 +130,36 @@ function printContainerHelp(){
     cmdinput.value = ""
 }
 
-function printContainers() {
-    console.log("TODO")
+async function printContainers() {
+    const user = await getUser()
+    // taken from https://www.w3schools.com/js/js_errors.asp
+    let containers = []
+    try {
+        const { data1, error1 } = await supabase
+            .from('user')
+            .select('id')
+            .eq('user_id', user.id);
+        if (error1) {
+            throw error1
+        }
+        console.log(data1)
+        if (data1) {
+            console.log("hello")
+            const { data2, error2 } = await supabase
+                .from('container')
+                .select('*')
+                .eq('user_id', data1.id);
+            if (error2) {
+                throw error2
+            }
+            if (data2) {
+                console.log(data2)
+            }
+        }
+    } catch (err) {
+        throw "Failed to fetch users containers - error:" + err
+    }
+    
 }
 
 function startContainer() {
@@ -156,6 +184,7 @@ async function createContainer(input) {
         });
 
         const data = await response.json()
+        //TODO print errors
         console.log(data)
     }
 }

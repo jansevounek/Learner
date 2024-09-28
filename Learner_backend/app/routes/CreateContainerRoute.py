@@ -46,7 +46,10 @@ def create_container():
                     "msg": "User has max containers"
                 })
 
-    return jsonify({"status":"done"})
+    return jsonify({
+        "status": True,
+        "msg": ""
+        })
 
 # creates the non sudo container
 # parameter name mandatory
