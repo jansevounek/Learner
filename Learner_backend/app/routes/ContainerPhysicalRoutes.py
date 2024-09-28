@@ -19,11 +19,20 @@ def create_container():
     extra = e[0]
     containers = getUserContainers(extra_id=extra.get("id"))
 
-    print(len(containers))
-    print(extra.get("containers_allowed"))
+    name = str(json["container_name"])
+    sudo = False
+
+    if not extra.get("premium") and name.endswith(" -s"):
+        return jsonify({
+                    "status": False,
+                    "msg": "User has requested a new sudo container when he has not got premium"
+                })
+    elif extra.get("premium") and name.endswith(" -s"):
+        name = name.split(" ")[0].strip()
+        sudo = True
 
     if extra.get("containers_allowed") > len(containers):
-        data = prepareContainerData(json["container_name"], id=extra.get("id"))
+        data = prepareContainerData(name, id=extra.get("id"), sudo=sudo)
         if(data):
             createContainer(data)
         else:
@@ -43,6 +52,7 @@ def create_container():
 # parameter name mandatory
 # parameter id or extra mandatory
 def prepareContainerData(name, **kwargs):
+    # solves user extra
     id = kwargs.get("id")
     extra = kwargs.get("extra")
     # https://stackoverflow.com/questions/9390126/pythonic-way-to-check-if-something-exists
@@ -52,6 +62,12 @@ def prepareContainerData(name, **kwargs):
     elif not id and not extra:
         # taken from https://stackoverflow.com/questions/2052390/manually-raising-throwing-an-exception-in-python
         raise ValueError('id or user extra not provided - failed to create container.')
+    
+    # solves sudo
+    sudo = False
+    s = kwargs.get("sudo")
+    if s:
+        sudo = s
     
     if(nameExists(name)):
         return False
@@ -67,7 +83,7 @@ def prepareContainerData(name, **kwargs):
         "name": name,
         "login": login,
         "pass": passw,
-        "sudo" : False
+        "sudo" : sudo
     }
 
     try:
@@ -95,7 +111,15 @@ def nameExists(name):
 
 #TODO to be continued
 def createContainer(data):
-    p = 10000 + int(data["extra_id"])
+    # get container for id
+    try:
+        response = supabase.table("container").select("id").eq("name", data["name"]).execute()
+        d = response.data
+    except Exception as e:
+        print(f"Error during Supabase query (during getting user containers in veryfing name originality): {e}")
+        return "Error occured", 500
+    
+    p = 10000 + d[0].get("id")
     env_var = {
         "SIAB_PASSWORD" : data["pass"],
         "SIAB_USER" : data["login"],
@@ -109,16 +133,13 @@ def createContainer(data):
     ports = {
         str(p) + '/tcp': p,
     }
-    container = docker.containers.create(
+    docker.containers.create(
         'garo/shellinabox:latest',
         detach=True,
         environment=env_var,
         ports=ports,
         name=data["name"]
     )
-
-    container.start()
-    
 
 # gets users extra information
 # one of extra_id or user_id is mandatory
