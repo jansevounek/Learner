@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_supabase import Supabase
 import os
-from .routes import ContainerPhysicalRoutes, ContainerUserRoutes, PaymentRoutes
+from .routes import ContainerUserRoutes, CretateContainerRoute, PaymentRoutes
 
 supabase = Supabase()
 
@@ -11,7 +11,7 @@ def create_app():
     CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Routes that delete or make containers
-    app.register_blueprint(ContainerPhysicalRoutes.bp)
+    app.register_blueprint(CretateContainerRoute.bp)
 
     # Other Container routes
     app.register_blueprint(ContainerUserRoutes.bp)

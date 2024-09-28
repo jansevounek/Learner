@@ -5,9 +5,9 @@ import uuid
 import string
 import secrets
 
-bp = Blueprint('physical', __name__, url_prefix='/physical')
+bp = Blueprint('create', __name__, url_prefix='/create')
 
-@bp.route('/create-container', methods=['POST'])
+@bp.route('/container', methods=['POST'])
 def create_container():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):

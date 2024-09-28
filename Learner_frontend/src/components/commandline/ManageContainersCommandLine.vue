@@ -143,7 +143,7 @@ async function createContainer(input) {
     if (name) {
         const user = await getUser()
         const apiurl = import.meta.env.VITE_API_URL
-        const response = await fetch(apiurl + "/physical/create-container", {
+        const response = await fetch(apiurl + "/create/container", {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
