@@ -92,21 +92,20 @@ function executeCommand() {
 function containerCommands() {
     // taken from https://stackoverflow.com/questions/63002735/can-you-use-functions-within-a-switch-case-in-javascript
     const command = cmdinput.value
+    //TODO remove these
     switch (true) {
         case command == "container":
             printContainerHelp()
             return true
-
-        case command == "container credentials":
-            printCredentials()
-            return true
         
-        case command == "container ps":
-            printContainers()
+        // done
+        case command.startsWith("container ps"):
+            printContainers(command)
             return true
 
+        // done
         case command.startsWith("container create "):
-            createContainer(cmdinput.value)
+            createContainer(command)
             return true
         
         case command.startsWith("container start "):
@@ -130,36 +129,42 @@ function printContainerHelp(){
     cmdinput.value = ""
 }
 
-async function printContainers() {
-    const user = await getUser()
+async function printContainers(c) {
     // taken from https://www.w3schools.com/js/js_errors.asp
-    let containers = []
-    try {
-        const { data1, error1 } = await supabase
-            .from('user')
-            .select('id')
-            .eq('user_id', user.id);
-        if (error1) {
-            throw error1
+
+    let command = c.replace("container ps", "")
+    let showPassword = false
+    if (command) {
+        if (command === " -p") {
+            showPassword = true
+        } else {
+            commandError()
+            return 0
         }
-        console.log(data1)
-        if (data1) {
-            console.log("hello")
-            const { data2, error2 } = await supabase
-                .from('container')
-                .select('*')
-                .eq('user_id', data1.id);
-            if (error2) {
-                throw error2
-            }
-            if (data2) {
-                console.log(data2)
-            }
-        }
-    } catch (err) {
-        throw "Failed to fetch users containers - error:" + err
     }
-    
+
+    let containers = await fetchUsersContainers()
+
+    let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
+
+    for (let i = 0; i < containers.length; i++){
+        output += i + 1 + ".\n name: " + containers[i].name + "\n"
+            + "login: " + containers[i].login + "\n"
+        // taken from https://stackoverflow.com/questions/1789945/how-to-check-whether-a-string-contains-a-substring-in-javascript/
+        if (showPassword) {
+            output += "password: " + containers[i].pass + "\n"
+        }
+        if (containers[i].sudo) {
+            output += "sudo: True \n"
+        } else {
+            output += "sudo: False \n"
+        }
+        output += "\n"
+    }
+
+    executedCommands.value += output
+
+    cmdinput.value = ""
 }
 
 function startContainer() {
@@ -185,8 +190,14 @@ async function createContainer(input) {
 
         const data = await response.json()
         //TODO print errors
-        console.log(data)
+        printCreateContainerOutputs(data)
     }
+}
+
+function printCreateContainerOutputs(data){
+    executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
+                        data.msg + "\n"
+    cmdinput.value = ""
 }
 
 function stopContainer() {
@@ -230,21 +241,6 @@ function commandError() {
     }
 }
 
-async function printCredentials() {
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data, error } = await supabase
-        .from('user_extra')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-    
-    executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
-                        "Login: " + data.container_login + "\n" +
-                        "Password: " + data.container_password + "\n" +
-                        "Do not show this info to anyone" + "\n \n"
-    cmdinput.value = ''
-}
-
 // handels the "ctrl + c" shortcut
 function handleKeyDown(event) {
     if (event.ctrlKey && event.key === 'l') {
@@ -268,6 +264,34 @@ function handleKeyDown(event) {
 async function getUser() {
     const { data: { user } } = await supabase.auth.getUser()
     return user
+}
+
+async function fetchUsersContainers() {
+    const user = await getUser()
+
+    let extra_id = 0
+
+    const { data, error } = await supabase
+        .from('user')
+        .select('id')
+        .eq('user_id', user.id);
+    if (error) {
+        throw error
+    }
+    extra_id = data[0].id
+
+    if (extra_id) {
+        const { data, error } = await supabase
+            .from('container')
+            .select('*')
+            .eq('extra_id', extra_id);
+        if (error) {
+            throw error
+        }
+        return data
+    } else {
+        throw "Failed to fetch users extra - no extra_id"
+    }
 }
 
 function changeCommand() {

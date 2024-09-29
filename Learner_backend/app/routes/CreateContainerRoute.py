@@ -25,7 +25,7 @@ def create_container():
     if not extra.get("premium") and name.endswith(" -s"):
         return jsonify({
                     "status": False,
-                    "msg": "User has requested a new sudo container when he has not got premium"
+                    "msg": "Failed to create sudo container when user has no sudo rights"
                 })
     elif extra.get("premium") and name.endswith(" -s"):
         name = name.split(" ")[0].strip()
@@ -38,17 +38,17 @@ def create_container():
         else:
             return jsonify({
                     "status": False,
-                   "msg": "Failed to create container due to matching names"
+                   "msg": "Failed to create container due to it matching a name of a different container"
                 })
     else:
         return jsonify({
                     "status": False,
-                    "msg": "User has max containers"
+                    "msg": "Failed to create container due to the maximum number of containers per user being reached"
                 })
 
     return jsonify({
         "status": True,
-        "msg": ""
+        "msg": 'Container created successfully - view it using command "container ps" '
         })
 
 # creates the non sudo container
