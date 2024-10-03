@@ -107,6 +107,11 @@ function containerCommands() {
         case command.startsWith("container create "):
             createContainer(command)
             return true
+
+        // done
+        case command.startsWith("container delete "):
+            deleteContainer(command)
+            return true
         
         case command.startsWith("container start "):
             startContainer()
@@ -167,10 +172,6 @@ async function printContainers(c) {
     cmdinput.value = ""
 }
 
-function startContainer() {
-    console.log("Start")
-}
-
 async function createContainer(input) {
     let name = input.replace("container create ", "")
     if (name) {
@@ -189,15 +190,34 @@ async function createContainer(input) {
         });
 
         const data = await response.json()
-        //TODO print errors
-        printCreateContainerOutputs(data)
+        printContainerOutputs(data)
     }
 }
 
-function printCreateContainerOutputs(data){
-    executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
-                        data.msg + "\n"
-    cmdinput.value = ""
+async function deleteContainer(input) {
+    let name = input.replace("container delete ", "")
+    if (name) {
+        const user = await getUser()
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/delete/container", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                container_name: name
+            })
+        });
+
+        const data = await response.json()
+        printContainerOutputs(data)
+    }
+}
+
+function startContainer() {
+    console.log("Start")
 }
 
 function stopContainer() {
@@ -206,6 +226,12 @@ function stopContainer() {
 
 function attachContainer() {
     console.log("attach")
+}
+
+function printContainerOutputs(data){
+    executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
+                        data.msg + "\n"
+    // TODO uncomment cmdinput.value = ""
 }
 
 async function logout(){

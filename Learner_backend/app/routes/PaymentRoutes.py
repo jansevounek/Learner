@@ -47,7 +47,6 @@ def payment_successful():
 
         user_id = session['metadata']['userId']
 
-        #TODO try statment
         try:
             supabase.table("user").update({"premium": "true"}).eq("user_id", user_id).execute()
         except Exception as e:
