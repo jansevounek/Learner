@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ...services.supabase_service import supabase, getUserExtra, getUserContainers
+from ...services.supabase_service import supabase, getUserExtra, getUserContainers, getUserLimitations
 from ...services.docker_service import docker
 import uuid
 import string
@@ -18,6 +18,7 @@ def create_container():
     e = getUserExtra(user_id=json["user_id"])
     extra = e[0]
     containers = getUserContainers(extra_id=extra.get("id"))
+    limitations = getUserLimitations(extra_id=extra.get("id"))[0]
 
     name = str(json["container_name"])
     sudo = False
@@ -31,7 +32,13 @@ def create_container():
         name = name.split(" ")[0].strip()
         sudo = True
 
-    if extra.get("containers_allowed") > len(containers):
+    if limitations.get("creations_limit") <= limitations.get("created"):
+        return jsonify({
+                    "status": False,
+                    "msg": "Failed to create container due to the limit to creating containers daily has been reached"
+                })
+
+    if limitations.get("container_limit") > len(containers):
         data = prepareContainerData(name, id=extra.get("id"), sudo=sudo)
         if(data):
             createContainer(data)
@@ -45,6 +52,8 @@ def create_container():
                     "status": False,
                     "msg": "Failed to create container due to the maximum number of containers per user being reached"
                 })
+    
+    increaseCreatedCount(limitations)
 
     return jsonify({
         "status": True,
@@ -143,3 +152,14 @@ def createContainer(data):
         ports=ports,
         name=data["name"]
     )
+
+# adds one to the times user has created a container today
+def increaseCreatedCount(limitations):
+
+    i = limitations.get("created") + 1
+
+    try:
+        supabase.table("limitations").update({"created": i}).eq("id", limitations.get("id")).execute()
+    except Exception as e:
+        print(f"Error during Supabase update (during increasing the number of creations): {e}")
+        return "Error occured", 500

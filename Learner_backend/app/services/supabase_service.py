@@ -66,4 +66,36 @@ def getUserContainers(**kwargs):
     else:
         raise ValueError("user_id, extra_id, name or id not provided - failed to fetch users containers")
 
-__all__ = ['supabase', 'getUserExtra', 'getUserContainers']
+# gets user limitations
+def getUserLimitations(**kwargs):
+    extra_id = kwargs.get("extra_id")
+    user_id = kwargs.get("user_id")
+    id = kwargs.get("id")
+
+    if id:
+        try:
+            response = supabase.table("limitations").select("*").eq("id", id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting users limitations): {e}")
+            return "Error occured", 500
+    elif user_id:
+        try:
+            r = supabase.table("user").select("*").eq("user_id", user_id).execute()
+            i = r.data[0].get("id")
+            response = supabase.table("limitations").select("*").eq("extra_id", i).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting users limitations): {e}")
+            return "Error occured", 500
+    elif extra_id:
+        try:
+            response = supabase.table("limitations").select("*").eq("extra_id", extra_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting users limitations): {e}")
+            return "Error occured", 500
+    else:
+        raise ValueError("user_id, extra_id, name or id not provided - failed to fetch users limitations")
+
+__all__ = ['supabase', 'getUserExtra', 'getUserContainers', 'getUserLimitations']

@@ -231,7 +231,7 @@ function attachContainer() {
 function printContainerOutputs(data){
     executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
                         data.msg + "\n"
-    // TODO uncomment cmdinput.value = ""
+    cmdinput.value = ""
 }
 
 async function logout(){
