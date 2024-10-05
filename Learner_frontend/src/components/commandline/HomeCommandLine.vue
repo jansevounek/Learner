@@ -28,7 +28,6 @@ let executedIndex = ref(0)
 
 // mounting handlers for shortcuts
 onMounted(() => {
-    checkUser()
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('click', handleClick);
 })
@@ -170,54 +169,6 @@ function changeCommand(){
 // handles if the user clicks somewhere
 function handleClick() {
     document.getElementById('cmd-input').focus();
-}
-
-async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (user) {
-        if(await extraExists(user) === false) {
-            setUpUser(user)
-        }
-    }
-}
-
-async function extraExists(user) {
-    const { data, error } = await supabase
-        .from('user_extra')
-        .select('*')
-        .eq('user_id', user.id);
-    
-    if(error) {
-        console.log(error)
-    }
-    if(data) {
-        if(data.length == 0) {
-            return false
-        } else {
-            return true
-        }
-    }
-
-    return true
-}
-
-async function setUpUser(user) {
-    const apiurl = import.meta.env.VITE_API_URL
-    const response = await fetch(apiurl + "/create-container1", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user.id),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    
-    const responseData = await response.json();
-    console.log(responseData);
 }
 
 async function logout(){

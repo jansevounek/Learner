@@ -121,8 +121,9 @@ function containerCommands() {
             stopContainer()
             return true
 
+        // done
         case command.startsWith("container attach "):
-            attachContainer()
+            attachContainer(command)
             return true
     }
     return false
@@ -167,7 +168,12 @@ async function printContainers(c) {
         output += "\n"
     }
 
-    executedCommands.value += output
+    if (containers.length == 0){
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
+                                 + "No containers found \n"
+    } else {
+        executedCommands.value += output
+    }
 
     cmdinput.value = ""
 }
@@ -224,8 +230,18 @@ function stopContainer() {
     console.log("stop")
 }
 
-function attachContainer() {
-    console.log("attach")
+async function attachContainer(input) {
+    let name = input.replace("container attach ", "")
+    let containers = await fetchUsersContainers({ name: name })
+
+    if (containers.length > 0){
+        let port = 10000 + containers[0].id
+        router.push("/learning/container/" + port)
+    } else {
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 
+                                'Failed to attach - the container "' + name + '" does not exist \n'
+        cmdinput.value = ""
+    }
 }
 
 function printContainerOutputs(data){
@@ -292,10 +308,10 @@ async function getUser() {
     return user
 }
 
-async function fetchUsersContainers() {
+async function fetchUsersContainers({ name = "" } = {}) {
     const user = await getUser()
 
-    let extra_id = 0
+    let extra_id = -1
 
     const { data, error } = await supabase
         .from('user')
@@ -306,11 +322,21 @@ async function fetchUsersContainers() {
     }
     extra_id = data[0].id
 
-    if (extra_id) {
+    if (extra_id && !name) {
         const { data, error } = await supabase
             .from('container')
             .select('*')
             .eq('extra_id', extra_id);
+        if (error) {
+            throw error
+        }
+        return data
+    } else if (extra_id && name) {
+        const { data, error } = await supabase
+            .from('container')
+            .select('*')
+            .eq('extra_id', extra_id)
+            .eq('name', name);
         if (error) {
             throw error
         }

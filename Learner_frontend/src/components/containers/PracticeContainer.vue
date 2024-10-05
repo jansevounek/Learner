@@ -36,7 +36,7 @@ function handleKeyDown(event) {
     } else if (event.key === 'Enter') {
         executeSelected()
     } else if (event.ctrlKey && event.key === 'c') {
-        router.push('/learning/homepage')
+        router.push('/learning/manage')
     }
 }
 
