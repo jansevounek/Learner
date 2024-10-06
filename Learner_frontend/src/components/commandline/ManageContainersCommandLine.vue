@@ -118,7 +118,7 @@ function containerCommands() {
             return true
 
         case command.startsWith("container stop "):
-            stopContainer()
+            stopContainer(command)
             return true
 
         // done
@@ -226,8 +226,27 @@ function startContainer() {
     console.log("Start")
 }
 
-function stopContainer() {
-    console.log("stop")
+async function stopContainer(input) {
+    let name = input.replace("container stop ", "")
+    if (name) {
+        const user = await getUser()
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/container/stop", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                container_name: name
+            })
+        });
+
+        const data = await response.json()
+        console.log(data)
+        //printContainerOutputs(data)
+    }
 }
 
 async function attachContainer(input) {

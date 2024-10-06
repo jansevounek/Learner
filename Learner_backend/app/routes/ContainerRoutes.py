@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify, request
-from ..services.supabase_service import supabase
+from ..services.supabase_service import supabase, getUserExtra, getContainerByIdName
 
 bp = Blueprint('container', __name__, url_prefix='/container')
 
-@bp.route('/names', methods=['POST'])
+
+@bp.route('/stop', methods=['POST'])
 def get_users():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
@@ -11,20 +12,33 @@ def get_users():
     else:
         return jsonify({'status': 'Content-Type not supported!'})
     
-    data = []
+    e = getUserExtra(user_id=json["user_id"])
+    extra = e[0]
+    container = getContainerByIdName(json["container_name"], extra.get("id"))
+
+    if len(container) == 0:
+        return jsonify({
+            "status": False,
+            "msg": 'The container "' + json["container_name"] + '" that was requested for stopage could not be found'
+            })
+    elif len(container) >= 2:
+        return jsonify({
+            "status": False,
+            "msg": 'More than one container with the name "' + json["container_name"] + '" have been selected for stoping - contact support'
+            })
     
-    try:
-        r = supabase.table("user").select("*").eq("user_id", json["user_id"]).execute()
-        i = r.data[0].get("id")
-        response = supabase.table("container").select("*").eq("extra_id", i).execute()
-        data = response.data
-    except Exception as e:
-        print(f"Error during Supabase query (during getting users containers): {e}")
-        return "Error occured", 500
+    if not stopContainer(json["container_name"], json["user_id"]):
+        return jsonify({
+            "status": False,
+            "msg": 'Failed to delete container - contact support'
+            })
 
     
     return jsonify({ 
         "status" : True,
-        "body" : data,
+        "body" : json["container_name"],
         "msg" : ""
         })
+
+def stopContainer(name, user_id):
+    pass

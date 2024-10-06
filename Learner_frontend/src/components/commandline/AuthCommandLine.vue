@@ -80,7 +80,6 @@ function executeCommand() {
         // general commands
         case "help":
             getHelp()
-            cmdinput.value = ''
             break
         case "clear":
             clearLines()
@@ -105,7 +104,7 @@ function executeCommand() {
             loginWithGoogle()
             break
         default:
-            processCredential()
+            output = processCredential()
     }
 }
 
@@ -268,22 +267,6 @@ function getHelp() {
                                 'Additionally you can use the command "google" which lets you login with google'
 }
 
-// handles the "ctrl + c" shortcut
-// TODO nobody knows what ctrl + i does
-function handleKeyDown(event) {
-    if (event.ctrlKey && event.key === 'l') {
-        event.preventDefault();
-        clearLines()    
-    } else if (event.ctrlKey && event.key === 'i' && (currentStep.value > 0 && currentStep.value < 3)) {
-        showPassword.value = !showPassword.value
-    }
-}
-
-// handles if the user clicks somewhere
-function handleClick() {
-    document.getElementById('cmd-input').focus();
-}
-
 // TODO auth
 function auth() {
     if (cmdinput.value == "Y") {
@@ -340,5 +323,21 @@ async function loginWithGoogle(){
     supabase.auth.signInWithOAuth({
         provider: 'google',
     })
+}
+
+// handles the "ctrl + c" shortcut
+// TODO nobody knows what ctrl + i does
+function handleKeyDown(event) {
+    if (event.ctrlKey && event.key === 'l') {
+        event.preventDefault();
+        clearLines()    
+    } else if (event.ctrlKey && event.key === 'i' && (currentStep.value > 0 && currentStep.value < 3)) {
+        showPassword.value = !showPassword.value
+    }
+}
+
+// handles if the user clicks somewhere
+function handleClick() {
+    document.getElementById('cmd-input').focus();
 }
 </script>

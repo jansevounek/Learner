@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from ...services.supabase_service import supabase, getUserExtra, getUserContainers
+from ...services.supabase_service import supabase, getUserExtra, getUserContainers, getContainerByIdName
 from ...services.docker_service import docker
 
 bp = Blueprint('delete', __name__, url_prefix='/delete')
@@ -15,14 +15,14 @@ def delete_container():
     
     e = getUserExtra(user_id=json["user_id"])
     extra = e[0]
-    container = getToBeDeletedContainer(json["container_name"], extra.get("id"))
+    container = getContainerByIdName(json["container_name"], extra.get("id"))
 
     if len(container) == 0:
         return jsonify({
             "status": False,
             "msg": 'The container "' + json["container_name"] + '" that was requested for deletion could not be found'
             })
-    elif len(container) > 2:
+    elif len(container) >= 2:
         return jsonify({
             "status": False,
             "msg": 'More than one container with the name "' + json["container_name"] + '" have been selected for deletion - contact support'
@@ -39,15 +39,6 @@ def delete_container():
         "status": True,
         "msg": 'Container "' + json["container_name"] + '" deleted successfully - view it using command "container ps" '
         })
-
-# gets the container that is to be deleted
-def getToBeDeletedContainer(name, extra_id):
-    try:
-        response = supabase.table("container").select("*").eq("name", name).eq("extra_id", extra_id).execute()
-        return response.data
-    except Exception as e:
-        print(f"Error during Supabase query (during getting users containers): {e}")
-        return "Error occured", 500
 
 # deletes the container
 def deleteContainer(name, extra_id):

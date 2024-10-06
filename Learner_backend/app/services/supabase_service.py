@@ -97,5 +97,14 @@ def getUserLimitations(**kwargs):
             return "Error occured", 500
     else:
         raise ValueError("user_id, extra_id, name or id not provided - failed to fetch users limitations")
+    
+# gets the container that is to be deleted
+def getContainerByIdName(name, extra_id):
+    try:
+        response = supabase.table("container").select("*").eq("name", name).eq("extra_id", extra_id).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error during Supabase query (during getting users containers): {e}")
+        return "Error occured", 500
 
-__all__ = ['supabase', 'getUserExtra', 'getUserContainers', 'getUserLimitations']
+__all__ = ['supabase', 'getUserExtra', 'getUserContainers', 'getUserLimitations', 'getToBeDeletedContainer']
