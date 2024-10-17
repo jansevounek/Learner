@@ -21,13 +21,17 @@
                 <h1>5</h1>
                 <h1>Forgot Password?</h1>
             </div>
-            <div class="navbar-top-item text-red-500" v-if="localUser && !isWithoutCmd">
+            <div class="navbar-top-item text-green-500" v-if="localUser && !isWithoutCmd">
                 <h1>6</h1>
                 <h1>Logout</h1>
             </div>
-            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/manage' && !isWithoutCmd">
+            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/admin' && !isWithoutCmd">
                 <h1>7</h1>
                 <h1>Lets Learn</h1>
+            </div>
+            <div class="navbar-top-item text-red-500" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/admin' && !isWithoutCmd">
+                <h1>8</h1>
+                <h1>Admin</h1>
             </div>
             <div class="navbar-top-item text-red-500" v-if="localUser && isWithoutCmd">
                 <h1>Use ctrl + c</h1>

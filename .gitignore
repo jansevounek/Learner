@@ -38,6 +38,9 @@ commands.txt
 
 TODO
 
+supabase/.temp
+supabase/.cache
+
 # Mine development commands
 backend.sh
 frontend.sh

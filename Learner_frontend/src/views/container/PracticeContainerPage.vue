@@ -18,7 +18,7 @@ _________              .___
 </template>
 
 <script setup>
-import PracticeContainer from '../components/containers/PracticeContainer.vue'
+import PracticeContainer from '../../components/containers/PracticeContainer.vue'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()

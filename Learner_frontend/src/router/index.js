@@ -5,12 +5,14 @@ import LoginPage from '../views/auth/LoginPage.vue'
 import SignupPage from '../views/auth/SignupPage.vue'
 import ResetPasswordPage from '../views/auth/ResetPasswordPage.vue'
 import UpdateUserPage from '../views/auth/UpdateUserPage.vue'
-import PracticeContainerPage from '../views/PracticeContainerPage.vue'
-import FullScreenContainerPage from '../views/FullScreenContainerPage.vue'
+import PracticeContainerPage from '../views/container/PracticeContainerPage.vue'
+import FullScreenContainerPage from '../views/container/FullScreenContainerPage.vue'
 import PaymentPage from '../views/payments/PaymentPage.vue'
 import PaymentCanceledPage from '../views/payments/PaymentCanceledPage.vue'
 import PaymentSuccessfullPage from '../views/payments/PaymentSuccessfullPage.vue'
 import ManageContainersPage from '../views/ManageContainersPage.vue'
+import LearningLessonsPage from '../views/learning/LearningLessonsPage.vue'
+import LearningAdminPage from '../views/learning/LearningAdminPage.vue'
 
 let localUser;
 
@@ -63,11 +65,28 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/learning/admin',
+      name: 'admin-lessons',
+      component: LearningAdminPage,
+      meta: { 
+        requiresAuth: true,
+        requiresPremium: true
+       },
+    },
+    {
+      path: '/learning/lessons',
+      name: 'lessons',
+      component: LearningLessonsPage,
+      meta: { requiresAuth: true },
+    },
+    // delete from here
+    {
       path: '/learning/manage',
       name: 'manage',
       component: ManageContainersPage,
       meta: { requiresAuth: true },
     },
+    // to here
     {
       path: '/learning/container/:port',
       name: 'practicecontainer',
@@ -101,9 +120,25 @@ async function getUserUnAuth(next) {
   }
 }
 
+async function getUserPremium(next) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+        .from('user')
+        .select('premium')
+        .eq('user_id', user.id);
+  if (data[0].premium) {
+    next();
+  } else {
+    next("/");
+  }
+}
+
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.requiresAuth) {
+
+  if (to.meta.requiresAuth && !to.meta.requiresPremium) {
     await getUserAuth(next);
+  } else if (to.meta.requiresAuth && to.meta.requiresPremium) {
+    await getUserPremium(next);
   } else if (to.meta.requiresUnAuth) {
     await getUserUnAuth(next);
   } else {

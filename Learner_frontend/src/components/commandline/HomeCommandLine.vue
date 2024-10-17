@@ -56,9 +56,13 @@ function executeCommand() {
             break
 
         // Navbar top
+        case "Admin":
+        case "go 8":
+            router.push('/learning/admin')
+            break
         case "Lets Learn":
         case "go 7":
-            router.push('/learning/manage')
+            router.push('/learning/lessons')
             break
         case "Logout":
         case "go 6":
