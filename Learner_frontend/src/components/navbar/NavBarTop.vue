@@ -25,7 +25,7 @@
                 <h1>6</h1>
                 <h1>Logout</h1>
             </div>
-            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/admin' && !isWithoutCmd">
+            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/lessons' && !isWithoutCmd">
                 <h1>7</h1>
                 <h1>Lets Learn</h1>
             </div>

@@ -11,7 +11,7 @@ import PaymentPage from '../views/payments/PaymentPage.vue'
 import PaymentCanceledPage from '../views/payments/PaymentCanceledPage.vue'
 import PaymentSuccessfullPage from '../views/payments/PaymentSuccessfullPage.vue'
 import ManageContainersPage from '../views/ManageContainersPage.vue'
-import LearningLessonsPage from '../views/learning/LearningLessonsPage.vue'
+import LearningUserPage from '../views/learning/LearningUserPage.vue'
 import LearningAdminPage from '../views/learning/LearningAdminPage.vue'
 
 let localUser;
@@ -76,7 +76,7 @@ const router = createRouter({
     {
       path: '/learning/lessons',
       name: 'lessons',
-      component: LearningLessonsPage,
+      component: LearningUserPage,
       meta: { requiresAuth: true },
     },
     // delete from here

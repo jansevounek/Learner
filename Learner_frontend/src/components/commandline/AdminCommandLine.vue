@@ -45,6 +45,14 @@ function executeCommand() {
         case "go 1":
             router.push('/')
             break
+        case "Logout":
+        case "go 6":
+            logout()
+            break
+        case "Lets learn":
+        case "go 7":
+            router.push('/learning/lessons')
+            break
 
         // general commands
         case "help":
@@ -80,9 +88,11 @@ function adminCommands() {
         case command.startsWith("team create"):
             createTeam(command);
             return true
+        //done
         case command === "team ps":
             getTeams();
             return true
+        //done
         case command.startsWith("team delete"):
             deleteTeam(command);
             return true
@@ -358,5 +368,15 @@ function handleKeyDown(event) {
 
 function handleClick() {
     document.getElementById('cmd-input').focus();
+}
+
+async function logout(){
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        console.log(error.message)
+    } else {
+        router.push('/')
+        location.reload()
+    }
 }
 </script>
