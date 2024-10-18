@@ -216,23 +216,31 @@ async function deleteTeam(c) {
                 return
             }
 
-            console.log(data)
-
             if (data.length) {
                 const limit = await getLimitations()
-                let count = limit.teams - 1
-                const { error } = await supabase
-                    .from("limitations")
-                    .update({ teams: count })
-                    .eq('extra_id', extra.id)
+                if (limit) {
+                    let count = limit.teams - data.length
+                    const { error } = await supabase
+                        .from("limitations")
+                        .update({ teams: count })
+                        .eq('extra_id', extra.id)
 
-                if (error) {
-                    console.log(error)
-                    commandOutput("You used delete - critical hit")
-                    return
+                    if (error) {
+                        console.log(error)
+                        commandOutput("You used delete - critical hit")
+                        return
+                    }
+
+                    let output = "user@linuxlearning:~$ " + cmdinput.value + "\n Deleted team(s):";
+
+                    for (let i = 0; i < data.length; i++) {
+                        output += ' "' + data[i].name + '",';
+                    }
+                    // taken from https://stackoverflow.com/questions/952924/how-do-i-chop-slice-trim-off-last-character-in-string-using-javascript
+                    output = output.slice(0, -1)
+
+                    commandOutput(output)
                 }
-
-                commandOutput("Done")
             } else {
                 commandOutput("No teams deleted")
                 return
@@ -288,20 +296,21 @@ async function getUserExtra() {
 }
 
 async function getLimitations() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data1, error1 } = await supabase
-        .from('user')
-        .select('*')
-        .eq('user_id', user.id);
-    const { data, error } = await supabase
-        .from('limitations')
-        .select('*')
-        .eq('extra_id', data1[0].id);
-    if (error) {
-        return false
-    }
-    if (data) {
-        return data[0]
+    const extra = await getUserExtra();
+    if (extra) {
+        const { data, error } = await supabase
+            .from('limitations')
+            .select('*')
+            .eq('extra_id', extra.id);
+        if (error) {
+            console.log(error)
+            return false
+        }
+        if (data) {
+            return data[0]
+        } else {
+            return false
+        }
     } else {
         return false
     }
