@@ -147,7 +147,29 @@ async function leaveTeam(c) {
 }
 
 async function getTeams() {
-    
+    let extra = await getUserExtra();
+
+    let teamArr = []
+
+    if (extra.teams) {
+        let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
+        // optimize this
+        for (let i = 0; i < extra.teams.length; i++) {
+            // taken from https://stackoverflow.com/questions/1133770/how-to-convert-a-string-to-an-integer-in-javascript
+            const { data, error } = await supabase.from("team").select("name").eq("id", parseInt(extra.teams[i]))
+
+            if (error) {
+                commandOutput("There is an issue with the teams you have joined - please contact support")
+            }
+
+            output += i + 1 + ".\n name: " + data[0].name + "\n"
+        }
+        commandOutput(output)
+        return
+    } else {
+        commandOutput("You are not yet a part of a team")
+        return
+    }
 }
 
 async function getUserExtra() {
