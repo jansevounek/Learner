@@ -84,6 +84,7 @@ function adminCommands() {
     const command = cmdinput.value
 
     switch(true) {
+        // done
         case command.startsWith("team join"):
             joinTeam(command);
             return true
@@ -98,9 +99,10 @@ function adminCommands() {
     return false;
 }
 
+//done
 async function joinTeam(c) {
     let teamCode = c.replace("team join ", "")
-    let extra = getUserExtra();
+    let extra = await getUserExtra();
 
     if (extra) {
         const { data, error } = await supabase.from("team").select("id, name").eq('team_code', teamCode )
@@ -109,10 +111,19 @@ async function joinTeam(c) {
             commandOutput("An error occured while accessing this team - contact support")
             return
         }
-
         if (data) {
-            console.log(data[0].id)
-            const { error } = await supabase.from("user").update({ teams: supabase.fn('array_append', "teams", data[0].id) }).eq("id", extra.id)
+            // taken from https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-a-value-in-javascript
+            let arr = extra.teams
+            if (!arr) {
+                arr = [data[0].id]
+            } else {
+                if (arr.includes(data[0].id)) {
+                    commandOutput('You already are a part of team "' + data[0].name + '"')
+                    return
+                }
+                arr.push(data[0].id)
+            }
+            const { error } = await supabase.from("user").update({ teams: arr }).eq("id", extra.id)
 
             if (error) {
                 console.log(error)
@@ -120,7 +131,7 @@ async function joinTeam(c) {
                 return
             }
 
-            commandOutput('You successfully joined "' + data[0].name + '" found')
+            commandOutput('You successfully joined team "' + data[0].name + '"')
         } else {
             commandOutput('No team with code "' + teamCode + '" found')
             return
@@ -136,6 +147,7 @@ async function leaveTeam(c) {
 }
 
 async function getTeams() {
+    
 }
 
 async function getUserExtra() {
