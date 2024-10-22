@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { supabase } from '../../supabase/init.js'
+import { supabase } from '@/supabase/init.js'
 import { ref, onMounted } from 'vue'
 
 let premiumUser = ref(false)

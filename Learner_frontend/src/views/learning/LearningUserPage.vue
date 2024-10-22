@@ -23,8 +23,7 @@
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import UserCommandLine from '../../components/commandline/UserCommandLine.vue'
+import UserCommandLine from '@/components/commandline/learning/UserCommandLine.vue'
 import { onMounted } from 'vue'
 
 // generates the random color for the title

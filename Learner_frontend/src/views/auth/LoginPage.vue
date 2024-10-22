@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import AuthCommandLine from '../../components/commandline/AuthCommandLine.vue'
+import AuthCommandLine from '@/components/commandline/auth/AuthCommandLine.vue'
 import { onMounted } from 'vue'  
 
 // generates the random color for the title

@@ -34,7 +34,7 @@ ______  ______ ______   _____  ______   _____
 
 <script setup>
 import { onMounted } from 'vue'
-import PaymentCommandLine from '../../components/commandline/PaymentCommandLine.vue'
+import PaymentCommandLine from '@/components/commandline/payments/PaymentCommandLine.vue'
 
 // generates the random color for the title
 onMounted(() => {

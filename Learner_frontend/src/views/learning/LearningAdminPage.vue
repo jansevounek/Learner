@@ -10,6 +10,5 @@
   </template>
   
   <script setup>
-  import { RouterLink, RouterView } from 'vue-router'
-  import HomeCommandLine from '../../components/commandline/AdminCommandLine.vue'
+  import HomeCommandLine from '@/components/commandline/learning/AdminCommandLine.vue'
   </script>

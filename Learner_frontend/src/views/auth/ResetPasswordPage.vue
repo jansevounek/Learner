@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import ResetPasswordCommandLine from '../../components/commandline/ResetPasswordCommandLine.vue'
+import ResetPasswordCommandLine from '@/components/commandline/auth/ResetPasswordCommandLine.vue'
 import { onMounted } from 'vue'  
 
 // generates the random color for the title

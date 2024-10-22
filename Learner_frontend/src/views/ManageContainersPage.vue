@@ -27,7 +27,7 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import ManageContainersCommandLine from '../components/commandline/ManageContainersCommandLine.vue'
+import ManageContainersCommandLine from '@/components/commandline/ManageContainersCommandLine.vue'
 
 // generates the random color for the title
 onMounted(() => {

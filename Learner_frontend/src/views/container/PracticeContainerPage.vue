@@ -18,12 +18,10 @@ _________              .___
 </template>
 
 <script setup>
-import PracticeContainer from '../../components/containers/PracticeContainer.vue'
+import PracticeContainer from '@/components/containers/PracticeContainer.vue'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-
-let displayContainer = ref(false)
 
 const url = ref('http://127.0.0.1:' + route.params.port)
 

@@ -45,7 +45,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { supabase } from '../../supabase/init.js'
+import { supabase } from '@/supabase/init.js'
 
 // router import a setup
 import { useRoute } from 'vue-router'

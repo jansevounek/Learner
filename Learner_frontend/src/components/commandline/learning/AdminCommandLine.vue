@@ -15,7 +15,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { supabase } from '../../supabase/init.js'
+import { supabase } from '@/supabase/init.js'
 
 // router import a setup
 import { useRouter } from 'vue-router'
@@ -41,17 +41,17 @@ function executeCommand() {
     switch(cmdinput.value) {
 
         // navbar commands
-        case "Admin":
-        case "go 8":
-            router.push('/learning/admin')
-            break
         case "Home":
         case "go 1":
-            router.push('/learning/admin')
+            router.push('/')
             break
         case "Logout":
         case "go 6":
-            router.push('/learning/admin')
+            logout()
+            break
+        case "Lets learn":
+        case "go 7":
+            router.push('/learning/lessons')
             break
 
         // general commands
@@ -84,28 +84,42 @@ function adminCommands() {
     const command = cmdinput.value
 
     switch(true) {
-        // done
-        case command.startsWith("team join"):
-            joinTeam(command);
+        //done
+        case command.startsWith("team create"):
+            createTeam(command);
             return true
-        case command.startsWith("team leave"):
-            leaveTeam(command);
-            return true
-        case command == "team ps":
+        //done
+        case command === "team ps":
             getTeams();
             return true
-        //TODO do the lessons
+        //done
+        case command.startsWith("team delete"):
+            deleteTeam(command);
+            return true
+        case command.startsWith("lesson create"):
+            createLesson();
+            return true
+        case command.startsWith("lesson cancel"):
+            cancelLesson();
+            return true
+        case command.startsWith("lesson ps"):
+            getLessons();
+            return true
+        case command.startsWith("lesson solutions"):
+            seeSolutions();
+            return true
     }
     return false;
 }
 
-//done
-async function joinTeam(c) {
-    let teamCode = c.replace("team join ", "")
-    if (teamCode) {
+// done
+async function createTeam(c) {
+    let name = c.replace("team create ", "")
+
+    if (name) {
         const { data: { user } } = await supabase.auth.getUser();
         const apiurl = import.meta.env.VITE_API_URL
-        const response = await fetch(apiurl + "/teams/user/join", {
+        const response = await fetch(apiurl + "/teams/admin/create", {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -113,7 +127,7 @@ async function joinTeam(c) {
           },
           body: JSON.stringify({
                 user_id: user.id,
-                team_code: teamCode,
+                team_name: name,
             })
         });
 
@@ -122,49 +136,91 @@ async function joinTeam(c) {
     }
 }
 
-async function leaveTeam(c) {
-    let teamName = c.replace("team leave ", "")
-    if (teamName) {
-        const { data: { user } } = await supabase.auth.getUser();
-        const apiurl = import.meta.env.VITE_API_URL
-        const response = await fetch(apiurl + "/teams/user/leave", {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-                user_id: user.id,
-                team_name: teamName,
-            })
-        });
 
-        const data = await response.json()
-        commandOutput(data.msg)
-    }
-}
-
+// done
 async function getTeams() {
-    let extra = await getUserExtra();
+    let extra = await getUserExtra()
 
-    if (extra.teams.length > 0) {
-        let output = "\n"
-        // optimize this
-        for (let i = 0; i < extra.teams.length; i++) {
-            // taken from https://stackoverflow.com/questions/1133770/how-to-convert-a-string-to-an-integer-in-javascript
-            const { data, error } = await supabase.from("team").select("name").eq("id", parseInt(extra.teams[i]))
-
-            if (error) {
-                commandOutput("There is an issue with the teams you have joined - please contact support")
-            }
-
-            output += i + 1 + ".\n name: " + data[0].name + "\n"
+    if (extra) {
+        const { data, error } = await supabase
+            .from('team')
+            .select('*')
+            .eq('creator_id', extra.id);
+        if (error) {
+            commandOutput("Failed to get your teams - contact support")
+            return
         }
-        commandOutput(output)
-        return
+
+        printTeams(data)
     } else {
-        commandOutput("You are not a part of any team")
+        commandOutput("Failed to get your teams - contact support")
         return
+    }
+}
+
+function printTeams(data) {
+    let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
+
+    if (data.length == 0){
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
+                                 + "No teams found \n"
+    } else {
+        for (let i = 0; i < data.length; i++) {
+            output += i + 1 + ".\n name: " + data[i].name + "\n"
+                + "team code: " + data[i].team_code + "\n\n"
+        }
+        executedCommands.value += output
+    }
+
+    cmdinput.value = ""
+}
+
+
+async function deleteTeam(c) {
+    let name = c.replace("team delete ", "")
+
+    if (name) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/teams/admin/delete", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                team_name: name,
+            })
+        });
+
+        const data = await response.json()
+        commandOutput(data.msg)
+    }
+}
+
+function createLesson() {
+
+}
+
+function cancelLesson() {
+
+}
+
+function getLessons() {
+
+}
+
+function seeSolutions() {
+
+}
+
+async function getUser() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+        return user;
+    } else {
+        return false;
     }
 }
 
@@ -179,6 +235,27 @@ async function getUserExtra() {
     }
     if (data) {
         return data[0]
+    } else {
+        return false
+    }
+}
+
+async function getLimitations() {
+    const extra = await getUserExtra();
+    if (extra) {
+        const { data, error } = await supabase
+            .from('limitations')
+            .select('*')
+            .eq('extra_id', extra.id);
+        if (error) {
+            console.log(error)
+            return false
+        }
+        if (data) {
+            return data[0]
+        } else {
+            return false
+        }
     } else {
         return false
     }

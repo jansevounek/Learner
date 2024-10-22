@@ -3,11 +3,11 @@
         <div class="cmd-output-container">
             {{ executedCommands }}
         </div>
-        <div class="cmd-credential-input">
-            <p class="cmd-credential-name">{{ inputName }}</p>
+        <div class="cmd-arrow-input">
+            <p class="cmd-arrow-name">{{ inputName }}</p>
             <div class="cmd-line-input-container">
                 <h1>></h1>
-                <input :type="currentStep > 0 && currentStep < 3 ? 'password' : 'text'" class="cmd-input"  
+                <input :type="!showText ? 'password' : 'text'" class="cmd-input"  
                 :class="[{'text-red-600': isEmail === false}]" id="cmd-input"
                  v-on:keyup.enter="executeCommand" v-model="cmdinput" autofocus>
             </div>
@@ -26,7 +26,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { supabase } from '../../supabase/init.js'
+import { supabase } from '@/supabase/init.js'
 
 // import a setup of the router
 import { useRouter, useRoute } from 'vue-router'
@@ -52,6 +52,8 @@ const inputName = ref('Email:')
 const credentials = ref([])
 const currentStep = ref(0)
 
+const showPassword = ref(false)
+
 // function that checks all the commands
 function executeCommand() {
     switch(cmdinput.value) {
@@ -73,14 +75,10 @@ function executeCommand() {
         case "go 5":
             router.push('/resetpassword')
             break
-        case "go 6":
-            logout()
-            break
 
         // general commands
         case "help":
             getHelp()
-            cmdinput.value = ''
             break
         case "clear":
             clearLines()
@@ -100,8 +98,12 @@ function executeCommand() {
             router.push('/payment/getpremium')
             break
 
+        // the stuff that logs you in
+        case "google":
+            loginWithGoogle()
+            break
         default:
-            processCredential()
+            output = processCredential()
     }
 }
 
@@ -119,7 +121,7 @@ function processCredential() {
             break
         case 3:
             if(credentials.value[1] === credentials.value[2]) {
-                changePassword()
+                auth()
             }
             cmdinput.value = ''
             break
@@ -131,7 +133,7 @@ function processCredential() {
 // saves the password and other auth info
 function savePassword() {
     if (currentStep.value == 1){
-        if (strengthLevel.value == 5) {
+        if (strengthLevel.value == 5 || route.path == '/login') {
             executedCommands.value += inputName.value + "\n" + "> " + '•'.repeat(cmdinput.value.length) + "\n"
             credentials.value[currentStep.value] = cmdinput.value
             currentStep.value++
@@ -148,7 +150,7 @@ function savePassword() {
             credentials.value[currentStep.value] = cmdinput.value
             currentStep.value++
             cmdinput.value = ''
-            inputName.value = 'Are you sure you want to change your password [Y/n]:'
+            inputName.value = 'Are you sure you want to log in [Y/n]:'
         } else {
             executedCommands.value += inputName.value + "\n" + "> " + '•'.repeat(cmdinput.value.length) + "\n" +
                                     "The passwords provided do not match. Please try again \n"
@@ -173,32 +175,9 @@ function saveEmail() {
     }
 }
 
-async function changePassword() {
-    if (cmdinput.value == "Y"){
-        const { data, error } = await supabase.auth.updateUser({
-            email: credentials.value[0],
-            password: credentials.value[1]
-        })
-        if (error){
-            console.log(error)
-        }
-    } else {
-        location.reload()
-    }
-}
-
-async function logout() {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-        console.log(error.message)
-    } else {
-        location.reload()
-    }
-}
-
 const isEmail = computed(() => {
     if (currentStep.value == 0) {
-        if (cmdinput.value === '') {
+        if (cmdinput.value === '' || route.path === '/login') {
             return true
         }
         return testEmail(cmdinput.value)
@@ -253,8 +232,19 @@ const strengthLevel = computed(() => {
     }
 })
 
+const showText = computed(() => {
+    if (currentStep.value > 0 && currentStep.value < 3) {
+        if (showPassword.value == true) {
+            return true
+        }
+        return false
+    }
+    
+    return true
+})
+
 const showStrength = computed(() => {
-    return currentStep.value == 1
+    return currentStep.value == 1 && route.path !== '/login'
 })
 
 // clears all the lines of output
@@ -268,14 +258,80 @@ function getHelp() {
     executedCommands.value = ''
     cmdinput.value = ''
     executedCommands.value += "Help: \n" +
-                                "Help me \n"
+                                "This is a website where you log in" +
+                                "\n" +
+                                'Follow the titles written above the ">" sign which signals the input and simply just write what the title asks for' +
+                                "\n" +
+                                "\n" +
+                                'Additionally you can use the command "google" which lets you login with google'
+}
+
+// TODO auth
+function auth() {
+    if (cmdinput.value == "Y") {
+        if (route.path === "/login"){
+            login()
+        } else {
+            signup()
+        }
+    } else {
+        location.reload()
+    }
+}
+
+function errorMessage() {
+    credentials.value = []
+    currentStep.value = 0
+
+    executedCommands.value += inputName.value + "\n" + "> " + cmdinput.value + "\n" + "No such account exists - try again"
+
+    inputName.value = "Email:"
+    cmdinput.value = ""
+}
+
+async function login() {
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.value[0],
+        password: credentials.value[1]
+    })
+    if (error) {
+        switch (error.message) {
+            case "Invalid login credentials":
+                errorMessage()
+                break
+        }
+    } else {
+        router.push('/')
+        location.reload()
+    }
+}
+
+async function signup() {
+    const { data, error } = await supabase.auth.signUp({
+        email: credentials.value[0],
+        password: credentials.value[1]
+    })
+    if (error) {
+        console.log(error)
+    } else {
+        router.push('/')
+    }
+}
+
+async function loginWithGoogle(){
+    supabase.auth.signInWithOAuth({
+        provider: 'google',
+    })
 }
 
 // handles the "ctrl + c" shortcut
+// TODO nobody knows what ctrl + i does
 function handleKeyDown(event) {
     if (event.ctrlKey && event.key === 'l') {
         event.preventDefault();
         clearLines()    
+    } else if (event.ctrlKey && event.key === 'i' && (currentStep.value > 0 && currentStep.value < 3)) {
+        showPassword.value = !showPassword.value
     }
 }
 

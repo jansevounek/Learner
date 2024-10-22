@@ -15,7 +15,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { supabase } from '../../supabase/init.js'
+import { supabase } from '@/supabase/init.js'
 import { loadStripe } from '@stripe/stripe-js';
 
 // router import a setup
