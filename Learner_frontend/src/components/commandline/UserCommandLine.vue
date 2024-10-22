@@ -102,57 +102,53 @@ function adminCommands() {
 //done
 async function joinTeam(c) {
     let teamCode = c.replace("team join ", "")
-    let extra = await getUserExtra();
+    if (teamCode) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/teams/user/join", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                team_code: teamCode,
+            })
+        });
 
-    if (extra) {
-        const { data, error } = await supabase.from("team").select("id, name").eq('team_code', teamCode )
-        
-        if (error) {
-            commandOutput("An error occured while accessing this team - contact support")
-            return
-        }
-        if (data) {
-            // taken from https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-a-value-in-javascript
-            let arr = extra.teams
-            if (!arr) {
-                arr = [data[0].id]
-            } else {
-                if (arr.includes(data[0].id)) {
-                    commandOutput('You already are a part of team "' + data[0].name + '"')
-                    return
-                }
-                arr.push(data[0].id)
-            }
-            const { error } = await supabase.from("user").update({ teams: arr }).eq("id", extra.id)
-
-            if (error) {
-                console.log(error)
-                commandOutput("An error occured while adding you to the team - contact support")
-                return
-            }
-
-            commandOutput('You successfully joined team "' + data[0].name + '"')
-        } else {
-            commandOutput('No team with code "' + teamCode + '" found')
-            return
-        }
-    } else {
-        commandOutput("User profile incpomplete - contact support")
-        return
+        const data = await response.json()
+        commandOutput(data.msg)
     }
 }
 
 async function leaveTeam(c) {
-    let teamCode = c.replace("team leave ", "")
+    let teamName = c.replace("team leave ", "")
+    if (teamName) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/teams/user/leave", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                team_name: teamName,
+            })
+        });
+
+        const data = await response.json()
+        commandOutput(data.msg)
+    }
 }
 
 async function getTeams() {
     let extra = await getUserExtra();
 
-    let teamArr = []
-
-    if (extra.teams) {
-        let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
+    if (extra.teams.length > 0) {
+        let output = "\n"
         // optimize this
         for (let i = 0; i < extra.teams.length; i++) {
             // taken from https://stackoverflow.com/questions/1133770/how-to-convert-a-string-to-an-integer-in-javascript
@@ -167,7 +163,7 @@ async function getTeams() {
         commandOutput(output)
         return
     } else {
-        commandOutput("You are not yet a part of a team")
+        commandOutput("You are not a part of any team")
         return
     }
 }

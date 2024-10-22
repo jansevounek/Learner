@@ -117,53 +117,22 @@ async function createTeam(c) {
     let name = c.replace("team create ", "")
 
     if (name) {
-        let extra = await getUserExtra()
-        if (extra) {
-            const { data, error } = await supabase
-                .from('limitations')
-                .select('team_limit, teams')
-                .eq('extra_id', extra.id);
-            if (error) {
-                commandOutput("User profile incomplete please contact support")
-                return;
-            }
-            if (data) {
-                if (data[0].team_limit > data[0].teams) {
-                    const { error } = await supabase
-                        .from("team")
-                        .insert({ name: name, creator_id: extra.id })
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/teams/admin/create", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                team_name: name,
+            })
+        });
 
-                    if (error) {
-                        console.log(error)
-                        commandOutput("Failed to create your team - contact support")
-                        return;
-                    } else {
-                        let count = data[0].teams + 1
-                        const { error } = await supabase
-                            .from("limitations")
-                            .update({ teams: count })
-                            .eq('extra_id', extra.id)
-
-                        if (error) {
-                            console.log(error)
-                            commandOutput("idk - Contact support")
-                            return;
-                        }
-                    }
-                } else {
-                    commandOutput("You have reached your maximum of created teams")
-                    return;
-                }
-            }
-        } else {
-            commandOutput("User profile incomplete please contact support")
-            return;
-        }
-        commandOutput('Team "' + name + '" successfully created')
-        return;
-    } else {
-        commandOutput("Please provide a name for the team")
-        return;
+        const data = await response.json()
+        commandOutput(data.msg)
     }
 }
 
@@ -211,56 +180,22 @@ async function deleteTeam(c) {
     let name = c.replace("team delete ", "")
 
     if (name) {
-        let extra = await getUserExtra()
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/teams/admin/delete", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                team_name: name,
+            })
+        });
 
-        if (extra) {
-            const { data, error } = await supabase
-                .from("team")
-                .delete()
-                .eq("name", name)
-                .eq("creator_id", extra.id)
-                .select()
-
-            if (error) {
-                commandOutput("An error occured while trying to delete a team - contact support")
-                return
-            }
-
-            if (data.length) {
-                const limit = await getLimitations()
-                if (limit) {
-                    let count = limit.teams - data.length
-                    const { error } = await supabase
-                        .from("limitations")
-                        .update({ teams: count })
-                        .eq('extra_id', extra.id)
-
-                    if (error) {
-                        console.log(error)
-                        commandOutput("You used delete - critical hit")
-                        return
-                    }
-
-                    let output = "user@linuxlearning:~$ " + cmdinput.value + "\n Deleted team(s):";
-
-                    for (let i = 0; i < data.length; i++) {
-                        output += ' "' + data[i].name + '",';
-                    }
-                    // taken from https://stackoverflow.com/questions/952924/how-do-i-chop-slice-trim-off-last-character-in-string-using-javascript
-                    output = output.slice(0, -1)
-
-                    commandOutput(output)
-                }
-            } else {
-                commandOutput("No teams deleted")
-                return
-            }
-        } else {
-            commandOutput("User profile incomplete please contact support")
-            return;
-        }
-    } else {
-        commandOutput("Please provide a name of a team you want to delete")
+        const data = await response.json()
+        commandOutput(data.msg)
     }
 }
 

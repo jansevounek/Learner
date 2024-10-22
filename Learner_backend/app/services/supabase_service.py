@@ -1,4 +1,5 @@
 import os
+import uuid
 from supabase import create_client, Client
 
 url: str = os.environ.get("VITE_SUPABASE_URL")
@@ -106,5 +107,46 @@ def getContainerByIdName(name, extra_id):
     except Exception as e:
         print(f"Error during Supabase query (during getting users containers): {e}")
         return "Error occured", 500
+    
+def getTeam(**kwargs):
+    id = kwargs.get("id")
+    name = kwargs.get("name")
+    code = kwargs.get("code")
+
+    if id:
+        try:
+            response = supabase.table("team").select("*").eq("id", id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting team by id): {e}")
+            return "Error occured", 500
+    elif name:
+        try:
+            response = supabase.table("team").select("*").eq("name", name).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting team by name): {e}")
+            return "Error occured", 500
+    elif code:
+        try:
+            if (is_uuid(code)):
+                response = supabase.table("team").select("*").eq("team_code", code).execute()
+                return response.data
+            else:
+                return []
+        except Exception as e:
+            print(f"Error during Supabase query (during getting team by code): {e}")
+            return "Error occured", 500
+    else:
+        raise ValueError("name or id not provided - failed to fetch team")
+
+# taken from https://stackoverflow.com/questions/53847404/how-to-check-uuid-validity-in-python
+def is_uuid(val):
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
+
 
 __all__ = ['supabase', 'getUserExtra', 'getUserContainers', 'getUserLimitations', 'getToBeDeletedContainer']
