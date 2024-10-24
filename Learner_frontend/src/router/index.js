@@ -1,18 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { supabase } from '../supabase/init.js'
-import HomePage from '../views/HomePage.vue'
-import LoginPage from '../views/auth/LoginPage.vue'
-import SignupPage from '../views/auth/SignupPage.vue'
-import ResetPasswordPage from '../views/auth/ResetPasswordPage.vue'
-import UpdateUserPage from '../views/auth/UpdateUserPage.vue'
-import PracticeContainerPage from '../views/container/PracticeContainerPage.vue'
-import FullScreenContainerPage from '../views/container/FullScreenContainerPage.vue'
-import PaymentPage from '../views/payments/PaymentPage.vue'
-import PaymentCanceledPage from '../views/payments/PaymentCanceledPage.vue'
-import PaymentSuccessfullPage from '../views/payments/PaymentSuccessfullPage.vue'
-import ManageContainersPage from '../views/ManageContainersPage.vue'
-import LearningUserPage from '../views/learning/LearningUserPage.vue'
-import LearningAdminPage from '../views/learning/LearningAdminPage.vue'
+import { supabase } from '@/supabase/init.js'
+import HomePage from '@/views/HomePage.vue'
+import LoginPage from '@/views/auth/LoginPage.vue'
+import SignupPage from '@/views/auth/SignupPage.vue'
+import ResetPasswordPage from '@/views/auth/ResetPasswordPage.vue'
+import UpdateUserPage from '@/views/auth/UpdateUserPage.vue'
+import PracticeContainerPage from '@/views/container/PracticeContainerPage.vue'
+import FullScreenContainerPage from '@/views/container/FullScreenContainerPage.vue'
+import PaymentPage from '@/views/payments/PaymentPage.vue'
+import PaymentCanceledPage from '@/views/payments/PaymentCanceledPage.vue'
+import PaymentSuccessfullPage from '@/views/payments/PaymentSuccessfullPage.vue'
+import ManageContainersPage from '@/views/ManageContainersPage.vue'
+import LearningUserPage from '@/views/learning/LearningUserPage.vue'
+import LearningAdminPage from '@/views/learning/LearningAdminPage.vue'
+import LearningCreateLessonPage from '@/views/learning/LearningCreateLessonPage.vue'
 
 let localUser;
 
@@ -74,9 +75,15 @@ const router = createRouter({
        },
     },
     {
-      path: '/learning/lessons',
-      name: 'lessons',
+      path: '/learning/user',
+      name: 'user-lessons',
       component: LearningUserPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/learning/create-lesson',
+      name: 'create-lesson',
+      component: LearningCreateLessonPage,
       meta: { requiresAuth: true },
     },
     // delete from here

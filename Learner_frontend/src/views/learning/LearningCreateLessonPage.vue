@@ -5,10 +5,10 @@
       <hr class="title-hr">
     </div>
     <div class="main-container">
-      <AdminCommandLine />
+      <LessonCreateSelector />
     </div>
   </template>
   
   <script setup>
-  import AdminCommandLine from '@/components/commandline/learning/AdminCommandLine.vue'
+  import LessonCreateSelector from '@/components/selector/learning/LessonCreateSelector.vue'
   </script>

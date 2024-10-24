@@ -47,11 +47,11 @@ function executeCommand() {
             break
         case "Home":
         case "go 1":
-            router.push('/learning/admin')
+            router.push('/')
             break
         case "Logout":
         case "go 6":
-            router.push('/learning/admin')
+            logout()
             break
 
         // general commands

@@ -62,7 +62,7 @@ function executeCommand() {
             break
         case "Lets Learn":
         case "go 7":
-            router.push('/learning/lessons')
+            router.push('/learning/user')
             break
         case "Logout":
         case "go 6":

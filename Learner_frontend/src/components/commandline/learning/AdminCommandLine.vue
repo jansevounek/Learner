@@ -51,7 +51,7 @@ function executeCommand() {
             break
         case "Lets learn":
         case "go 7":
-            router.push('/learning/lessons')
+            router.push('/learning/user')
             break
 
         // general commands
@@ -147,13 +147,13 @@ async function getTeams() {
             .select('*')
             .eq('creator_id', extra.id);
         if (error) {
-            commandOutput("Failed to get your teams - contact support")
+            commandOutput("User information incomplete - contact support")
             return
         }
 
         printTeams(data)
     } else {
-        commandOutput("Failed to get your teams - contact support")
+        commandOutput("User information incomplete - contact support")
         return
     }
 }
@@ -199,8 +199,34 @@ async function deleteTeam(c) {
     }
 }
 
-function createLesson() {
+async function createLesson() {
+    let extra = await getUserExtra()
 
+    if (extra) {
+        const { data, error } = await supabase
+            .from('limitations')
+            .select('lesson_limit, lessons')
+            .eq('extra_id', extra.id);
+        if (error) {
+            commandOutput("User information incomplete - contact support")
+            return
+        }
+
+        if (data.length > 1) {
+            commandOutput("User information error - contact support")
+            return
+        } else {
+            if (data[0].lesson_limit > data[0].lessons) {
+                router.push("/learning/create-lesson")
+            } else {
+                commandOutput("You have reached the maximum of lessons you can create")
+                return
+            }
+        }
+    } else {
+        commandOutput("User information incomplete - contact support")
+        return
+    }
 }
 
 function cancelLesson() {

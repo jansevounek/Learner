@@ -5,7 +5,7 @@
 
 @layer components {
     .selections-container {
-        @apply font-mono text-green-600 relative flex flex-col mx-2 mb-10;
+        @apply font-mono text-green-600 relative flex flex-col mx-2 mb-10 mt-3;
     }
     .selections-item {
         @apply w-[100%] h-16 border-x-2 border-b-2 border-green-700 flex flex-row items-center;
@@ -30,5 +30,24 @@
     }
     .start-lesson-button {
         @apply text-red-600 underline mb-2 relative;
+    }
+
+    .textarea-input {
+        @apply bg-inherit h-60 outline-none font-mono mx-2 text-green-600;
+    }
+    .item-details-checkbox-container {
+        @apply mx-auto flex flex-row relative items-start justify-center mt-2 border-2 border-green-600;
+    }
+    .item-details-checkbox {
+        @apply h-4 w-4 my-auto mx-1 border-2 border-red-600 bg-red-600
+    }
+    .checboxSelected {
+        @apply border-green-600 bg-green-600;
+    }
+    .item-detail-input-container {
+        @apply mx-auto flex flex-col relative mt-2 border-2 border-green-600;
+    }
+    .item-detail-input {
+        @apply bg-inherit w-11 outline-none font-mono text-center mx-auto;
     }
 }
