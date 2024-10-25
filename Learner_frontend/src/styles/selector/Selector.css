@@ -50,4 +50,7 @@
     .item-detail-input {
         @apply bg-inherit w-11 outline-none font-mono text-center mx-auto;
     }
+    .selections-item-date {
+        @apply w-[100%] h-24 border-x-2 border-b-2 border-green-700 flex flex-col lg:flex-row justify-center lg:items-center;
+    }
 }

@@ -12,6 +12,7 @@
     "@stripe/stripe-js": "^4.4.0",
     "@supabase/supabase-js": "^2.44.4",
     "@vue-stripe/vue-stripe": "^4.5.0",
+    "@vuepic/vue-datepicker": "^9.0.3",
     "dotenv": "^16.4.5",
     "figlet": "^1.7.0",
     "vue": "^3.4.29",

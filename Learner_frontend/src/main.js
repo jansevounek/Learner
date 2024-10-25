@@ -10,6 +10,9 @@ import './styles/commandline/CommandLine.css';
 import './styles/selector/Selector.css';
 import './styles/containers/Containers.css';
 
+// taken from https://vue3datepicker.com/installation/
+import '@vuepic/vue-datepicker/dist/main.css'
+
 const app = createApp(App)
 
 app.use(router)
