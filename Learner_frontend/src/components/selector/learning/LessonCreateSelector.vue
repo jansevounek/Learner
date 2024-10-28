@@ -11,7 +11,7 @@
         </div>
         <!--other section-->
         <div @click="currentIndex = 1">
-            <div class="selections-item" :class="{ selected: currentIndex === 1}">
+            <div class="selections-item" :class="{ selected: currentIndex === 1 }">
                 <h1 class="selections-item-content">The task</h1>
                 <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
                     <span v-if="!displayDetails || currentIndex != 1">▲</span>
@@ -25,7 +25,7 @@
             </div>
         </div>
         <div @click="currentIndex = 2">
-            <div class="selections-item" :class="{ selected: currentIndex === 2}">
+            <div class="selections-item" :class="{ selected: currentIndex === 2 }">
                 <h1 class="selections-item-content">Container settings</h1>
                 <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
                     <span v-if="!displayDetails || currentIndex != 2">▲</span>
@@ -33,26 +33,57 @@
                 </a>
             </div>
             <div class="selections-item-details" v-if="displayDetails && currentIndex == 2">
-                <div class="item-details-checkbox-container" :class="{ selected: subIndex === 0}">
+                <div class="item-details-checkbox-container" :class="{ selected: subIndex1 === 0 }">
                     <div class="item-details-checkbox" :class="{ checboxSelected: networkSelected }" @click="networkSelected = !networkSelected"></div>
                     <label class="mr-1">Network required</label>
                 </div>
-                <div class="item-details-checkbox-container" :class="{ selected: subIndex === 1}">
+                <div class="item-details-checkbox-container" :class="{ selected: subIndex1 === 1 }">
                     <div class="item-details-checkbox" :class="{ checboxSelected: sudoSelected }" @click="sudoSelected = !sudoSelected"></div>
                     <label class="mr-1">Sudo required</label>
                 </div>
-                <div class="item-detail-input-container mb-3" :class="{ selected: subIndex === 2}">
+                <div class="item-detail-input-container mb-3" :class="{ selected: subIndex1 === 2 }">
                     <p class="mx-2">What load is allowed</p>
-                    <input type="text" class="item-detail-input" placeholder="0-100" v-model="loadInput" v-focus="displayDetails && currentIndex == 2 && subIndex == 2">
+                    <input type="number" class="item-detail-input" placeholder="0-100" v-model="loadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 2">
                 </div>
             </div>
         </div>
         <div @click="currentIndex = 3">
-            <div class="selections-item-date" :class="{ selected: currentIndex === 3}">
+            <div class="selections-item-date" :class="{ selected: currentIndex === 3 }">
                 <h1 class="selections-item-content">Time of availibility</h1>
                 <p class="selections-item-content">
-                    <VueDatePicker v-model="date" range multi-calendars dark arrow-navigation/>
+                    <VueDatePicker v-model="date" range multi-calendars dark/>
                 </p>
+            </div>
+        </div>
+        <div @click="currentIndex = 4">
+            <div class="selections-item" :class="{ selected: currentIndex === 4 }">
+                <h1 class="selections-item-content">Teams</h1>
+                <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
+                    <span v-if="!displayDetails || currentIndex != 4">▲</span>
+                    <span v-if="displayDetails && currentIndex == 4">▼</span>
+                </a>
+            </div>
+            <div class="selections-item-details" v-if="displayDetails && currentIndex == 4">
+                <div class="item-details-checkbox-container" v-for="(team, index) in adminTeams" :class="{ selected: subIndex2 === index }">
+                    <div class="item-details-checkbox" :class="{ checboxSelected: networkSelected }" @click="networkSelected = !networkSelected"></div>
+                    <label class="mr-1">{{ team.name }}</label>
+                </div>
+            </div>
+        </div>
+        <div @click="currentIndex = 5">
+            <div class="selections-item" :class="{ selected: currentIndex === 5 }">
+                <b class="selection-item-button" @click="createLesson">Create</b>
+            </div>
+        </div>
+        <div>
+            <div class="selections-error" v-if="isError && !firstLoad">
+                <p v-if="errors.name_errors.empty" class="selection-error">1.1 A name for the lesson is required</p>
+                <p v-if="errors.name_errors.invalidAscii" class="selection-error">1.2 The name can only consist of letters and numbers</p>
+                <p v-if="errors.name_errors.onlySpaces" class="selection-error">1.3 The name of the lesson must be something else then spaces</p>
+                <p v-if="errors.task_errors.empty" class="selection-error">2.1 A task for the lesson is required</p>
+                <p v-if="errors.task_errors.short" class="selection-error text-orange-500">2.2 The task for the lesson is short</p>
+                <p v-if="errors.load" class="selection-error">3. The maximum load of the container must be set</p>
+                <p v-if="errors.time" class="selection-error">4. The time of the lesson must be set</p>
             </div>
         </div>
         <span class="mb-12"></span>
@@ -68,21 +99,39 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-let date = ref();
 
 let displayDetails = ref(false)
 let currentIndex = ref(0)
-let subIndex = ref(0)
+let subIndex1 = ref(0)
+let subIndex2 = ref(0)
 
+// all the lesson information
 let taskArea = ref('')
 let nameInput = ref('')
 let networkSelected = ref(false)
 let sudoSelected = ref(false)
 let loadInput = ref('')
-let calendarOpen = ref(false)
+let date = ref();
 
-const listLength = 4
-const subListLength = 3
+let firstLoad = true
+let errors = {
+    name_errors: {
+        empty: true,
+        invalidAscii: true,
+        onlySpaces: true
+    },
+    task_errors: {
+        empty: true,
+        short: true
+    },
+    load: true,
+    time: true,
+}
+
+const listLength = 5
+const subListLength1 = 3
+const subListLength2 = 3
+const adminTeams = getTeams()
 
 // mounting handlers for controls
 onMounted(() => {
@@ -109,24 +158,30 @@ const vFocus = {
 function handleKeyDown(event) {
     if (event.key === 'ArrowDown' && event.ctrlKey) {
         if (displayDetails.value && currentIndex.value == 2) {
-            subIndex.value = (subIndex.value + 1) % subListLength;
+            subIndex1.value = (subIndex1.value + 1) % subListLength1;
+        }
+        if (displayDetails.value && currentIndex.value == 4) {
+            subIndex2.value = (subIndex2.value + 1) % subListLength2;
         }
     } else if (event.key === 'ArrowUp' && event.ctrlKey) {
         if (displayDetails.value && currentIndex.value == 2) {
-            subIndex.value = (subIndex.value - 1 + subListLength) % subListLength;
+            subIndex1.value = (subIndex1.value - 1 + subListLength1) % subListLength1;
         }
-    } else if (event.key === 'ArrowDown' && calendarOpen) {
+        if (displayDetails.value && currentIndex.value == 4) {
+            subIndex2.value = (subIndex2.value - 1 + subListLength2) % subListLength2;
+        }
+    } else if (event.key === 'ArrowDown') {
         displayDetails.value = false
         currentIndex.value = (currentIndex.value + 1) % listLength;
         updateSelection(currentIndex.value);
-    } else if (event.key === 'ArrowUp' && calendarOpen) {
+    } else if (event.key === 'ArrowUp') {
         displayDetails.value = false
         currentIndex.value = (currentIndex.value - 1 + listLength) % listLength;
         updateSelection(currentIndex.value);
     } else if (event.key === 'Enter' && event.ctrlKey) {
         selectContainerOptions()
-    } else if (event.key === 'Enter' && currentIndex.value == 3) {
-        calendarOpen = !calendarOpen
+    } else if (event.key === 'Enter' && currentIndex.value == 4) {
+        createLesson()
     } else if (event.key === 'Enter') {
         displayDetails.value = !displayDetails.value
     } else if (event.key === 'Escape') {
@@ -145,6 +200,115 @@ function selectContainerOptions() {
         networkSelected.value = !networkSelected.value
     } else if (subIndex.value === 1) {
         sudoSelected.value = !sudoSelected.value
+    }
+}
+
+async function createLesson() {
+    let error = {
+        name_errors: {
+            empty: true,
+            invalidAscii: true,
+            onlySpaces: true
+        },
+        task_errors: {
+            empty: true,
+            short: true
+        },
+        load: true,
+        time: true,
+    }
+
+    error = testName(error)
+
+    error = testTask(error)
+    
+    if (loadInput.value > 0 && loadInput.value < 100) {
+        error.load = false
+    }
+
+    if (date.value) {
+        error.time = false
+    }
+
+    errors = error
+    firstLoad = false
+
+    if (!isError) {
+        create()
+    }
+}
+
+function testName(error) {
+    if (nameInput.value != "") {
+        error.name_errors.empty = false
+    }
+    // taken from https://bobbyhadz.com/blog/javascript-check-if-string-contains-only-letters-and-numbers#check-if-string-contains-only-letters-and-numbers-in-javascript
+    if (/^[A-Za-z0-9 _-]*$/.test(nameInput.value)) {
+        error.name_errors.invalidAscii = false
+    }
+
+    // taken from https://stackoverflow.com/questions/10261986/how-to-detect-string-which-contains-only-spaces
+    if (nameInput.value.replace(/\s/g, '').length) {
+        error.name_errors.onlySpaces = false
+    }
+    return error
+}
+
+function testTask(error) {
+    if (taskArea.value != "" && taskArea.value.replace(/\s/g, '').length) {
+        error.task_errors.empty = false
+    }
+
+    if (taskArea.value.length > 50) {
+        error.task_errors.short = false
+    }
+    return error
+}
+
+function isError(error) {
+    if (
+        error.name_errors.empty ||
+        error.name_errors.invalidAscii ||
+        error.name_errors.onlySpaces ||
+        error.load ||
+        error.time ||
+        error.task_errors.empty ||
+        error.task_errors.short
+    ) {
+        return true
+    }
+    return false
+}
+
+async function getTeams() {
+    let extra = await getUserExtra()
+
+    if (extra) {
+        const { data, error } = await supabase
+            .from('team')
+            .select('*')
+            .eq('creator_id', extra.id);
+
+        console.log(data)
+        return data;
+    }
+
+    return [];
+}
+
+async function getUserExtra() {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data, error } = await supabase
+        .from('user')
+        .select('*')
+        .eq('user_id', user.id);
+    if (error) {
+        return false
+    }
+    if (data) {
+        return data[0]
+    } else {
+        return false
     }
 }
 </script>

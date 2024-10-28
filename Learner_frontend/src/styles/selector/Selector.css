@@ -51,6 +51,15 @@
         @apply bg-inherit w-11 outline-none font-mono text-center mx-auto;
     }
     .selections-item-date {
-        @apply w-[100%] h-24 border-x-2 border-b-2 border-green-700 flex flex-col lg:flex-row justify-center lg:items-center;
+        @apply w-[100%] h-24 border-x-2 border-b-2 border-green-600 flex flex-col lg:flex-row justify-center lg:items-center;
+    }
+    .selection-item-button {
+        @apply mx-auto border-2 border-green-600 px-2
+    }
+    .selections-error {
+        @apply w-[100%] border-x-2 border-b-2 border-red-700 flex flex-col justify-center text-red-600;
+    }
+    .selection-error {
+        @apply mx-2 mb-1
     }
 }
