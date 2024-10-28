@@ -216,10 +216,15 @@ async function createLesson() {
             commandOutput("User information error - contact support")
             return
         } else {
-            if (data[0].lesson_limit > data[0].lessons) {
-                router.push("/learning/create-lesson")
+            if (data[0].teams > 0) {
+                if (data[0].lesson_limit > data[0].lessons) {
+                    router.push("/learning/create-lesson")
+                } else {
+                    commandOutput("You have reached the maximum of lessons you can create")
+                    return
+                }
             } else {
-                commandOutput("You have reached the maximum of lessons you can create")
+                commandOutput("You need to have at least one team for which to create a lesson")
                 return
             }
         }

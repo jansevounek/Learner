@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request
 
 from ...services.supabase_service import supabase, getTeam, getUserExtra
-from ...services.docker_service import docker
 
 bp = Blueprint('user_teams', __name__, url_prefix='/teams/user')
 

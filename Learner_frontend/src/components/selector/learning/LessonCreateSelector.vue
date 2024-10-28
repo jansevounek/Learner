@@ -64,10 +64,11 @@
                 </a>
             </div>
             <div class="selections-item-details" v-if="displayDetails && currentIndex == 4">
-                <div class="item-details-checkbox-container" v-for="(team, index) in adminTeams" :class="{ selected: subIndex2 === index }">
-                    <div class="item-details-checkbox" :class="{ checboxSelected: networkSelected }" @click="networkSelected = !networkSelected"></div>
+                <div class="item-details-checkbox-container" v-for="(team, index) in adminTeams" :class="{ selected: subIndex2 === index }" :ref="'item-n-' + index">
+                    <div class="item-details-checkbox" :class="{ checboxSelected: teamSelected == team.id }" @click="selectTeam(team.id)"></div>
                     <label class="mr-1">{{ team.name }}</label>
                 </div>
+                <span class="mt-2"></span>
             </div>
         </div>
         <div @click="currentIndex = 5">
@@ -82,8 +83,9 @@
                 <p v-if="errors.name_errors.onlySpaces" class="selection-error">1.3 The name of the lesson must be something else then spaces</p>
                 <p v-if="errors.task_errors.empty" class="selection-error">2.1 A task for the lesson is required</p>
                 <p v-if="errors.task_errors.short" class="selection-error text-orange-500">2.2 The task for the lesson is short</p>
-                <p v-if="errors.load" class="selection-error">3. The maximum load of the container must be set</p>
-                <p v-if="errors.time" class="selection-error">4. The time of the lesson must be set</p>
+                <p v-if="errors.team" class="selection-error">3. The team for which the lesson is intended must be selected</p>
+                <p v-if="errors.load" class="selection-error">4. The maximum load of the container must be set</p>
+                <p v-if="errors.time" class="selection-error">5. The time of the lesson must be set</p>
             </div>
         </div>
         <span class="mb-12"></span>
@@ -99,12 +101,6 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-
-let displayDetails = ref(false)
-let currentIndex = ref(0)
-let subIndex1 = ref(0)
-let subIndex2 = ref(0)
-
 // all the lesson information
 let taskArea = ref('')
 let nameInput = ref('')
@@ -112,9 +108,11 @@ let networkSelected = ref(false)
 let sudoSelected = ref(false)
 let loadInput = ref('')
 let date = ref();
+let teamSelected = ref(0);
 
+// errors stuff
 let firstLoad = true
-let errors = {
+let errors = ref({
     name_errors: {
         empty: true,
         invalidAscii: true,
@@ -124,14 +122,21 @@ let errors = {
         empty: true,
         short: true
     },
+    team: true,
     load: true,
     time: true,
-}
+})
 
-const listLength = 5
+// listing stuff
+const listLength = 6
 const subListLength1 = 3
-const subListLength2 = 3
-const adminTeams = getTeams()
+let subListLength2 = 0
+const adminTeams = ref([]);
+setAdminTeams()
+let displayDetails = ref(false)
+let currentIndex = ref(0)
+let subIndex1 = ref(0)
+let subIndex2 = ref(0)
 
 // mounting handlers for controls
 onMounted(() => {
@@ -178,9 +183,11 @@ function handleKeyDown(event) {
         displayDetails.value = false
         currentIndex.value = (currentIndex.value - 1 + listLength) % listLength;
         updateSelection(currentIndex.value);
-    } else if (event.key === 'Enter' && event.ctrlKey) {
+    } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 2) {
         selectContainerOptions()
-    } else if (event.key === 'Enter' && currentIndex.value == 4) {
+    } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 4) {
+        selectTeamOptions()
+    } else if (event.key === 'Enter' && currentIndex.value == 5) {
         createLesson()
     } else if (event.key === 'Enter') {
         displayDetails.value = !displayDetails.value
@@ -196,11 +203,15 @@ function updateSelection(index) {
 }
 
 function selectContainerOptions() {
-    if (subIndex.value === 0) {
+    if (subIndex1.value === 0) {
         networkSelected.value = !networkSelected.value
-    } else if (subIndex.value === 1) {
+    } else if (subIndex1.value === 1) {
         sudoSelected.value = !sudoSelected.value
     }
+}
+
+function selectTeamOptions() {
+    teamSelected.value = adminTeams.value[subIndex2.value].id
 }
 
 async function createLesson() {
@@ -214,6 +225,7 @@ async function createLesson() {
             empty: true,
             short: true
         },
+        team: true,
         load: true,
         time: true,
     }
@@ -230,10 +242,15 @@ async function createLesson() {
         error.time = false
     }
 
-    errors = error
+    if (teamSelected.value != 0) {
+        error.team = false
+    }
+
+    errors.value = error
     firstLoad = false
 
-    if (!isError) {
+    console.log(isError(error))
+    if (!isError(error)) {
         create()
     }
 }
@@ -251,6 +268,7 @@ function testName(error) {
     if (nameInput.value.replace(/\s/g, '').length) {
         error.name_errors.onlySpaces = false
     }
+
     return error
 }
 
@@ -278,6 +296,40 @@ function isError(error) {
         return true
     }
     return false
+}
+
+function selectTeam(id) {
+    teamSelected.value = id;
+}
+
+async function setAdminTeams() {
+    adminTeams.value = await getTeams()
+    subListLength2 = adminTeams.value.length
+}
+
+async function create() {
+    const { data: { user } } = await supabase.auth.getUser();
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/lessons/admin/create", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+            user_id: user.id,
+            name: nameInput.value,
+            task: taskArea.value,
+            container_settings: {
+                network: networkSelected.value,
+                sudo: sudoSelected.value,
+                load: loadInput.value,
+            },
+            date: date.value,
+            team_id: teamSelected.value
+        })
+    });
+    const data = await response.json()
 }
 
 async function getTeams() {
