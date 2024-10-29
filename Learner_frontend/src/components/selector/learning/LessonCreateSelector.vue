@@ -249,7 +249,6 @@ async function createLesson() {
     errors.value = error
     firstLoad = false
 
-    console.log(isError(error))
     if (!isError(error)) {
         create()
     }
@@ -328,8 +327,11 @@ async function create() {
             date: date.value,
             team_id: teamSelected.value
         })
-    });
+    })
     const data = await response.json()
+    if (data.status) {
+        router.push("/learning/admin")
+    }
 }
 
 async function getTeams() {
@@ -340,8 +342,6 @@ async function getTeams() {
             .from('team')
             .select('*')
             .eq('creator_id', extra.id);
-
-        console.log(data)
         return data;
     }
 
