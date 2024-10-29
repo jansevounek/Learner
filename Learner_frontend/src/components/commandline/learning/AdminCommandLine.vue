@@ -96,6 +96,7 @@ function adminCommands() {
         case command.startsWith("team delete"):
             deleteTeam(command);
             return true
+        //done
         case command.startsWith("lesson create"):
             createLesson();
             return true
@@ -238,8 +239,57 @@ function cancelLesson() {
 
 }
 
-function getLessons() {
+async function getLessons() {
+    let extra = await getUserExtra()
 
+    if (extra) {
+        const { data, error } = await supabase
+            .from("lesson")
+            .select("*")
+            .eq('creator_id', extra.id)
+        if (error) {
+            commandOutput("User information incomplete - contact support")
+            return
+        }
+
+        printLessons(data)
+    } else {
+        commandOutput("User information incomplete - contact support")
+        return
+    }
+}
+
+async function printLessons(lesson) {
+
+    let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
+
+    if (lesson.length == 0){
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
+                                 + "No lessons found \n"
+    } else {
+        for (let i = 0; i < lesson.length; i++) {
+            const { data, error } = await supabase
+                .from("team")
+                .select("*")
+                .eq('id', lesson[i].team_id)
+            if (error) {
+                break
+            }
+            output += i + 1 + ".\n name: " + lesson[i].name + "\n"
+                + "start: " + lesson[i].start_time + "\n"
+                + "end: " + lesson[i].end_time + "\n"
+                + "team: \n" 
+                + "a) name: " + data[0].name + "\n"
+                + "b) code: " + data[0].team_code + "\n"
+                + "settings: \n"
+                + "a) load allowed: " + lesson[i].settings["load"] + "%\n"
+                + "b) network needed: " + lesson[i].settings["network"] + "\n"
+                + "c) sudo needed: " + lesson[i].settings["sudo"] + "\n\n"
+        }
+        executedCommands.value += output
+    }
+
+    cmdinput.value = ""
 }
 
 function seeSolutions() {
