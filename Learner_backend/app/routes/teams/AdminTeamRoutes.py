@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getTeam
+from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getTeam, getLesson
 
 bp = Blueprint('admin_teams', __name__, url_prefix='/teams/admin')
 
@@ -55,6 +55,8 @@ def delete_team():
     extra = getUserExtra(user_id=json["user_id"])
     team = getTeam(name=json["team_name"])
 
+    lesson = getLesson(team_id=team[0].get("id"))
+
     if (extra):
         if (team):
             try:
@@ -63,10 +65,12 @@ def delete_team():
                 print(f"Error during Supabase query (during deletion of a team): {e}")
                 return "Error occured", 500
             
-            subtract = 2 - len(team)
+            subtract_lessons = 2 - len(lesson)
+            
+            subtract_teams = 2 - len(team)
 
             try:
-                supabase.table("limitations").update({ "teams": subtract }).eq("extra_id", extra[0].get("id")).execute()
+                supabase.table("limitations").update({ "teams": subtract_teams, "lessons": subtract_lessons }).eq("extra_id", extra[0].get("id")).execute()
             except Exception as e:
                 print(f"Error during Supabase query (during updating user limits - team creation): {e}")
                 return "Error occured", 500

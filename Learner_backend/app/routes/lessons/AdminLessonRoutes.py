@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getTeam
+from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson
 from ...services.docker_service import docker
 
 bp = Blueprint('admin_lessons', __name__, url_prefix='/lessons/admin')
@@ -52,4 +52,46 @@ def create_lesson():
     return jsonify({
         "status": True,
         "msg": 'on skibidi'
+        })
+
+# TODO unique names
+@bp.route('/cancel', methods=['POST'])
+def cancel_lesson():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    extra = getUserExtra(user_id=json["user_id"])
+    limit = getUserLimitations(user_id=json["user_id"])
+    lesson = getLesson(name=json["lesson_name"])
+
+    if (extra and limit):
+        if (lesson):
+            try:
+                supabase.table("lesson").delete().eq("name", json["lesson_name"]).eq("creator_id", extra[0].get("id")).execute()
+            except Exception as e:
+                print(f"Error during Supabase query (during creation of a lesson): {e}")
+                return "Error occured", 500
+
+            try:
+                supabase.table("limitations").update({ "lessons": limit[0].get("lessons") - 1 }).eq("extra_id", extra[0].get("id")).execute()
+            except Exception as e:
+                print(f"Error during Supabase query (during creation of a lesson): {e}")
+                return "Error occured", 500
+        else:
+            return jsonify({
+                "status": False,
+                "msg": 'No lesson with the name "' + json["lesson_name"] + '" found'
+            })
+    else:
+        return jsonify({
+            "status": False,
+            "msg": 'Your user profile is incomplete - contact support'
+        })
+    
+    return jsonify({
+        "status": True,
+        "msg": 'Lesson "' + json["lesson_name"] + '" canceled successfully'
         })

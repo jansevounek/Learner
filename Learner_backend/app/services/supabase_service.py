@@ -147,6 +147,53 @@ def is_uuid(val):
         return True
     except ValueError:
         return False
+    
+def getLesson(**kwargs):
+    id = kwargs.get("id")
+    user_id = kwargs.get("user_id")
+    extra_id = kwargs.get("extra_id")
+    name = kwargs.get("name")
+    team_id = kwargs.get("team_id")
+
+    if id:
+        try:
+            response = supabase.table("lesson").select("*").eq("id", id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting lesson by id): {e}")
+            return "Error occured", 500
+    elif extra_id:
+        try:
+            response = supabase.table("lesson").select("*").eq("creator_id", extra_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting lesson by extra_id): {e}")
+            return "Error occured", 500
+    elif name:
+        try:
+            response = supabase.table("lesson").select("*").eq("name", name).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting lesson by name): {e}")
+            return "Error occured", 500
+    elif user_id:
+        try:
+            r = supabase.table("user").select("*").eq("user_id", user_id).execute()
+            i = r.data[0].get("id")
+            response = supabase.table("lesson").select("*").eq("creator_id", i).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting lesson by user_id): {e}")
+            return "Error occured", 500
+    elif team_id:
+        try:
+            response = supabase.table("lesson").select("*").eq("team_id", team_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting lesson by name): {e}")
+            return "Error occured", 500
+    else:
+        raise ValueError("user_id, extra_id or id not provided - failed to fetch lesson")
 
 
 __all__ = ['supabase', 'getUserExtra', 'getUserContainers', 'getUserLimitations', 'getToBeDeletedContainer']

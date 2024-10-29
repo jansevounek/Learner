@@ -100,8 +100,8 @@ function adminCommands() {
         case command.startsWith("lesson create"):
             createLesson();
             return true
-        case command.startsWith("lesson cancel"):
-            cancelLesson();
+        case command.startsWith("lesson cancel "):
+            cancelLesson(command);
             return true
         case command.startsWith("lesson ps"):
             getLessons();
@@ -235,8 +235,27 @@ async function createLesson() {
     }
 }
 
-function cancelLesson() {
+async function cancelLesson(c) {
+    let name = c.replace("lesson cancel ", "")
 
+    if (name) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/lessons/admin/cancel", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+                user_id: user.id,
+                lesson_name: name,
+            })
+        });
+
+        const data = await response.json()
+        commandOutput(data.msg)
+    }
 }
 
 async function getLessons() {
