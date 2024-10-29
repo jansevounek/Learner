@@ -205,7 +205,7 @@ async function createLesson() {
     if (extra) {
         const { data, error } = await supabase
             .from('limitations')
-            .select('lesson_limit, lessons')
+            .select('lesson_limit, lessons, teams')
             .eq('extra_id', extra.id);
         if (error) {
             commandOutput("User information incomplete - contact support")
