@@ -5,7 +5,7 @@
         </div>
         <div class="flex flex-row">
             <p>></p>
-            <input type="email" class="cmd-input" v-model="cmdinput" id="cmd-input" v-on:keyup.enter="executeCommand" :class="[{'text-red-600': isEmail === false}]">
+            <input type="email" class="cmd-input" v-model="cmdinput" id="cmd-input" v-on:keyup.enter="executeCommand" ref="input" :class="[{'text-red-600': isEmail === false}]">
         </div>
         <button class="cmd-input-mobile-btn" @click="executeCommand">
             Execute
@@ -24,7 +24,10 @@ const router = useRouter()
 let executedCommands = ref('Please enter your email adress:')
 let cmdinput = ref('')
 
+const input = ref(null)
+
 onMounted(() => {
+    input.value?.focus()
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('click', handleClick);
 })

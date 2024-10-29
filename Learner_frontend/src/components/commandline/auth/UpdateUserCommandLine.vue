@@ -9,7 +9,7 @@
                 <h1>></h1>
                 <input :type="currentStep > 0 && currentStep < 3 ? 'password' : 'text'" class="cmd-input"  
                 :class="[{'text-red-600': isEmail === false}]" id="cmd-input"
-                 v-on:keyup.enter="executeCommand" v-model="cmdinput" autofocus>
+                 v-on:keyup.enter="executeCommand" ref="input" v-model="cmdinput">
             </div>
             <div class="cmd-password-strength-container" v-if="showStrength">
                 <p class="cmd-strength-indicator" :class="strengthLevel >= 2 ? 'text-red-600' : 'text-white'">#</p>
@@ -33,8 +33,11 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
+const input = ref(null)
+
 // mounting handlers for shortcuts
 onMounted(() => {
+    input.value?.focus()
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('click', handleClick);
 })

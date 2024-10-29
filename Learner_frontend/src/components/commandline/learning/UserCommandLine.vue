@@ -5,7 +5,7 @@
         </div>
         <div class="cmd-line-input-container">
             <h1 id="inputTitle">user@linuxlearning:~$</h1>
-            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand"  v-model="cmdinput" autofocus>
+            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand" ref="input" v-model="cmdinput">
         </div>
         <button class="cmd-input-mobile-btn" @click="executeCommand">
             Execute
@@ -21,6 +21,8 @@ import { supabase } from '@/supabase/init.js'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+const input = ref(null)
+
 const cmdinput = ref('');
 let executedCommands = ref('')
 const executedList = ref([])
@@ -28,6 +30,7 @@ let executedIndex = ref(0)
 
 // mounting handlers for shortcuts
 onMounted(() => {
+    input.value?.focus()
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('click', handleClick);
 })
@@ -52,6 +55,7 @@ function executeCommand() {
         case "Logout":
         case "go 6":
             logout()
+            router.push('/')
             break
 
         // general commands
@@ -88,13 +92,18 @@ function adminCommands() {
         case command.startsWith("team join"):
             joinTeam(command);
             return true
+        // done
         case command.startsWith("team leave"):
             leaveTeam(command);
             return true
+        // done
         case command == "team ps":
             getTeams();
             return true
-        //TODO do the lessons
+        // done
+        case command == "lesson ps":
+            getLessons();
+            return true
     }
     return false;
 }
@@ -156,9 +165,10 @@ async function getTeams() {
 
             if (error) {
                 commandOutput("There is an issue with the teams you have joined - please contact support")
+                return
             }
 
-            output += i + 1 + ".\n name: " + data[0].name + "\n"
+            output += i + 1 + '.\n name: "' + data[0].name + '"\n'
         }
         commandOutput(output)
         return
@@ -166,6 +176,57 @@ async function getTeams() {
         commandOutput("You are not a part of any team")
         return
     }
+}
+
+async function getLessons() {
+    let extra = await getUserExtra();
+
+    if (extra.teams.length > 0) {
+        let output = "\n"
+        let index = 1;
+
+        for (let i = 0; i < extra.teams.length; i++) {
+            // taken from https://stackoverflow.com/questions/1133770/how-to-convert-a-string-to-an-integer-in-javascript
+            const { data, error } = await supabase.from("team").select("*").eq("id", parseInt(extra.teams[i]))
+            const team = data
+
+            if (error) {
+                commandOutput("There is an issue with the teams you have joined - please contact support")
+                return
+            }
+
+            let lessons = await getLesson(team[0].id)
+
+            if (lessons.length > 0) {
+                for (let i = 0; i < lessons.length; i++) {
+                    output += index + ". \n" +
+                        'lesson name: "' + lessons[i].name + '"\n' +
+                        'from team: "' + team[0].name + '"\n' +
+                        'starts: "' + lessons[i].start_time + '"\n' +
+                        'ends: "' + lessons[i].end_time + '"\n'
+                    index++
+                }
+            } else {
+                output += 'No lesson for team "' + team[0].name + '" found \n'
+            }
+        }
+
+        commandOutput(output)
+        return
+    } else {
+        commandOutput("You need to join a team in order to get lessons")
+        return
+    }
+}
+
+async function getLesson(team_id) {
+    const { data, error } = await supabase.from("lesson").select("*").eq("team_id", team_id)
+
+    if (error) {
+        commandOutput("No team with id " + team_id + " found")
+    }
+
+    return data
 }
 
 async function getUserExtra() {

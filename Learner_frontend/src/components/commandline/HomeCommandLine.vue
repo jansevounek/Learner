@@ -5,7 +5,7 @@
         </div>
         <div class="cmd-line-input-container">
             <h1 id="inputTitle">user@linuxlearning:~$</h1>
-            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand"  v-model="cmdinput" autofocus>
+            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand" ref="input" v-model="cmdinput">
         </div>
         <button class="cmd-input-mobile-btn" @click="executeCommand">
             Execute
@@ -21,6 +21,8 @@ import { supabase } from '@/supabase/init.js'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+const input = ref(null)
+
 const cmdinput = ref('');
 let executedCommands = ref('')
 const executedList = ref([])
@@ -28,6 +30,7 @@ let executedIndex = ref(0)
 
 // mounting handlers for shortcuts
 onMounted(() => {
+    input.value?.focus()
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('click', handleClick);
 })

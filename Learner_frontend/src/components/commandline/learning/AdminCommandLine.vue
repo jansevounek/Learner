@@ -5,7 +5,7 @@
         </div>
         <div class="cmd-line-input-container">
             <h1 id="inputTitle">user@linuxlearning:~$</h1>
-            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand"  v-model="cmdinput" autofocus>
+            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand" ref="input" v-model="cmdinput">
         </div>
         <button class="cmd-input-mobile-btn" @click="executeCommand">
             Execute
@@ -21,6 +21,8 @@ import { supabase } from '@/supabase/init.js'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+const input = ref(null)
+
 const cmdinput = ref('');
 let executedCommands = ref('')
 const executedList = ref([])
@@ -28,6 +30,7 @@ let executedIndex = ref(0)
 
 // mounting handlers for shortcuts
 onMounted(() => {
+    input.value?.focus()
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('click', handleClick);
 })
@@ -48,6 +51,7 @@ function executeCommand() {
         case "Logout":
         case "go 6":
             logout()
+            router.push('/')
             break
         case "Lets learn":
         case "go 7":
@@ -97,12 +101,14 @@ function adminCommands() {
             deleteTeam(command);
             return true
         //done
-        case command.startsWith("lesson create"):
+        case command === "lesson create":
             createLesson();
             return true
+        //done
         case command.startsWith("lesson cancel "):
             cancelLesson(command);
             return true
+        //done
         case command.startsWith("lesson ps"):
             getLessons();
             return true
@@ -167,8 +173,8 @@ function printTeams(data) {
                                  + "No teams found \n"
     } else {
         for (let i = 0; i < data.length; i++) {
-            output += i + 1 + ".\n name: " + data[i].name + "\n"
-                + "team code: " + data[i].team_code + "\n\n"
+            output += i + 1 + '.\n name: "' + data[i].name + '"\n'
+                + 'team code: "' + data[i].team_code + '"\n\n'
         }
         executedCommands.value += output
     }
@@ -294,16 +300,16 @@ async function printLessons(lesson) {
             if (error) {
                 break
             }
-            output += i + 1 + ".\n name: " + lesson[i].name + "\n"
-                + "start: " + lesson[i].start_time + "\n"
-                + "end: " + lesson[i].end_time + "\n"
-                + "team: \n" 
-                + "a) name: " + data[0].name + "\n"
-                + "b) code: " + data[0].team_code + "\n"
-                + "settings: \n"
-                + "a) load allowed: " + lesson[i].settings["load"] + "%\n"
-                + "b) network needed: " + lesson[i].settings["network"] + "\n"
-                + "c) sudo needed: " + lesson[i].settings["sudo"] + "\n\n"
+            output += i + 1 + '.\n name: "' + lesson[i].name + '"\n'
+                + 'start: "' + lesson[i].start_time + '"\n'
+                + 'end: "' + lesson[i].end_time + '"\n'
+                + 'team: \n' 
+                + 'a) name: "' + data[0].name + '"\n'
+                + 'b) code: "' + data[0].team_code + '"\n'
+                + 'settings: \n'
+                + 'a) load allowed: ' + lesson[i].settings['load'] + '%\n'
+                + 'b) network needed: ' + lesson[i].settings['network'] + '\n'
+                + 'c) sudo needed: ' + lesson[i].settings['sudo'] + '\n\n'
         }
         executedCommands.value += output
     }

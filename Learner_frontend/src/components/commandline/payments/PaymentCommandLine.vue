@@ -5,7 +5,7 @@
         </div>
         <div class="cmd-line-input-container">
             <h1 id="inputTitle">></h1>
-            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand"  v-model="cmdinput" autofocus>
+            <input type="text" class="cmd-input" id="cmd-input" v-on:keyup.enter="executeCommand" ref="input" v-model="cmdinput">
         </div>
         <button class="cmd-input-mobile-btn" @click="executeCommand">
             Execute
@@ -22,12 +22,15 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+const input = ref(null)
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
 let executedCommands = ref('To continue type "pay":')
 let cmdinput = ref('')
 
 onMounted(() => {
+    input.value?.focus()
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('click', handleClick);
 })
