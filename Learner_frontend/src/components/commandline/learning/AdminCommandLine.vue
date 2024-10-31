@@ -140,6 +140,8 @@ async function createTeam(c) {
 
         const data = await response.json()
         commandOutput(data.msg)
+    } else {
+        commandOutput("No name provided - please provide a name")
     }
 }
 
@@ -203,6 +205,8 @@ async function deleteTeam(c) {
 
         const data = await response.json()
         commandOutput(data.msg)
+    } else {
+        commandOutput("No name provided - please provide a name")
     }
 }
 
@@ -261,6 +265,8 @@ async function cancelLesson(c) {
 
         const data = await response.json()
         commandOutput(data.msg)
+    } else {
+        commandOutput("No name provided - please provide a name")
     }
 }
 

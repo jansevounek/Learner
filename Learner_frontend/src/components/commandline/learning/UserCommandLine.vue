@@ -104,6 +104,9 @@ function adminCommands() {
         case command == "lesson ps":
             getLessons();
             return true
+        case command.startsWith("lesson do"):
+            doLesson(command);
+            return true
     }
     return false;
 }
@@ -216,6 +219,37 @@ async function getLessons() {
     } else {
         commandOutput("You need to join a team in order to get lessons")
         return
+    }
+}
+
+async function doLesson(c){
+    let lessonName = c.replace("lesson do ", "")
+
+    if (lessonName) {
+        const extra = await getUserExtra()
+        if (extra) {
+            const { data, error } = await supabase.from("lesson").select("*").eq("name", lessonName).eq("creator_id", extra.id)
+
+            if (error) {
+                commandOutput("There is a issue and we are not able to serve you now")
+                return
+            }
+
+            if (data.length == 0) {
+                commandOutput('No lesson with name "' + lessonName + '" found')
+                return
+            } else if (data.length > 1) {
+                commandOutput('More then one lessons with name "' + lessonName + '" found - contact support')
+                return
+            } else {
+                console.log("redirect")
+            }
+        } else {
+            commandOutput("Incomplete user profile - contact support")
+            return
+        }
+    } else {
+        commandOutput("No name provided - please provide a name")
     }
 }
 

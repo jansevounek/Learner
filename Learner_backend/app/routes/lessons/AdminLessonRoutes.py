@@ -16,33 +16,45 @@ def create_lesson():
     extra = getUserExtra(user_id=json["user_id"])
     limit = getUserLimitations(user_id=json["user_id"])
 
-    if (extra and limit):
-        if limit[0].get("lesson_limit") > limit[0].get("lessons"):
-            data = {
-                "creator_id": extra[0].get("id"),
-                "start_time": json["date"][0],
-                "end_time": json["date"][1],
-                "task": json["task"],
-                "name": json["name"],
-                "team_id": json["team_id"],
-                "settings": json["container_settings"]
-            }
-            try:
-                supabase.table("lesson").insert(data).execute()
-            except Exception as e:
-                print(f"Error during Supabase query (during creation of a lesson): {e}")
-                return "Error occured", 500
 
-            try:
-                supabase.table("limitations").update({ "lessons": limit[0].get("lessons") + 1 }).eq("extra_id", extra[0].get("id")).execute()
-            except Exception as e:
-                print(f"Error during Supabase query (during updating user limitations): {e}")
-                return "Error occured", 500
+    if (extra and limit):
+        try:
+            response = supabase.table("lesson").select("*").eq("name", json["name"]).eq("creator_id", extra[0].get("id")).execute()
+        except Exception as e:
+            print(f"Error during Supabase query (during checking for same lesson names): {e}")
+            return "Error occured", 500
+        if not response.data:
+            if limit[0].get("lesson_limit") > limit[0].get("lessons"):
+                data = {
+                    "creator_id": extra[0].get("id"),
+                    "start_time": json["date"][0],
+                    "end_time": json["date"][1],
+                    "task": json["task"],
+                    "name": json["name"],
+                    "team_id": json["team_id"],
+                    "settings": json["container_settings"]
+                }
+                try:
+                    supabase.table("lesson").insert(data).execute()
+                except Exception as e:
+                    print(f"Error during Supabase query (during creation of a lesson): {e}")
+                    return "Error occured", 500
+
+                try:
+                    supabase.table("limitations").update({ "lessons": limit[0].get("lessons") + 1 }).eq("extra_id", extra[0].get("id")).execute()
+                except Exception as e:
+                    print(f"Error during Supabase query (during updating user limitations): {e}")
+                    return "Error occured", 500
+            else:
+                return jsonify({
+                    "status": False,
+                    "msg": 'You have reached the maximum of lessons that you can create'
+                })
         else:
             return jsonify({
-                "status": False,
-                "msg": 'You have reached the maximum of lessons that can be created'
-            })
+                    "status": False,
+                    "msg": 'You already have a lesson with the same name created'
+                })
     else:
         return jsonify({
             "status": False,

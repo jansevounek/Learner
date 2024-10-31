@@ -14,6 +14,7 @@ import ManageContainersPage from '@/views/ManageContainersPage.vue'
 import LearningUserPage from '@/views/learning/LearningUserPage.vue'
 import LearningAdminPage from '@/views/learning/LearningAdminPage.vue'
 import LearningCreateLessonPage from '@/views/learning/LearningCreateLessonPage.vue'
+import LessonPage from '@/views/learning/LessonPage.vue'
 
 let localUser;
 
@@ -84,6 +85,12 @@ const router = createRouter({
       path: '/learning/create-lesson',
       name: 'create-lesson',
       component: LearningCreateLessonPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/learning/lesson/:id',
+      name: 'lesson-do',
+      component: LessonPage,
       meta: { requiresAuth: true },
     },
     // delete from here

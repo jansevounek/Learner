@@ -86,6 +86,7 @@
                 <p v-if="errors.team" class="selection-error">3. The team for which the lesson is intended must be selected</p>
                 <p v-if="errors.load" class="selection-error">4. The maximum load of the container must be set</p>
                 <p v-if="errors.time" class="selection-error">5. The time of the lesson must be set</p>
+                <p v-if="errors.api" class="selection-error">6. {{ apiErrorMsg }}</p>
             </div>
         </div>
         <span class="mb-12"></span>
@@ -125,7 +126,9 @@ let errors = ref({
     team: true,
     load: true,
     time: true,
+    api: false
 })
+let apiErrorMsg = ref('')
 
 // listing stuff
 const listLength = 6
@@ -228,6 +231,7 @@ async function createLesson() {
         team: true,
         load: true,
         time: true,
+        api: false
     }
 
     error = testName(error)
@@ -290,7 +294,8 @@ function isError(error) {
         error.load ||
         error.time ||
         error.task_errors.empty ||
-        error.task_errors.short
+        error.task_errors.short ||
+        error.api
     ) {
         return true
     }
@@ -329,7 +334,10 @@ async function create() {
         })
     })
     const data = await response.json()
-    if (data.status) {
+    if (!data.status) {
+        errors.value.api = true
+        apiErrorMsg.value = data.msg
+    } else {
         router.push("/learning/admin")
     }
 }
