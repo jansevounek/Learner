@@ -24,4 +24,18 @@ body {
     .title-hr {
         @apply mx-4 text-white mt-2
     }
+
+    /* lesson page */
+    .split-container {
+        @apply relative flex flex-col lg:flex-row;
+    }
+    .control-container {
+        @apply w-[100%] lg:w-[60%] border-x-2 border-t-2 border-green-600 lg:border-y-2 lg:border-l-2 lg:border-r-0
+    }
+    .linux-container {
+        @apply h-[70vh] w-[100%] border-2 border-green-600 flex flex-row justify-center items-center;
+    }
+    .linux-button {
+        @apply h-16 w-32 border-2 border-green-600 text-green-600;
+    }
 }

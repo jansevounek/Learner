@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .selection-container-addon {
+        @apply border-b-2 border-green-600 h-16
+    }
+}

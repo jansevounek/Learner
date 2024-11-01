@@ -248,7 +248,7 @@ async function doLesson(c){
 
                 if (startTime < todaysTime) {
                     if (endTime > todaysTime) {
-                        console.log("go")
+                        router.push("/learning/lesson/" + data[0].id)
                     } else {
                         commandOutput("The lesson is already over")
                         return
