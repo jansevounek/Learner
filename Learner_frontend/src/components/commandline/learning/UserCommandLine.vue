@@ -242,7 +242,21 @@ async function doLesson(c){
                 commandOutput('More then one lessons with name "' + lessonName + '" found - contact support')
                 return
             } else {
-                console.log("redirect")
+                let todaysTime = new Date();
+                let startTime = new Date(data[0].start_time);
+                let endTime = new Date(data[0].end_time);
+
+                if (startTime < todaysTime) {
+                    if (endTime > todaysTime) {
+                        console.log("go")
+                    } else {
+                        commandOutput("The lesson is already over")
+                        return
+                    }
+                } else {
+                    commandOutput("The lesson hasnt started yet")
+                    return
+                }
             }
         } else {
             commandOutput("Incomplete user profile - contact support")
