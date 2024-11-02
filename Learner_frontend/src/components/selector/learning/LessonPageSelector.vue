@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 3" :class="{ selected2: currentIndex === 3 }">
-                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 3 }">Exit</button>
+                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 3 }" @click="router.push('/learning/user')">Exit</button>
             </div>
         </div>
         <div class="linux-container" @click="currentIndex = 4" :class="{ selected2: currentIndex === 4 }">
@@ -112,6 +112,38 @@ async function getLesson() {
 }
 
 async function useContainer() {
-    console.log(lessonId)
+    const { data, error } = await supabase.from('container').select('*').eq('lesson_id', lessonId)
+
+    console.log(data)
+ 
+    if (error) {
+        return
+    }
+
+    if (data.length == 1) {
+        console.log("start container")
+    } else if (data.length > 1){
+        console.log("error")
+    } else {
+        createContainer()
+    }
+}
+
+async function createContainer() {
+    const { data: { user } } = await supabase.auth.getUser();
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/lessons/user/create-container", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+            user_id: user.id,
+            lesson_id: lessonId,
+        })
+    });
+    const data = await response.json()
+    console.log(data)
 }
 </script>
