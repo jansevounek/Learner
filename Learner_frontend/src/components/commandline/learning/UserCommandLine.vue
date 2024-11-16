@@ -16,6 +16,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase/init.js'
+import { getUser, getUserExtra, getTeam, getLesson } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRouter } from 'vue-router'
@@ -98,11 +99,11 @@ function adminCommands() {
             return true
         // done
         case command == "team ps":
-            getTeams();
+            printTeams();
             return true
         // done
         case command == "lesson ps":
-            getLessons();
+            printLessons();
             return true
         case command.startsWith("lesson do"):
             doLesson(command);
@@ -115,7 +116,7 @@ function adminCommands() {
 async function joinTeam(c) {
     let teamCode = c.replace("team join ", "")
     if (teamCode) {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/user/join", {
           method: 'POST',
@@ -137,7 +138,7 @@ async function joinTeam(c) {
 async function leaveTeam(c) {
     let teamName = c.replace("team leave ", "")
     if (teamName) {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/user/leave", {
           method: 'POST',
@@ -156,23 +157,16 @@ async function leaveTeam(c) {
     }
 }
 
-async function getTeams() {
-    let extra = await getUserExtra();
+async function printTeams() {
+    const team = await getTeam()
 
-    if (extra.teams.length > 0) {
+    if (team.length > 0) {
         let output = "\n"
-        // optimize this
-        for (let i = 0; i < extra.teams.length; i++) {
-            // taken from https://stackoverflow.com/questions/1133770/how-to-convert-a-string-to-an-integer-in-javascript
-            const { data, error } = await supabase.from("team").select("name").eq("id", parseInt(extra.teams[i]))
 
-            if (error) {
-                commandOutput("There is an issue with the teams you have joined - please contact support")
-                return
-            }
-
-            output += i + 1 + '.\n name: "' + data[0].name + '"\n'
+        for (let i = 0; i < team.length; i++) {
+            output += i + 1 + '.\n name: "' + team[i].name + '"\n'
         }
+
         commandOutput(output)
         return
     } else {
@@ -181,24 +175,15 @@ async function getTeams() {
     }
 }
 
-async function getLessons() {
-    let extra = await getUserExtra();
+async function printLessons() {
+    const team = await getTeam()
 
-    if (extra.teams.length > 0) {
+    if (team.length > 0) {
         let output = "\n"
         let index = 1;
 
-        for (let i = 0; i < extra.teams.length; i++) {
-            // taken from https://stackoverflow.com/questions/1133770/how-to-convert-a-string-to-an-integer-in-javascript
-            const { data, error } = await supabase.from("team").select("*").eq("id", parseInt(extra.teams[i]))
-            const team = data
-
-            if (error) {
-                commandOutput("There is an issue with the teams you have joined - please contact support")
-                return
-            }
-
-            let lessons = await getLesson(team[0].id)
+        for (let i = 0; i < team.length; i++) {
+            let lessons = await getLesson({ team_id: team[i].id })
 
             if (lessons.length > 0) {
                 for (let i = 0; i < lessons.length; i++) {
@@ -226,7 +211,9 @@ async function doLesson(c){
     let lessonName = c.replace("lesson do ", "")
 
     if (lessonName) {
-        const extra = await getUserExtra()
+        let data = await getUserExtra();
+        const extra = data[0]
+
         if (extra) {
             const { data, error } = await supabase.from("lesson").select("*").eq("name", lessonName).eq("creator_id", extra.id)
 
@@ -264,32 +251,6 @@ async function doLesson(c){
         }
     } else {
         commandOutput("No name provided - please provide a name")
-    }
-}
-
-async function getLesson(team_id) {
-    const { data, error } = await supabase.from("lesson").select("*").eq("team_id", team_id)
-
-    if (error) {
-        commandOutput("No team with id " + team_id + " found")
-    }
-
-    return data
-}
-
-async function getUserExtra() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-        .from('user')
-        .select('*')
-        .eq('user_id', user.id);
-    if (error) {
-        return false
-    }
-    if (data) {
-        return data[0]
-    } else {
-        return false
     }
 }
 

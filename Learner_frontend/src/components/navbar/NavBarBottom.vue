@@ -19,30 +19,27 @@
 </template>
 
 <script setup>
-import { supabase } from '@/supabase/init.js'
 import { ref, onMounted } from 'vue'
+import { getUser, getUserExtra } from '@/supabase/getFunctions.js'
 
 let premiumUser = ref(false)
 
 let localUser = ref(false)
 
-async function getUser() {
-    const { data: { user } } = await supabase.auth.getUser()
+async function setUser() {
+    const user = await getUser()
     if (user) {
-        getPremiumStatus(user)
+        getPremiumStatus()
         localUser.value = true
     } else {
         premiumUser.value = false
     }
 }
 
-async function getPremiumStatus(user) {
-    const { data, error } = await supabase
-        .from('user')
-        .select('premium')
-        .eq('user_id', user.id);
-    if (data) {
-        premiumUser.value = data[0].premium
+async function getPremiumStatus() {
+    const extra = await getUserExtra()
+    if (extra) {
+        premiumUser.value = extra[0].premium
     } else {
         console.log("an error when getting user extras for bottom navbar occured")
     }
@@ -50,7 +47,7 @@ async function getPremiumStatus(user) {
 
 
 onMounted(() => {
-    getUser()
+    setUser()
 })
 </script>
 

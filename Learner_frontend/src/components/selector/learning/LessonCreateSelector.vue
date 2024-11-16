@@ -97,6 +97,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase/init.js'
 import VueDatePicker from '@vuepic/vue-datepicker';
+import { getTeam, getUserExtra, getUser } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRouter } from 'vue-router'
@@ -307,12 +308,13 @@ function selectTeam(id) {
 }
 
 async function setAdminTeams() {
-    adminTeams.value = await getTeams()
+    let extra = await getUserExtra()
+    adminTeams.value = await getTeam({ creator_id : extra[0].id })
     subListLength2 = adminTeams.value.length
 }
 
 async function create() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
     const apiurl = import.meta.env.VITE_API_URL
     const response = await fetch(apiurl + "/lessons/admin/create", {
       method: 'POST',
@@ -339,36 +341,6 @@ async function create() {
         apiErrorMsg.value = data.msg
     } else {
         router.push("/learning/admin")
-    }
-}
-
-async function getTeams() {
-    let extra = await getUserExtra()
-
-    if (extra) {
-        const { data, error } = await supabase
-            .from('team')
-            .select('*')
-            .eq('creator_id', extra.id);
-        return data;
-    }
-
-    return [];
-}
-
-async function getUserExtra() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-        .from('user')
-        .select('*')
-        .eq('user_id', user.id);
-    if (error) {
-        return false
-    }
-    if (data) {
-        return data[0]
-    } else {
-        return false
     }
 }
 </script>

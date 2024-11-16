@@ -16,6 +16,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase/init.js'
+import { getUser, getUserExtra, getTeam, getLesson } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRouter } from 'vue-router'
@@ -94,7 +95,7 @@ function adminCommands() {
             return true
         //done
         case command === "team ps":
-            getTeams();
+            printTeams();
             return true
         //done
         case command.startsWith("team delete"):
@@ -110,7 +111,7 @@ function adminCommands() {
             return true
         //done
         case command.startsWith("lesson ps"):
-            getLessons();
+            printLessons();
             return true
         case command.startsWith("lesson solutions"):
             seeSolutions();
@@ -124,7 +125,7 @@ async function createTeam(c) {
     let name = c.replace("team create ", "")
 
     if (name) {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/admin/create", {
           method: 'POST',
@@ -147,36 +148,20 @@ async function createTeam(c) {
 
 
 // done
-async function getTeams() {
-    let extra = await getUserExtra()
+async function printTeams() {
+    const data = await getUserExtra()
+    const extra = data[0]
+    const teams = await getTeam({ creator_id : extra.id })
 
-    if (extra) {
-        const { data, error } = await supabase
-            .from('team')
-            .select('*')
-            .eq('creator_id', extra.id);
-        if (error) {
-            commandOutput("User information incomplete - contact support")
-            return
-        }
-
-        printTeams(data)
-    } else {
-        commandOutput("User information incomplete - contact support")
-        return
-    }
-}
-
-function printTeams(data) {
     let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
 
-    if (data.length == 0){
+    if (teams.length == 0){
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
                                  + "No teams found \n"
     } else {
-        for (let i = 0; i < data.length; i++) {
-            output += i + 1 + '.\n name: "' + data[i].name + '"\n'
-                + 'team code: "' + data[i].team_code + '"\n\n'
+        for (let i = 0; i < teams.length; i++) {
+            output += i + 1 + '.\n name: "' + teams[i].name + '"\n'
+                + 'team code: "' + teams[i].team_code + '"\n\n'
         }
         executedCommands.value += output
     }
@@ -189,7 +174,7 @@ async function deleteTeam(c) {
     let name = c.replace("team delete ", "")
 
     if (name) {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/admin/delete", {
           method: 'POST',
@@ -211,7 +196,8 @@ async function deleteTeam(c) {
 }
 
 async function createLesson() {
-    let extra = await getUserExtra()
+    const data = await getUserExtra()
+    const extra = data[0]
 
     if (extra) {
         const { data, error } = await supabase
@@ -249,7 +235,7 @@ async function cancelLesson(c) {
     let name = c.replace("lesson cancel ", "")
 
     if (name) {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/lessons/admin/cancel", {
           method: 'POST',
@@ -270,107 +256,36 @@ async function cancelLesson(c) {
     }
 }
 
-async function getLessons() {
-    let extra = await getUserExtra()
-
-    if (extra) {
-        const { data, error } = await supabase
-            .from("lesson")
-            .select("*")
-            .eq('creator_id', extra.id)
-        if (error) {
-            commandOutput("User information incomplete - contact support")
-            return
-        }
-
-        printLessons(data)
-    } else {
-        commandOutput("User information incomplete - contact support")
-        return
-    }
-}
-
-async function printLessons(lesson) {
-
+async function printLessons() {
+    const lessons = await getLesson()
+    
     let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
 
-    if (lesson.length == 0){
+    if (lessons.length == 0){
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
                                  + "No lessons found \n"
     } else {
-        for (let i = 0; i < lesson.length; i++) {
-            const { data, error } = await supabase
-                .from("team")
-                .select("*")
-                .eq('id', lesson[i].team_id)
-            if (error) {
-                break
-            }
-            output += i + 1 + '.\n name: "' + lesson[i].name + '"\n'
-                + 'start: "' + lesson[i].start_time + '"\n'
-                + 'end: "' + lesson[i].end_time + '"\n'
+        for (let i = 0; i < lessons.length; i++) {
+            const team = await getTeam({ id : lessons[i].team_id })
+
+            output += i + 1 + '.\n name: "' + lessons[i].name + '"\n'
+                + 'start: "' + lessons[i].start_time + '"\n'
+                + 'end: "' + lessons[i].end_time + '"\n'
                 + 'team: \n' 
-                + 'a) name: "' + data[0].name + '"\n'
-                + 'b) code: "' + data[0].team_code + '"\n'
+                + 'a) name: "' + team[0].name + '"\n'
+                + 'b) code: "' + team[0].team_code + '"\n'
                 + 'settings: \n'
-                + 'a) load allowed: ' + lesson[i].settings['load'] + '%\n'
-                + 'b) network needed: ' + lesson[i].settings['network'] + '\n'
-                + 'c) sudo needed: ' + lesson[i].settings['sudo'] + '\n\n'
+                + 'a) load allowed: ' + lessons[i].settings['load'] + '%\n'
+                + 'b) network needed: ' + lessons[i].settings['network'] + '\n'
+                + 'c) sudo needed: ' + lessons[i].settings['sudo'] + '\n\n'
         }
         executedCommands.value += output
     }
-
     cmdinput.value = ""
 }
 
 function seeSolutions() {
 
-}
-
-async function getUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-        return user;
-    } else {
-        return false;
-    }
-}
-
-async function getUserExtra() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-        .from('user')
-        .select('*')
-        .eq('user_id', user.id);
-    if (error) {
-        return false
-    }
-    if (data) {
-        return data[0]
-    } else {
-        return false
-    }
-}
-
-async function getLimitations() {
-    const extra = await getUserExtra();
-    if (extra) {
-        const { data, error } = await supabase
-            .from('limitations')
-            .select('*')
-            .eq('extra_id', extra.id);
-        if (error) {
-            console.log(error)
-            return false
-        }
-        if (data) {
-            return data[0]
-        } else {
-            return false
-        }
-    } else {
-        return false
-    }
 }
 
 function commandOutput(output) {

@@ -14,9 +14,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase/init.js'
 import { loadStripe } from '@stripe/stripe-js';
+import { getUser } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRouter } from 'vue-router'
@@ -119,7 +120,7 @@ async function logout(){
 }
 
 async function createCheckout() {
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
     const apiurl = import.meta.env.VITE_API_URL
     const response = await fetch(apiurl + "/payments/create-stripe-session", {
       method: 'POST',

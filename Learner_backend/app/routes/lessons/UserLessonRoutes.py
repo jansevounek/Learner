@@ -2,7 +2,7 @@ import secrets
 import string
 from flask import Blueprint, jsonify, request
 
-from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson
+from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson, getContainer
 from ...services.docker_service import docker
 
 import uuid
@@ -19,20 +19,41 @@ def create_container():
 
     extra = getUserExtra(user_id=json["user_id"])
     lesson = getLesson(id=json["lesson_id"])
+    container = getContainer(extra_id=extra[0].get("id"), lesson_id=json["lesson_id"])
 
     if (extra and lesson):
-        data = generateContainerInformation(lesson)
+        if (not container):
+            data = generateContainerInformation(lesson)
 
-        if (data):
-            data.update({"user_id": extra[0].get("id")})
-            if createContainer(data, lesson):
-                pass
-                # TODO start the process that checks the load - if it is not already running + add to the database
+            if (data):
+                data.update({"user_id": extra[0].get("id"), "lesson_id": json["lesson_id"]})
 
+                container = createContainer(data, lesson)
+                if (container):
+                    try:
+                        supabase.table("container").insert(data).execute()
+                    except Exception as e:
+                        print(f"Error during Supabase query (during creating container): {e}")
+                        container.remove()
+                        return jsonify({
+                            "status": False,
+                            "msg": 'There has been a problem with creating the container - while inserting it into database'
+                        })
+                else:
+                    return jsonify({
+                        "status": False,
+                        "msg": 'There has been a problem with creating the container - while starting it'
+                    })
+
+            else:
+                return jsonify({
+                    "status": False,
+                    "msg": 'There has been a problem with creating the container - while generating its credentials'
+                })
         else:
             return jsonify({
                 "status": False,
-                "msg": 'There has been a problem with creating the container'
+                "msg": 'The container already exists - contact support'
             })
     else:
         return jsonify({
@@ -77,13 +98,17 @@ def createContainer(data, lesson):
     ports = {
         str(p) + '/tcp': p,
     }
-    container = docker.containers.create(
-        'garo/shellinabox:latest',
-        detach=True,
-        environment=env_var,
-        ports=ports,
-        name=data["container_code"]
-    )
 
-    print(env_var)
-    return True
+    try:
+        container = docker.containers.create(
+            'garo/shellinabox:latest',
+            detach=True,
+            environment=env_var,
+            ports=ports,
+            name=data["name"]
+        )
+    except Exception as e:
+        print(f"Error during docker create: {e}")
+        return False
+
+    return container

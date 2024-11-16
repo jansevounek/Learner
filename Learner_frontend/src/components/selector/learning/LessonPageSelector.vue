@@ -29,7 +29,8 @@
             </div>
         </div>
         <div class="linux-container" @click="currentIndex = 4" :class="{ selected2: currentIndex === 4 }">
-            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()">Create Container</button>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="!containerExists">Create Container</button>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="containerExists">Use Container</button>
             <!--<iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd"></iframe>-->
         </div>
     </div>
@@ -38,6 +39,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase/init.js'
+import { getUserExtra, getLesson, getContainer } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRouter, useRoute } from 'vue-router'
@@ -48,6 +50,7 @@ let currentIndex = ref(0)
 let horIndex = ref(0)
 let lastControlIndex = ref(0);
 let lesson = ref(false)
+let containerExists = ref(false)
 
 const listLength = 5
 const horLength = 2
@@ -55,7 +58,7 @@ const lessonId = route.params.id
 
 // mounting handlers for controls
 onMounted(() => {
-    setLesson()
+    setVariables()
     window.addEventListener('keydown', handleKeyDown);
 })
 
@@ -95,24 +98,10 @@ function handleKeyDown(event) {
     }
 }
 
-async function setLesson() {
-    lesson.value = await getLesson()
-}
-
-async function getLesson() {
-    const { data, error } = await supabase
-        .from('lesson')
-        .select('*')
-        .eq('id', lessonId);
-    
-    if (error) {
-        return false
-    }
-    return data[0]
-}
 
 async function useContainer() {
-    const { data, error } = await supabase.from('container').select('*').eq('lesson_id', lessonId)
+    const extra = await getUserExtra()
+    const { data, error } = await supabase.from('container').select('*').eq('lesson_id', lessonId).eq('user_id', extra.id)
 
     console.log(data)
  
@@ -125,7 +114,7 @@ async function useContainer() {
     } else if (data.length > 1){
         console.log("error")
     } else {
-        createContainer()
+        await createContainer()
     }
 }
 
@@ -144,6 +133,15 @@ async function createContainer() {
         })
     });
     const data = await response.json()
-    console.log(data)
+    if (data.status) {
+        containerExists.value = true
+    }
+}
+
+async function setVariables() {
+    const data = await getLesson({ id : lessonId })
+    lesson.value = data[0]
+    const extra = await getUserExtra()
+    containerExists.value = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
 }
 </script>

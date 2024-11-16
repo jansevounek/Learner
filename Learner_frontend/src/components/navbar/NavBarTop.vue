@@ -45,7 +45,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { supabase } from '@/supabase/init.js'
+import { getUser } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRoute } from 'vue-router'
@@ -70,8 +70,8 @@ const isWithoutCmd = computed(() => {
     return false
 })
 
-async function getUser() {
-    const { data: { user } } = await supabase.auth.getUser()
+async function setUser() {
+    const user = await getUser()
     if (user) {
         localUser.value = true
     } else {
@@ -81,7 +81,7 @@ async function getUser() {
 
 
 onMounted(() => {
-    getUser()
+    setUser()
 })
 </script>
 
