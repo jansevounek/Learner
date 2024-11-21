@@ -84,7 +84,7 @@ def generateContainerInformation(lesson):
     return data
 
 def createContainer(data, lesson):
-    p = 8000 + data["user_id"]
+    p = 8000 + data["user_id"] + lesson[0].get("id")
     env_var = {
         "SIAB_PASSWORD" : data["password"],
         "SIAB_USER" : data["login"],
@@ -112,3 +112,34 @@ def createContainer(data, lesson):
         return False
 
     return container
+
+@bp.route('/start-container', methods=['POST'])
+def start_container():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    extra = getUserExtra(user_id=json["user_id"])
+    lesson = getLesson(id=json["lesson_id"])
+    container = getContainer(id=json["container_id"])
+
+    if (extra and lesson):
+        if (container):
+            pass
+        else:
+            return jsonify({
+                "status": False,
+                "msg": 'The container is missing - contact support'
+            })
+    else:
+        return jsonify({
+            "status": False,
+            "msg": 'Your user profile is incomplete - contact support'
+        })
+
+    return jsonify({
+        "status": True,
+        "msg": 'on skibidi'
+        })

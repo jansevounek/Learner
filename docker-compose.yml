@@ -1,18 +1,4 @@
 services:
-  api:
-    build:
-      context: ./Learner_api
-    ports:
-      - "${API_PORT}"
-    env_file: ".env"
-    volumes:
-      - ./Learner_api:/app
-      # from https://stackoverflow.com/questions/40961073/starting-and-stopping-docker-container-from-other-container
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
-
   frontend:
     build:
       context: ./Learner_frontend
@@ -23,14 +9,22 @@ services:
       - ./Learner_frontend:/app
     environment:
       - NODE_ENV=production
-  
-  script:
-    build:
-      context: ./Learner_scripts
+
+  api:
+    build: 
+      context: ./Learner_backend
+    container_name: flask_api
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=development
+    ports:
+      - "${API_PORT}"
     volumes:
-      - ./Learner_scripts:/app
+      - ./Learner_backend:/app
+      # from https://stackoverflow.com/questions/40961073/starting-and-stopping-docker-container-from-other-container
       - /var/run/docker.sock:/var/run/docker.sock
-    env_file: ".env"
+    env_file:
+      - .env  
 
   # from https://community.cloudflare.com/t/can-i-use-cloudflared-in-a-docker-compose-yml/407168
   tunnel:

@@ -91,7 +91,7 @@ function handleKeyDown(event) {
         } else if (horIndex.value == 1) {
             currentIndex.value = 4;
         }
-    } else if (event.key === 'Enter' && currentIndex.value == 2) {
+    } else if (event.key === 'Enter' && currentIndex.value == 3) {
         router.push("/learning/user")
     } else if (event.key === 'Enter' && currentIndex.value == 4) {
         useContainer()
@@ -101,16 +101,14 @@ function handleKeyDown(event) {
 
 async function useContainer() {
     const extra = await getUserExtra()
-    const { data, error } = await supabase.from('container').select('*').eq('lesson_id', lessonId).eq('user_id', extra.id)
-
-    console.log(data)
- 
+    const { data, error } = await supabase.from('container').select('*').eq('lesson_id', lessonId).eq('user_id', extra[0].id)
+    
     if (error) {
         return
     }
 
     if (data.length == 1) {
-        console.log("start container")
+        await startContainer(data)
     } else if (data.length > 1){
         console.log("error")
     } else {
@@ -138,10 +136,36 @@ async function createContainer() {
     }
 }
 
+async function startContainer(container) {
+    const { data: { user } } = await supabase.auth.getUser();
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/lessons/user/start-container", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+            user_id: user.id,
+            lesson_id: lessonId,
+            container_id: container[0].id
+        })
+    });
+    const data = await response.json()
+    if (data.status) {
+        console.log("done")
+    } else {
+        console.log("nope")
+    }
+}
+
 async function setVariables() {
     const data = await getLesson({ id : lessonId })
     lesson.value = data[0]
     const extra = await getUserExtra()
-    containerExists.value = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
+    const container = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
+    if (container.length) {
+        containerExists.value = true
+    }
 }
 </script>

@@ -46,3 +46,7 @@ backend.sh
 frontend.sh
 supabase_down.sh
 supabase_up.sh
+
+# temporary
+target_script.py
+test.py
