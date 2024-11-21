@@ -1,9 +1,8 @@
 import docker
-import re
 import time
 import sys
 import logging
-from logger import CircularBufferHandler
+from Learner_scripts.CircularBufferHandler import CircularBufferHandler
 
 docker = docker.from_env()
 
