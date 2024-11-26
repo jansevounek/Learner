@@ -6,8 +6,8 @@ from CircularBufferHandler import CircularBufferHandler
 docker = docker.from_env()
 
 # taken from https://stackoverflow.com/questions/17544307/how-do-i-run-python-script-using-arguments-in-windows-command-line
-ram_limit = float(sys.argv[1])
-load_limit = float(sys.argv[2])
+load_limit = float(sys.argv[1])
+network_limit = float(sys.argv[2])
 log_file = str(sys.argv[3])
 prefix = str(sys.argv[4])
 
@@ -24,36 +24,22 @@ def main():
         for container in containers:
             if container.status == "running":
                 container.reload()
-                #exec_id = container.attrs["ExecIDs"]
                 stats = container.stats(decode=True)
-
-                logs = container.logs(timestamps=True).decode('utf-8').strip()
-
-                last_log_line = logs.split('\n')[-1]
-                timestamp_str, message = last_log_line.split(' ', 1)
-
-                last_interaction_time = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
-
-                elapsed = datetime.now(last_interaction_time.tzinfo) - last_interaction_time
 
                 uptime = get_container_uptime(container)
                 logger.debug("Containers: " + container.name + " uptime is " + str(uptime))
 
                 if uptime > timedelta(minutes=1):
-                    # taken from https://medium.com/@martinkarlsson.io/control-and-monitor-your-docker-containers-with-python-7a3bdc4b88fa
-                    for stat in itertools.islice(stats, 1):
-                        memory_percentage = get_memory_percantage(stat)
-                        if (ram_limit < memory_percentage):
-                            logger.debug("container: " + container.name + " stopped - ram limit exceeded")
-                            container.stop()
-                        logger.debug("container: " + container.name + " is running and using: " + f"{memory_percentage:.2f}%" + " ram")
-
-                        handler.flush_to_file()
+                    if not check_container_memory(stats, container, logger):
+                        logger.debug("container: " + container.name + " stopped - ram limit exceeded")
+                        container.stop()
 
                     if not check_container_timeout(container, logger):
                         logger.debug("container: " + container.name + " stopped - timeout")
                         container.stop()
-                        handler.flush_to_file()
+
+                    handler.flush_to_file()
+
 
                 else:
                     logger.debug("container: " + container.name + " is not yet running for more then 1 minute -> not taking action")
@@ -98,10 +84,21 @@ def check_container_timeout(container, logger):
 
     logger.debug("ltime since container: " + container.name + " received last command: " + str(elapsed))
 
-    if elapsed > timedelta(seconds=30):
+    if elapsed > timedelta(minutes=5):
         return False
     
     return True
+
+def check_container_memory(stats, container, logger):
+    # taken from https://medium.com/@martinkarlsson.io/control-and-monitor-your-docker-containers-with-python-7a3bdc4b88f
+    for stat in itertools.islice(stats, 1):
+        memory_percentage = get_memory_percantage(stat)
+        if (load_limit < memory_percentage):
+            return False
+        
+        logger.debug("container: " + container.name + " is running and using: " + f"{memory_percentage:.2f}%" + " ram")
+
+        return True
 
 def get_memory_percantage(stat):
     memory_stats = stat.get('memory_stats', {})
