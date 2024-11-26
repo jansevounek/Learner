@@ -11,11 +11,16 @@ network_limit = float(sys.argv[2])
 log_file = str(sys.argv[3])
 prefix = str(sys.argv[4])
 
+MAX_NETWORK = 50
+
+network_load_limit = MAX_NETWORK * (network_limit / 100)
+
+previous_networks_stats = {}
+
 def main():
     logger, handler = setup_logger(log_file, max_logs=1000)
     while True:
         containers = get_named_containers(prefix)
-        time.sleep(len(containers))
 
         if len(containers) == 0:
             logger.debug('No containers with prefix "' + str(prefix) + '" found')
@@ -23,29 +28,46 @@ def main():
         
         for container in containers:
             if container.status == "running":
-                container.reload()
+                output = "Container: " + container.name + "\n"
+                container.reload() 
                 stats = container.stats(decode=True)
 
                 uptime = get_container_uptime(container)
-                logger.debug("Containers: " + container.name + " uptime is " + str(uptime))
+                output += " - uptime: " + str(uptime) + "\n"
+                #logger.debug("Containers: " + container.name + " uptime is " + str(uptime))
 
                 if uptime > timedelta(minutes=1):
-                    if not check_container_memory(stats, container, logger):
+                    memory = check_container_memory(stats)
+                    if not memory:
                         logger.debug("container: " + container.name + " stopped - ram limit exceeded")
                         container.stop()
+                    else:
+                        output += memory
 
-                    if not check_container_timeout(container, logger):
+                    timeout = check_container_timeout(container)
+                    if not timeout:
                         logger.debug("container: " + container.name + " stopped - timeout")
                         container.stop()
+                    else:
+                        output += timeout
 
-                    handler.flush_to_file()
+                    network = check_container_network(stats, container)
+                    if not network:
+                        logger.debug("container: " + container.name + " stopped - netwrok limit exceeded")
+                        container.stop()
+                    else:
+                        output += network
 
 
                 else:
-                    logger.debug("container: " + container.name + " is not yet running for more then 1 minute -> not taking action")
-                    handler.flush_to_file()
+                    output += " - running more then a minute: False \n"
+                
+                logger.debug(output)
+                handler.flush_to_file()
+
+                
             else:
-                logger.debug("container: " + container.name + " is not running")
+                logger.debug("Container: " + container.name + " is not running")
                 handler.flush_to_file()
 
     handler.flush_to_file()
@@ -72,7 +94,7 @@ def get_container_uptime(container):
 
     return uptime
 
-def check_container_timeout(container, logger):
+def check_container_timeout(container):
     logs = container.logs(timestamps=True).decode('utf-8').strip()
 
     last_log_line = logs.split('\n')[-1]
@@ -82,23 +104,49 @@ def check_container_timeout(container, logger):
 
     elapsed = datetime.now(last_interaction_time.tzinfo) - last_interaction_time
 
-    logger.debug("ltime since container: " + container.name + " received last command: " + str(elapsed))
+    #logger.debug("ltime since container: " + container.name + " received last command: " + str(elapsed))
 
     if elapsed > timedelta(minutes=5):
         return False
     
-    return True
+    return " - last activity: " + str(elapsed) + "\n"
 
-def check_container_memory(stats, container, logger):
+def check_container_network(stats, container):
+    for stat in itertools.islice(stats, 1):
+        if container.name in previous_networks_stats:
+            prev_stat = previous_networks_stats.get(container.name)
+
+            rx_delta = stat['networks']['eth0']['rx_bytes'] - prev_stat["last_rx"]
+            tx_delta = stat['networks']['eth0']['tx_bytes'] - prev_stat["last_tx"]
+
+            previous_networks_stats.get(container.name)["last_rx"] = stat['networks']['eth0']['rx_bytes']
+            previous_networks_stats.get(container.name)["last_tx"] = stat['networks']['eth0']['tx_bytes']
+
+            if rx_delta / 1_000_000 > network_load_limit or tx_delta / 1_000_000 > network_load_limit:
+                return False
+            
+            rx_percent = (rx_delta / 1_000_000) / (network_load_limit / 100)
+            tx_percent = (tx_delta / 1_000_000) / (network_load_limit / 100)
+            
+            return " - network out: " + str(rx_delta / 1_000_000) + " mb (" + f"{rx_percent:.2f}%" + ") \n" + " - network in: " + str(tx_delta / 1_000_000) + " mb (" + f"{tx_percent:.2f}%" + ") \n"
+        else:
+            previous_networks_stats.update({ 
+                container.name: {
+                    "last_rx": stat['networks']['eth0']['rx_bytes'],
+                    "last_tx": stat['networks']['eth0']['tx_bytes']
+                }
+             })
+            
+            return " - network: Not yet calculated"
+
+def check_container_memory(stats):
     # taken from https://medium.com/@martinkarlsson.io/control-and-monitor-your-docker-containers-with-python-7a3bdc4b88f
     for stat in itertools.islice(stats, 1):
         memory_percentage = get_memory_percantage(stat)
         if (load_limit < memory_percentage):
             return False
-        
-        logger.debug("container: " + container.name + " is running and using: " + f"{memory_percentage:.2f}%" + " ram")
 
-        return True
+        return " - memory usage: " + f"{memory_percentage:.2f}%" + "\n"
 
 def get_memory_percantage(stat):
     memory_stats = stat.get('memory_stats', {})
