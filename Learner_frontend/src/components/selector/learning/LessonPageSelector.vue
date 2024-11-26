@@ -19,7 +19,8 @@
             <div class="selection-container-addon" @click="currentIndex = 2" :class="{ selected2: currentIndex === 2 }">
                 <div class="mx-2">
                     <h1 class="selector-title">Your workplace settigns</h1>
-                    <p>Load allowed: {{ lesson.settings.load }}%</p>
+                    <p>Network load allowed: {{ lesson.settings.network_load }}%</p>
+                    <p>Cpu load allowed: {{ lesson.settings.cpu_load }}%</p>
                     <p>Network allowed: {{ lesson.settings.network }}</p>
                     <p>Sudo: {{ lesson.settings.sudo }}</p>
                 </div>

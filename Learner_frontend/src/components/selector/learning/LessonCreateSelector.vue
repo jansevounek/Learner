@@ -41,9 +41,13 @@
                     <div class="item-details-checkbox" :class="{ checboxSelected: sudoSelected }" @click="sudoSelected = !sudoSelected"></div>
                     <label class="mr-1">Sudo required</label>
                 </div>
-                <div class="item-detail-input-container mb-3" :class="{ selected: subIndex1 === 2 }">
-                    <p class="mx-2">What load is allowed</p>
-                    <input type="number" class="item-detail-input" placeholder="0-100" v-model="loadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 2">
+                <div class="item-detail-input-container" :class="{ selected: subIndex1 === 2 }">
+                    <p class="mx-2">What memory load is allowed</p>
+                    <input type="number" class="item-detail-input" placeholder="0-100" v-model="networkLoadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 2">
+                </div>
+                <div class="item-detail-input-container mb-3" :class="{ selected: subIndex1 === 3 }">
+                    <p class="mx-2">What cpu load is allowed</p>
+                    <input type="number" class="item-detail-input" placeholder="0-100" v-model="cpuLoadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 3">
                 </div>
             </div>
         </div>
@@ -108,7 +112,8 @@ let taskArea = ref('')
 let nameInput = ref('')
 let networkSelected = ref(false)
 let sudoSelected = ref(false)
-let loadInput = ref('')
+let networkLoadInput = ref('')
+let cpuLoadInput = ref(' ')
 let date = ref();
 let teamSelected = ref(0);
 
@@ -133,7 +138,7 @@ let apiErrorMsg = ref('')
 
 // listing stuff
 const listLength = 6
-const subListLength1 = 3
+const subListLength1 = 4
 let subListLength2 = 0
 const adminTeams = ref([]);
 setAdminTeams()
@@ -239,7 +244,7 @@ async function createLesson() {
 
     error = testTask(error)
     
-    if (loadInput.value > 0 && loadInput.value < 100) {
+    if (networkLoadInput.value > 0 && networkLoadInput.value < 100 && cpuLoadInput.value > 0 && cpuLoadInput.value < 100) {
         error.load = false
     }
 
@@ -329,7 +334,8 @@ async function create() {
             container_settings: {
                 network: networkSelected.value,
                 sudo: sudoSelected.value,
-                load: loadInput.value,
+                network_load: networkLoadInput.value,
+                cpu_load: cpuLoadInput.value
             },
             date: date.value,
             team_id: teamSelected.value

@@ -66,7 +66,7 @@ def create_lesson():
         "msg": 'on skibidi'
         })
 
-# TODO unique names
+# TODO unique names + delete containers
 @bp.route('/cancel', methods=['POST'])
 def cancel_lesson():
     content_type = request.headers.get('Content-Type')

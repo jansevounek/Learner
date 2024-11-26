@@ -1,5 +1,4 @@
-import pprint
-import docker, time, sys, logging, itertools
+import docker, sys, logging, itertools
 from datetime import datetime, timezone, timedelta
 from CircularBufferHandler import CircularBufferHandler
 
@@ -34,7 +33,6 @@ def main():
 
                 uptime = get_container_uptime(container)
                 output += " - uptime: " + str(uptime) + "\n"
-                #logger.debug("Containers: " + container.name + " uptime is " + str(uptime))
 
                 if uptime > timedelta(minutes=1):
                     memory = check_container_memory(stats)
@@ -103,8 +101,6 @@ def check_container_timeout(container):
     last_interaction_time = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
 
     elapsed = datetime.now(last_interaction_time.tzinfo) - last_interaction_time
-
-    #logger.debug("ltime since container: " + container.name + " received last command: " + str(elapsed))
 
     if elapsed > timedelta(minutes=5):
         return False
