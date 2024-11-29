@@ -12,7 +12,6 @@ container_name = str(sys.argv[3])
 
 MAX_NETWORK = 50
 LOG_FILE = "logs/" + container_name + ".log"
-print(LOG_FILE)
 
 network_load_limit = MAX_NETWORK * (network_limit / 100)
 

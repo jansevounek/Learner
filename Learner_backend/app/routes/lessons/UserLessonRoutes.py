@@ -1,5 +1,6 @@
 import secrets
 import string
+import subprocess
 from flask import Blueprint, jsonify, request
 
 from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson, getContainer
@@ -127,7 +128,8 @@ def start_container():
 
     if (extra and lesson):
         if (container):
-            pass
+            args = [str(lesson[0].get("settings").get("network_load")), str(lesson[0].get("settings").get("cpu_load")), str(container[0].get("name"))]
+            subprocess.run(["python3", "Learner_scripts/container_script.py", *args])
         else:
             return jsonify({
                 "status": False,
