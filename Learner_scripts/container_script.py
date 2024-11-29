@@ -1,3 +1,4 @@
+from time import sleep
 import docker, sys, logging, itertools
 from datetime import datetime, timezone, timedelta
 from CircularBufferHandler import CircularBufferHandler
@@ -7,80 +8,64 @@ docker = docker.from_env()
 # taken from https://stackoverflow.com/questions/17544307/how-do-i-run-python-script-using-arguments-in-windows-command-line
 load_limit = float(sys.argv[1])
 network_limit = float(sys.argv[2])
-log_file = str(sys.argv[3])
-prefix = str(sys.argv[4])
+container_name = str(sys.argv[3])
 
 MAX_NETWORK = 50
+LOG_FILE = "logs/" + container_name + ".log"
+print(LOG_FILE)
 
 network_load_limit = MAX_NETWORK * (network_limit / 100)
 
 previous_networks_stats = {}
 
 def main():
-    logger, handler = setup_logger(log_file, max_logs=1000)
+    logger, handler = setup_logger(LOG_FILE, max_logs=1000)
     while True:
-        containers = get_named_containers(prefix)
+        sleep(2)
 
-        if len(containers) == 0:
-            logger.debug('No containers with prefix "' + str(prefix) + '" found')
+        try:
+            container = docker.containers.get(container_name)
+        except Exception as e:
+            logger.debug('No containers with name "' + str(container_name) + '" found')
+            handler.flush_to_file()
             break
         
-        for container in containers:
-            if container.status == "running":
-                output = "Container: " + container.name + "\n"
-                container.reload() 
-                stats = container.stats(decode=True)
-
-                uptime = get_container_uptime(container)
-                output += " - uptime: " + str(uptime) + "\n"
-
-                if uptime > timedelta(minutes=1):
-                    memory = check_container_memory(stats)
-                    if not memory:
-                        logger.debug("container: " + container.name + " stopped - ram limit exceeded")
-                        container.stop()
-                    else:
-                        output += memory
-
-                    timeout = check_container_timeout(container)
-                    if not timeout:
-                        logger.debug("container: " + container.name + " stopped - timeout")
-                        container.stop()
-                    else:
-                        output += timeout
-
-                    network = check_container_network(stats, container)
-                    if not network:
-                        logger.debug("container: " + container.name + " stopped - netwrok limit exceeded")
-                        container.stop()
-                    else:
-                        output += network
-
-
+        if container.status == "running":
+            output = "Container: " + container.name + "\n"
+            container.reload() 
+            stats = container.stats(decode=True)
+            uptime = get_container_uptime(container)
+            output += " - uptime: " + str(uptime) + "\n"
+            if uptime > timedelta(minutes=1):
+                memory = check_container_memory(stats)
+                if not memory:
+                    logger.debug("container: " + container.name + " stopped - ram limit exceeded")
+                    container.stop()
                 else:
-                    output += " - running more then a minute: False \n"
-                
-                logger.debug(output)
-                handler.flush_to_file()
-
-                
+                    output += memory
+                timeout = check_container_timeout(container)
+                if not timeout:
+                    logger.debug("container: " + container.name + " stopped - timeout")
+                    container.stop()
+                else:
+                    output += timeout
+                network = check_container_network(stats, container)
+                if not network:
+                    logger.debug("container: " + container.name + " stopped - netwrok limit exceeded")
+                    container.stop()
+                else:
+                    output += network
             else:
-                logger.debug("Container: " + container.name + " is not running")
-                handler.flush_to_file()
+                output += " - running more then a minute: False \n"
+            
+            logger.debug(output)
+            handler.flush_to_file()
+            
+        else:
+            logger.debug("Container: " + container.name + " is not running")
+            handler.flush_to_file()
 
     handler.flush_to_file()
-
-
-def get_named_containers(name_prefix):
-    client = docker.from_env()
-    containers = client.containers.list(all=True)
-    matching_containers = []
-
-    for container in containers:
-        if container.name.startswith(name_prefix):
-            matching_containers.append(container)
-
-    return matching_containers
 
 def get_container_uptime(container):
     started_at = container.attrs['State']['StartedAt']
