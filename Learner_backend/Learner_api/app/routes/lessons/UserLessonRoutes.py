@@ -2,6 +2,7 @@ import secrets
 import string
 import subprocess
 import os
+import signal
 from flask import Blueprint, jsonify, request
 
 from ...services.supabase_service import supabase, getUserExtra, getLesson, getContainer, getScript
@@ -274,7 +275,46 @@ def stop_container():
     else:
         return jsonify({'status': 'Content-Type not supported!'})
     
-    print(json)
+    script = getScript(container_name=json["name"])
+    c = docker.containers.get(json["name"])
+    
+    if (script):
+        if (c):
+        # taken from https://stackoverflow.com/questions/17856928/how-to-terminate-process-from-python-using-pid
+            try:
+                c.stop()
+            except Exception as e:
+                return jsonify({
+                    "status": False,
+                    "msg": 'There has been a problem stoping the container'
+                })
+            
+            try:
+                supabase.table("container").update({"running": "false"}).eq("id", script[0].get("container_id")).execute()
+            except Exception as e:
+                return jsonify({
+                            "status": False,
+                            "msg": 'There has been a problem starting your container - contact support'
+                        })
+            
+            try:
+                supabase.table("container_script").update({"running": "false"}).eq("id", script[0].get("id")).execute()
+            except Exception as e:
+                return jsonify({
+                            "status": False,
+                            "msg": 'There has been a problem starting your container - contact support'
+                        })
+
+        else:
+            return jsonify({
+                "status": False,
+                "msg": 'no container found'
+            })
+    else:
+        return jsonify({
+            "status": False,
+            "msg": 'no script found'
+        })
 
     return jsonify({
         "status": True,

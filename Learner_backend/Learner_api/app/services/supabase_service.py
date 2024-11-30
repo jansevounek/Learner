@@ -220,6 +220,7 @@ def getContainer(**kwargs):
 def getScript(**kwargs):
     id = kwargs.get("id")
     container_id = kwargs.get("container_id")
+    container_name = kwargs.get("container_name")
 
     if id:
         try:
@@ -231,6 +232,13 @@ def getScript(**kwargs):
     elif container_id:
         try:
             response = supabase.table("container_script").select("*").eq("container_id", container_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting script by container_id): {e}")
+            return "Error occured", 500
+    elif container_name:
+        try:
+            response = supabase.table("container_script").select("*").eq("container_name", container_name).execute()
             return response.data
         except Exception as e:
             print(f"Error during Supabase query (during getting script by container_id): {e}")

@@ -1,4 +1,4 @@
-import os
+import os, requests, json
 from time import sleep
 import docker, sys, logging, itertools
 from datetime import datetime, timezone, timedelta
@@ -148,8 +148,13 @@ def stop_container(container):
     # taken from https://www.geeksforgeeks.org/how-to-create-and-use-env-files-in-python/
     url = os.getenv("VITE_API_URL") + "/lessons/user/stop-container"
 
-    
-    pass
+    #taken from https://www.geeksforgeeks.org/get-post-requests-using-python/
+    response = requests.post(url=url, data=json.dumps({"name": container.name}), headers={'Content-Type': 'application/json'})
+    j = response.json()
+
+    if j.get("status"):
+        sys.exit()
+
 
 def setup_logger(log_file, max_logs=100):
     logger = logging.getLogger("CircularLogger")
