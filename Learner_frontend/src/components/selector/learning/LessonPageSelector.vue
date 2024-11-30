@@ -155,8 +155,10 @@ async function startContainer(container) {
     const data = await response.json()
     if (data.status) {
         console.log("done")
+        console.log(data.msg)
     } else {
         console.log("nope")
+        console.log(data.msg)
     }
 }
 

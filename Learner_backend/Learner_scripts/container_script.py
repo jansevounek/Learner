@@ -1,7 +1,11 @@
+import os
 from time import sleep
 import docker, sys, logging, itertools
 from datetime import datetime, timezone, timedelta
 from CircularBufferHandler import CircularBufferHandler
+from dotenv import load_dotenv, dotenv_values 
+
+load_dotenv() 
 
 docker = docker.from_env()
 
@@ -39,19 +43,19 @@ def main():
                 memory = check_container_memory(stats)
                 if not memory:
                     logger.debug("container: " + container.name + " stopped - ram limit exceeded")
-                    container.stop()
+                    stop_container(container)
                 else:
                     output += memory
                 timeout = check_container_timeout(container)
                 if not timeout:
                     logger.debug("container: " + container.name + " stopped - timeout")
-                    container.stop()
+                    stop_container(container)
                 else:
                     output += timeout
                 network = check_container_network(stats, container)
                 if not network:
                     logger.debug("container: " + container.name + " stopped - netwrok limit exceeded")
-                    container.stop()
+                    stop_container(container)
                 else:
                     output += network
             else:
@@ -138,6 +142,14 @@ def get_memory_percantage(stat):
     ram_percentage = (memory_usage / memory_limit) * 100
 
     return ram_percentage
+
+def stop_container(container):
+
+    # taken from https://www.geeksforgeeks.org/how-to-create-and-use-env-files-in-python/
+    url = os.getenv("VITE_API_URL") + "/lessons/user/stop-container"
+
+    
+    pass
 
 def setup_logger(log_file, max_logs=100):
     logger = logging.getLogger("CircularLogger")

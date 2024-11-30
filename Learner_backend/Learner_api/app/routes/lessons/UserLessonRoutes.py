@@ -1,9 +1,10 @@
 import secrets
 import string
 import subprocess
+import os
 from flask import Blueprint, jsonify, request
 
-from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson, getContainer
+from ...services.supabase_service import supabase, getUserExtra, getLesson, getContainer, getScript
 from ...services.docker_service import docker
 
 import uuid
@@ -126,10 +127,129 @@ def start_container():
     lesson = getLesson(id=json["lesson_id"])
     container = getContainer(id=json["container_id"])
 
+    #TODO check if process exists and start only then
+
     if (extra and lesson):
         if (container):
-            args = [str(lesson[0].get("settings").get("network_load")), str(lesson[0].get("settings").get("cpu_load")), str(container[0].get("name"))]
-            subprocess.run(["python3", "Learner_scripts/container_script.py", *args])
+            script = getScript(container_id=json["container_id"])
+            if (len(script) == 0):
+                args = [str(lesson[0].get("settings").get("cpu_load")), str(lesson[0].get("settings").get("network_load")), str(container[0].get("name"))]
+                command = ["python3", "container_script.py", *args] + args
+                target_cwd = os.path.abspath(os.path.join(os.path.abspath(__file__), "..", "..", "..", "..", "..", "Learner_scripts"))
+
+                process = False
+                try:
+                    process = subprocess.Popen(command, cwd=target_cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print(process.pid)
+                except Exception as e:
+                    return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem starting your container - contact support'
+                            })
+
+                if (process):
+                    data = {
+                        "container_id": container[0].get("id"),
+                        "container_name": container[0].get("name"),
+                        "pid": process.pid,
+                        "running": "true",
+                        "settings": {
+                            "cpu_load": lesson[0].get("settings").get("cpu_load"),
+                            "network_load": lesson[0].get("settings").get("network_load")
+                        }
+                    }
+                    try:
+                        supabase.table("container_script").insert(data).execute()
+                    except Exception as e:
+                        process.kill()
+                        print(e)
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+                    
+                    try:
+                        c = docker.containers.get(container[0].get("name"))
+                        c.start()
+                    except Exception as e:
+                        print(e)
+                        process.kill()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+                    
+                    try:
+                        supabase.table("container").update({"running": "true"}).eq("id", container[0].get("id")).execute()
+                    except Exception as e:
+                        print(e)
+                        process.kill()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+                else:
+                    return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem starting your container - contact support'
+                            })
+            else:
+                args = [str(script[0].get("settings").get("cpu_load")), str(lesson[0].get("settings").get("network_load")), str(container[0].get("name"))]
+                command = ["python3", "container_script.py", *args] + args
+                target_cwd = os.path.abspath(os.path.join(os.path.abspath(__file__), "..", "..", "..", "..", "..", "Learner_scripts"))
+
+                process = False
+                try:
+                    process = subprocess.Popen(command, cwd=target_cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print(process.pid)
+                except Exception as e:
+                    return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem starting your container - contact support'
+                            })
+
+                if (process):
+                    data = {
+                        "pid": process.pid,
+                        "running": "true",
+                    }
+
+                    try:
+                        supabase.table("container_script").update(data).eq("id", script[0].get("id")).execute()
+                    except Exception as e:
+                        print(e)
+                        process.kill()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+
+                    try:
+                        c = docker.containers.get(container[0].get("name"))
+                        c.start()
+                    except Exception as e:
+                        print(e)
+                        process.kill()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+
+                    try:
+                        supabase.table("container").update({"running": "true"}).eq("id", container[0].get("id")).execute()
+                    except Exception as e:
+                        print(e)
+                        process.kill()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+                else:
+                    return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+
         else:
             return jsonify({
                 "status": False,
@@ -140,6 +260,21 @@ def start_container():
             "status": False,
             "msg": 'Your user profile is incomplete - contact support'
         })
+
+    return jsonify({
+        "status": True,
+        "msg": 'on skibidi'
+        })
+
+@bp.route('/stop-container', methods=['POST'])
+def stop_container():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    print(json)
 
     return jsonify({
         "status": True,

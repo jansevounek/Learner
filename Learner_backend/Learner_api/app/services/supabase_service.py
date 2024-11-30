@@ -215,7 +215,28 @@ def getContainer(**kwargs):
             print(f"Error during Supabase query (during getting container by extra_id): {e}")
             return "Error occured", 500
     else:
-        raise ValueError("(lesson_id and extra_id) or id not provided - failed to fetch lesson")
+        raise ValueError("(lesson_id and extra_id) or id not provided - failed to fetch container")
+    
+def getScript(**kwargs):
+    id = kwargs.get("id")
+    container_id = kwargs.get("container_id")
+
+    if id:
+        try:
+            response = supabase.table("container_script").select("*").eq("id", id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting script by id): {e}")
+            return "Error occured", 500
+    elif container_id:
+        try:
+            response = supabase.table("container_script").select("*").eq("container_id", container_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting script by container_id): {e}")
+            return "Error occured", 500
+    else:
+        raise ValueError("container_id or id not provided - failed to fetch script")
 
 
 __all__ = ['supabase', 'getUserExtra', 'getUserContainers', 'getUserLimitations', 'getToBeDeletedContainer']
