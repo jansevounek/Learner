@@ -86,7 +86,19 @@ def cancel_lesson():
             except Exception as e:
                 print(f"Error during Supabase query (during creation of a lesson): {e}")
                 return "Error occured", 500
+            
+            try:
+                containers = docker.containers.list(all=True)
 
+                for container in containers:
+                    if container.name.startswith(json["lesson_name"] + "-"):
+                        if container.status == "running":
+                            container.stop()
+                        container.remove()
+            except Exception as e:
+                print(f"Error during deleting containers - lesson cancel: {e}")
+                return "Error occured", 500
+            
             try:
                 supabase.table("limitations").update({ "lessons": limit[0].get("lessons") - 1 }).eq("extra_id", extra[0].get("id")).execute()
             except Exception as e:

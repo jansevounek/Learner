@@ -85,10 +85,11 @@
                 <p v-if="errors.name_errors.empty" class="selection-error">1.1 A name for the lesson is required</p>
                 <p v-if="errors.name_errors.invalidAscii" class="selection-error">1.2 The name can only consist of letters and numbers</p>
                 <p v-if="errors.name_errors.onlySpaces" class="selection-error">1.3 The name of the lesson must be something else then spaces</p>
+                <p v-if="errors.name_errors.exists" class="selection-error">1.4 The name of the lesson is already in use - change it please</p>
                 <p v-if="errors.task_errors.empty" class="selection-error">2.1 A task for the lesson is required</p>
                 <p v-if="errors.task_errors.short" class="selection-error text-orange-500">2.2 The task for the lesson is short</p>
                 <p v-if="errors.team" class="selection-error">3. The team for which the lesson is intended must be selected</p>
-                <p v-if="errors.load" class="selection-error">4. The maximum load of the container must be set</p>
+                <p v-if="errors.load" class="selection-error">4. The maximum network and cpu load of the container must be set</p>
                 <p v-if="errors.time" class="selection-error">5. The time of the lesson must be set</p>
                 <p v-if="errors.api" class="selection-error">6. {{ apiErrorMsg }}</p>
             </div>
@@ -99,9 +100,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { supabase } from '@/supabase/init.js'
 import VueDatePicker from '@vuepic/vue-datepicker';
-import { getTeam, getUserExtra, getUser } from '@/supabase/getFunctions.js'
+import { getTeam, getUserExtra, getUser, getLesson } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRouter } from 'vue-router'
@@ -228,7 +228,8 @@ async function createLesson() {
         name_errors: {
             empty: true,
             invalidAscii: true,
-            onlySpaces: true
+            onlySpaces: true,
+            exists: true
         },
         task_errors: {
             empty: true,
@@ -269,13 +270,19 @@ function testName(error) {
         error.name_errors.empty = false
     }
     // taken from https://bobbyhadz.com/blog/javascript-check-if-string-contains-only-letters-and-numbers#check-if-string-contains-only-letters-and-numbers-in-javascript
-    if (/^[A-Za-z0-9 _-]*$/.test(nameInput.value)) {
+    if (/^[A-Za-z0-9 _]*$/.test(nameInput.value) && !nameInput.value.includes("supabase")) {
         error.name_errors.invalidAscii = false
     }
 
     // taken from https://stackoverflow.com/questions/10261986/how-to-detect-string-which-contains-only-spaces
     if (nameInput.value.replace(/\s/g, '').length) {
         error.name_errors.onlySpaces = false
+    }
+
+    let lesson = getLesson({ name: nameInput.value })
+
+    if (lesson.length == 0) {
+        error.name_errors.exists = false
     }
 
     return error
