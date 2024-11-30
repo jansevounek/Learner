@@ -76,7 +76,7 @@ def generateContainerInformation(lesson):
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(20))
     data = {
-        "running": "true",
+        "running": "false",
         "name": name,
         "login": login,
         "password": password,
