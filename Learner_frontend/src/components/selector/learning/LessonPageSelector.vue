@@ -25,15 +25,21 @@
                     <p>Sudo: {{ lesson.settings.sudo }}</p>
                 </div>
             </div>
-            <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 3" :class="{ selected2: currentIndex === 3 }">
+            <div class="selection-container-addon lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 3" :class="{ selected2: currentIndex === 3 }">
                 <button class="selector-addon-button" :class="{ selected_button: currentIndex === 3 }" @click="router.push('/learning/user')">Exit</button>
             </div>
+            <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 4" :class="{ selected2: currentIndex === 4 }">
+                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 4, disabled_button: containerRunning == false }" @click="stopContainer()">Stop Container</button>
+            </div>
         </div>
-        <div class="linux-container" @click="currentIndex = 4" :class="{ selected2: currentIndex === 4 }">
-            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
-            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
+        <div class="linux-container" @click="currentIndex = 5" :class="{ selected2: currentIndex === 5 }">
+            <button class="linux-button" :class="{ selected_button: currentIndex === 5 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 5 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
             <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="containerExists && containerRunning"></iframe>
         </div>
+    </div>
+    <div>
+        
     </div>
 </template>
 
@@ -56,7 +62,7 @@ let containerRunning = ref(false)
 let url = ref("")
 let container = ref()
 
-const listLength = 5
+const listLength = 6
 const horLength = 2
 const lessonId = route.params.id
 
@@ -98,7 +104,7 @@ function handleKeyDown(event) {
         if (horIndex.value == 0) {
             currentIndex.value = lastControlIndex.value;
         } else if (horIndex.value == 1) {
-            currentIndex.value = 4;
+            currentIndex.value = 5;
         }
     }  else if (event.key === 'ArrowRight') {
         if (currentIndex.value < 4) {
@@ -108,7 +114,7 @@ function handleKeyDown(event) {
         if (horIndex.value == 0) {
             currentIndex.value = lastControlIndex.value;
         } else if (horIndex.value == 1) {
-            currentIndex.value = 4;
+            currentIndex.value = 5;
         }
     } else if (event.key === 'Enter' && currentIndex.value == 3) {
         router.push("/learning/user")
@@ -176,6 +182,23 @@ async function startContainer(container) {
     } else {
         console.log("nope")
         console.log(data.msg)
+    }
+}
+
+async function stopContainer() {
+    if (containerRunning.value == true) {
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/lessons/user/stop-container", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: container.value[0].name,
+            })
+        });
+        const data = await response.json()
     }
 }
 

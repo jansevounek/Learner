@@ -15,6 +15,9 @@
     .selected_button {
         @apply bg-black text-white border-black
     }
+    .disabled_button {
+        @apply bg-black text-red-600 border-black
+    }
     .selector-title {
         @apply text-center font-bold text-lg;
     }

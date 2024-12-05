@@ -133,7 +133,6 @@ def start_container():
     extra = getUserExtra(user_id=json["user_id"])
     lesson = getLesson(id=json["lesson_id"])
     container = getContainer(id=json["container_id"])
-    print(lesson)
 
     #TODO check if process exists and start only then
 
