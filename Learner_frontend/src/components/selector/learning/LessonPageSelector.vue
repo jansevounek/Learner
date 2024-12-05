@@ -30,9 +30,9 @@
             </div>
         </div>
         <div class="linux-container" @click="currentIndex = 4" :class="{ selected2: currentIndex === 4 }">
-            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="!containerExists">Create Container</button>
-            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="containerExists">Use Container</button>
-            <!--<iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd"></iframe>-->
+            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 4 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
+            <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="containerExists && containerRunning"></iframe>
         </div>
     </div>
 </template>
@@ -52,6 +52,9 @@ let horIndex = ref(0)
 let lastControlIndex = ref(0);
 let lesson = ref(false)
 let containerExists = ref(false)
+let containerRunning = ref(false)
+let url = ref("")
+let container = ref()
 
 const listLength = 5
 const horLength = 2
@@ -66,6 +69,21 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('keydown', handleKeyDown);
 })
+
+const handleRunningChange = (payload) => {
+    if (payload.new.id == container.value[0].id) {
+        if (!payload.new.running) {
+            containerRunning.value = false
+        } else if (payload.new.running) {
+            containerRunning.value = true
+        }
+    }
+}
+
+supabase
+  .channel('realtime')
+  .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'container' }, handleRunningChange)
+  .subscribe()
 
 function handleKeyDown(event) {
     if (event.key === 'ArrowDown') {
@@ -154,8 +172,7 @@ async function startContainer(container) {
     });
     const data = await response.json()
     if (data.status) {
-        console.log("done")
-        console.log(data.msg)
+        containerRunning.value = true
     } else {
         console.log("nope")
         console.log(data.msg)
@@ -166,9 +183,14 @@ async function setVariables() {
     const data = await getLesson({ id : lessonId })
     lesson.value = data[0]
     const extra = await getUserExtra()
-    const container = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
-    if (container.length) {
+    const c = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
+    if (c.length) {
         containerExists.value = true
+        url.value = "http://127.0.0.1:" + String(c[0].port)
+        if (c[0].running) {
+            containerRunning.value = true
+        }
     }
+    container.value = c
 }
 </script>

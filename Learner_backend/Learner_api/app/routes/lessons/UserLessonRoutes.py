@@ -26,10 +26,13 @@ def create_container():
 
     if (extra and lesson):
         if (not container):
-            data = generateContainerInformation(lesson)
+            data = generateContainerInformation(extra, lesson)
 
             if (data):
-                data.update({"user_id": extra[0].get("id"), "lesson_id": json["lesson_id"]})
+                data.update({
+                    "user_id": extra[0].get("id"), 
+                    "lesson_id": json["lesson_id"],
+                })
 
                 container = createContainer(data, lesson)
                 if (container):
@@ -70,36 +73,39 @@ def create_container():
         "msg": 'on skibidi'
         })
 
-def generateContainerInformation(lesson):
+def generateContainerInformation(extra, lesson):
     c = str(uuid.uuid4()).split("-")
     login = "guest" + c[0]
     name = lesson[0].get("name") + "-" + c[1]
     # taken from https://stackoverflow.com/questions/3854692/generate-password-in-python
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(20))
+    p = str(8 + extra[0].get("id")) + str(lesson[0].get("id"))
+    if int(p) < 8000:
+        p += "1"
     data = {
         "running": "false",
         "name": name,
         "login": login,
         "password": password,
+        "port": int(p)
     }
 
     return data
 
 def createContainer(data, lesson):
-    p = 8000 + data["user_id"] + lesson[0].get("id")
     env_var = {
         "SIAB_PASSWORD" : data["password"],
         "SIAB_USER" : data["login"],
         "SIAB_SUDO" : lesson[0].get("settings").get("sudo"),
         "SIAB_SSL" : "false", #TODO change this
-        "SIAB_PORT" : p,
+        "SIAB_PORT" : data["port"],
         "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173",
         "SIAB_PKGS" : "nano"
     }
 
     ports = {
-        str(p) + '/tcp': p,
+        str(data["port"]) + '/tcp': data["port"],
     }
 
     try:
@@ -127,6 +133,7 @@ def start_container():
     extra = getUserExtra(user_id=json["user_id"])
     lesson = getLesson(id=json["lesson_id"])
     container = getContainer(id=json["container_id"])
+    print(lesson)
 
     #TODO check if process exists and start only then
 

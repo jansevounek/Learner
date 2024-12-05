@@ -44,3 +44,5 @@ websocket-client
 websockets
 Werkzeug
 stripe
+celery
+redis
