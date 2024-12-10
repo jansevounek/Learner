@@ -7,6 +7,4 @@
 
 <script setup>
 import LessonPageSelector from '@/components/selector/learning/LessonPageSelector.vue'
-
-let url = "https://youtube.com"
 </script>

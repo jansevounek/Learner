@@ -186,16 +186,16 @@ async function printLessons() {
             let lessons = await getLesson({ team_id: team[i].id })
 
             if (lessons.length > 0) {
-                for (let i = 0; i < lessons.length; i++) {
+                for (let k = 0; k < lessons.length; k++) {
                     output += index + ". \n" +
-                        'lesson name: "' + lessons[i].name + '"\n' +
+                        'lesson name: "' + lessons[k].name + '"\n' +
                         'from team: "' + team[0].name + '"\n' +
-                        'starts: "' + lessons[i].start_time + '"\n' +
-                        'ends: "' + lessons[i].end_time + '"\n'
+                        'starts: "' + lessons[k].start_tkme + '"\n' +
+                        'ends: "' + lessons[k].end_time + '"\n'
                     index++
                 }
             } else {
-                output += 'No lesson for team "' + team[0].name + '" found \n'
+                output += 'No lesson for team "' + team[i + 1].name + '" found \n'
             }
         }
 

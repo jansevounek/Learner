@@ -113,8 +113,8 @@ function adminCommands() {
         case command.startsWith("lesson ps"):
             printLessons();
             return true
-        case command.startsWith("lesson solutions"):
-            seeSolutions();
+        case command.startsWith("lesson solution "):
+            seeSolutions(command);
             return true
     }
     return false;
@@ -261,7 +261,7 @@ async function printLessons() {
     
     let output = "user@linuxlearning:~$ " + cmdinput.value + "\n\n"
 
-    if (lessons.length == 0){
+    if (lessons.length == 0) {
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
                                  + "No lessons found \n"
     } else {
@@ -275,17 +275,36 @@ async function printLessons() {
                 + 'a) name: "' + team[0].name + '"\n'
                 + 'b) code: "' + team[0].team_code + '"\n'
                 + 'settings: \n'
-                + 'a) load allowed: ' + lessons[i].settings['load'] + '%\n'
-                + 'b) network needed: ' + lessons[i].settings['network'] + '\n'
-                + 'c) sudo needed: ' + lessons[i].settings['sudo'] + '\n\n'
+                + 'a) network load allowed: ' + lessons[i].settings['network_load'] + '%\n'
+                + 'b) cpu load allowed: ' + lessons[i].settings['cpu_load'] + '%\n'
+                + 'c) network needed: ' + lessons[i].settings['network'] + '\n'
+                + 'd) sudo needed: ' + lessons[i].settings['sudo'] + '\n'
+            
+            let todaysTime = new Date();
+            let endTime = new Date(lessons[i].end_time);
+
+            if (todaysTime > endTime) {
+                output += "lesson ended: true \n\n"
+            } else {
+                output += "lesson ended: false \n\n"
+            }
         }
         executedCommands.value += output
     }
     cmdinput.value = ""
 }
 
-function seeSolutions() {
+// TODO for testing keep without time check - then change
+async function seeSolutions(c) {
+    let name = c.replace("lesson solution ", "")
 
+    if (name) {
+        const lesson = await getLesson({ name : name })
+
+        router.push("/learning/solutions/" + lesson[0].id)
+    } else {
+        commandOutput("No name provided - please provide a name")
+    }
 }
 
 function commandOutput(output) {

@@ -106,7 +106,7 @@ function executeCommand() {
             loginWithGoogle()
             break
         default:
-            output = processCredential()
+            processCredential()
     }
 }
 

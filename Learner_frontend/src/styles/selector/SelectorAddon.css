@@ -21,4 +21,7 @@
     .selector-title {
         @apply text-center font-bold text-lg;
     }
+    .linuxAlignLeft {
+        @apply items-start justify-start;
+    }
 }
