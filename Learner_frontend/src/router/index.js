@@ -100,6 +100,12 @@ const router = createRouter({
       component: LessonSolutionsPage,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/learning/solutions/container/:id',
+      name: 'lesson-solutions-container',
+      component: LessonSolutionsPage,
+      meta: { requiresAuth: true },
+    },
     // delete from here
     {
       path: '/learning/manage',
