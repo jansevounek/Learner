@@ -67,13 +67,29 @@ def join_team():
                         "msg": 'You are already a part of team "' + team[0].get("name") + '"'
                     })
             
+            if team[0].get("member_count") >= team[0].get("member_limit"):
+                return jsonify({
+                        "status": False,
+                        "msg": 'Team "' + team[0].get("name") + '" is already full'
+                    })
+            
             arr.append(team[0].get("id"))
+
+            count = team[0].get("member_count")
+            count += 1
 
             try:
                 supabase.table("user").update({ "teams": arr }).eq("id", extra[0].get("id")).execute()
             except Exception as e:
                 print(f"Error during Supabase query (during updating the user teams column): {e}")
                 return "Error occured", 500
+            
+            try:
+                supabase.table("team").update({ "member_count": count }).eq("team_code", json["team_code"]).execute()
+            except Exception as e:
+                print(f"Error during Supabase query (during updating the user teams column): {e}")
+                return "Error occured", 500
+
         else:
             return jsonify({
                     "status": False,

@@ -29,7 +29,7 @@
                 <h1>7</h1>
                 <h1>Lets Learn</h1>
             </div>
-            <div class="navbar-top-item text-red-500" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/admin' && !isWithoutCmd">
+            <div class="navbar-top-item text-red-500" v-if="localUser && premiumUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/admin' && !isWithoutCmd">
                 <h1>8</h1>
                 <h1>Admin</h1>
             </div>
@@ -45,12 +45,13 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { getUser } from '@/supabase/getFunctions.js'
+import { getUser, getUserExtra } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRoute } from 'vue-router'
 const route = useRoute()
 
+let premiumUser = ref(false)
 const localUser = ref(false)
 
 // credit https://stackoverflow.com/questions/53926267/dynamically-show-components-depending-on-the-current-route-vuejs
@@ -73,9 +74,20 @@ const isWithoutCmd = computed(() => {
 async function setUser() {
     const user = await getUser()
     if (user) {
+        getPremiumStatus()
         localUser.value = true
     } else {
         localUser.value = false
+    }
+}
+
+
+async function getPremiumStatus() {
+    const extra = await getUserExtra()
+    if (extra) {
+        premiumUser.value = extra[0].premium
+    } else {
+        console.log("an error when getting user extras for bottom navbar occured")
     }
 }
 

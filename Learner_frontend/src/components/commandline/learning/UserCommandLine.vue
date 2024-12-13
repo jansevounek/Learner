@@ -189,13 +189,13 @@ async function printLessons() {
                 for (let k = 0; k < lessons.length; k++) {
                     output += index + ". \n" +
                         'lesson name: "' + lessons[k].name + '"\n' +
-                        'from team: "' + team[0].name + '"\n' +
+                        'from team: "' + team[i].name + '"\n' +
                         'starts: "' + lessons[k].start_tkme + '"\n' +
                         'ends: "' + lessons[k].end_time + '"\n'
                     index++
                 }
             } else {
-                output += 'No lesson for team "' + team[i + 1].name + '" found \n'
+                output += 'No lesson for team "' + team[i].name + '" found \n'
             }
         }
 
@@ -211,42 +211,37 @@ async function doLesson(c){
     let lessonName = c.replace("lesson do ", "")
 
     if (lessonName) {
-        let data = await getUserExtra();
-        const extra = data[0]
+        const lesson = await getLesson({ name: lessonName })
+        const teams = await getTeam()
 
-        if (extra) {
-            const { data, error } = await supabase.from("lesson").select("*").eq("name", lessonName).eq("creator_id", extra.id)
+        if (lesson.length == 0) {
+            commandOutput('No lesson with name "' + lessonName + '" found')
+            return
+        } else if (lesson.length > 1) {
+            commandOutput('More then one lessons with name "' + lessonName + '" found - contact support')
+            return
+        } else {
 
-            if (error) {
-                commandOutput("There is a issue and we are not able to serve you now")
-                return
-            }
-
-            if (data.length == 0) {
-                commandOutput('No lesson with name "' + lessonName + '" found')
-                return
-            } else if (data.length > 1) {
-                commandOutput('More then one lessons with name "' + lessonName + '" found - contact support')
-                return
-            } else {
-                let todaysTime = new Date();
-                let startTime = new Date(data[0].start_time);
-                let endTime = new Date(data[0].end_time);
-
-                if (startTime < todaysTime) {
-                    if (endTime > todaysTime) {
-                        router.push("/learning/lesson/" + data[0].id)
+            for (let i = 0; i < teams.length; i++) {
+                if (lesson[0].team_id == teams[i].id) {
+                    let todaysTime = new Date();
+                    let startTime = new Date(lesson[0].start_time);
+                    let endTime = new Date(lesson[0].end_time);
+                    if (startTime < todaysTime) {
+                        if (endTime > todaysTime) {
+                            router.push("/learning/lesson/" + lesson[0].id)
+                        } else {
+                            commandOutput("The lesson is already over")
+                            return
+                        }
                     } else {
-                        commandOutput("The lesson is already over")
+                        commandOutput("The lesson hasnt started yet")
                         return
                     }
-                } else {
-                    commandOutput("The lesson hasnt started yet")
-                    return
                 }
             }
-        } else {
-            commandOutput("Incomplete user profile - contact support")
+            
+            commandOutput('No lesson with name "' + lessonName + '" found')
             return
         }
     } else {
