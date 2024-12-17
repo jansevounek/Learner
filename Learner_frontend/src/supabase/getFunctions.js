@@ -1,19 +1,23 @@
 import { supabase } from '@/supabase/init.js'
 
 export async function getUser() {
-    try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
-        if (error) {
-            console.error('Error fetching user:', error.message);
-            throw new Error('Failed to fetch user: ' + error.message);
-        }
+    const localUser = await supabase.auth.getSession();
 
-        return user
-    } catch (err) {
-        console.error('Unexpected error in getUser:', err);
-        throw new Error('An unexpected error occurred: ' + err.message);
-    }
+    if (localUser.data.session) {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+
+            if (error) {
+                console.error('Error fetching user:', error.message);
+                throw new Error('Failed to fetch user: ' + error.message);
+            }
+
+            return user
+        } catch (err) {
+            console.error('Unexpected error in getUser:', err);
+            throw new Error('An unexpected error occurred: ' + err.message);
+        }
+    }   
 }
 
 export async function getUserExtra({id = null, user_id= null} = {}) {

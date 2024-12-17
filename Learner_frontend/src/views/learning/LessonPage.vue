@@ -2,7 +2,6 @@
     <div class="main-container">
         <LessonPageSelector />
     </div>
-    <div class="mb-12"></div>
 </template>
 
 <script setup>

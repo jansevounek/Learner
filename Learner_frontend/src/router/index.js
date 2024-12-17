@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/supabase/init.js'
+import { getLesson, getUserExtra } from '@/supabase/getFunctions'
 import HomePage from '@/views/HomePage.vue'
 import LoginPage from '@/views/auth/LoginPage.vue'
 import SignupPage from '@/views/auth/SignupPage.vue'
@@ -16,6 +17,7 @@ import LearningAdminPage from '@/views/learning/LearningAdminPage.vue'
 import LearningCreateLessonPage from '@/views/learning/LearningCreateLessonPage.vue'
 import LessonPage from '@/views/learning/LessonPage.vue'
 import LessonSolutionsPage from '@/views/learning/LessonSolutionsPage.vue'
+import { transformVNodeArgs } from 'vue'
 
 let localUser;
 
@@ -72,7 +74,6 @@ const router = createRouter({
       name: 'admin-lessons',
       component: LearningAdminPage,
       meta: { 
-        requiresAuth: true,
         requiresPremium: true
        },
     },
@@ -86,13 +87,13 @@ const router = createRouter({
       path: '/learning/create-lesson',
       name: 'create-lesson',
       component: LearningCreateLessonPage,
-      meta: { requiresAuth: true },
+      meta: { requiresPremium: true },
     },
     {
       path: '/learning/lesson/:id',
       name: 'lesson-do',
       component: LessonPage,
-      meta: { requiresAuth: true },
+      meta: { requiresTeam: true },
     },
     {
       path: '/learning/solutions/:id',
@@ -149,23 +150,45 @@ async function getUserUnAuth(next) {
 
 async function getUserPremium(next) {
   const { data: { user } } = await supabase.auth.getUser()
-  const { data, error } = await supabase
-        .from('user')
-        .select('premium')
-        .eq('user_id', user.id);
-  if (data[0].premium) {
-    next();
+  if (user) {
+    const { data, error } = await supabase
+          .from('user')
+          .select('premium')
+          .eq('user_id', user.id);
+    if (error) {
+      next("/");
+    }
+    if (data[0].premium) {
+      next();
+    } else {
+      next("/");
+    }
+  }
+}
+
+async function getUserTeam(to, next) {
+  const user = await getUserExtra()
+  const lesson = await getLesson({ id : to.params.id })
+
+  if (user && lesson) {
+    // taken from https://stackoverflow.com/questions/7378228/check-if-an-element-is-present-in-an-array
+    if (user[0].teams.includes(lesson[0].team_id)) {
+      next();
+    } else {
+      next("/");
+    }
   } else {
     next("/");
   }
 }
 
 router.beforeEach(async (to, from, next) => {
-
-  if (to.meta.requiresAuth && !to.meta.requiresPremium) {
+  if (to.meta.requiresAuth) {
     await getUserAuth(next);
-  } else if (to.meta.requiresAuth && to.meta.requiresPremium) {
+  } else if (to.meta.requiresPremium) {
     await getUserPremium(next);
+  } else if (to.meta.requiresTeam) {
+    await getUserTeam(to, next)
   } else if (to.meta.requiresUnAuth) {
     await getUserUnAuth(next);
   } else {

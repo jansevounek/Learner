@@ -90,7 +90,9 @@
                 <p v-if="errors.task_errors.short" class="selection-error text-orange-500">2.2 The task for the lesson is short</p>
                 <p v-if="errors.team" class="selection-error">3. The team for which the lesson is intended must be selected</p>
                 <p v-if="errors.load" class="selection-error">4. The maximum network and cpu load of the container must be set</p>
-                <p v-if="errors.time" class="selection-error">5. The time of the lesson must be set</p>
+                <p v-if="errors.time.empty" class="selection-error">5.1 The time of the lesson must be set</p>
+                <p v-if="errors.time.start" class="selection-error">5.2 The lesson cannot start before today</p>
+                <p v-if="errors.time.end" class="selection-error">5.3 The lesson cannot end before today</p>
                 <p v-if="errors.api" class="selection-error">6. {{ apiErrorMsg }}</p>
             </div>
         </div>
@@ -105,6 +107,7 @@ import { getTeam, getUserExtra, getUser, getLesson } from '@/supabase/getFunctio
 
 // router import a setup
 import { useRouter } from 'vue-router'
+import { data } from 'autoprefixer';
 const router = useRouter()
 
 // all the lesson information
@@ -129,9 +132,13 @@ let errors = ref({
         empty: true,
         short: true
     },
+    time: {
+        empty: true,
+        start: true,
+        end: true
+    },
     team: true,
     load: true,
-    time: true,
     api: false
 })
 let apiErrorMsg = ref('')
@@ -235,13 +242,17 @@ async function createLesson() {
             empty: true,
             short: true
         },
+        time: {
+            empty: true,
+            start: true,
+            end: true
+        },
         team: true,
         load: true,
-        time: true,
         api: false
     }
 
-    error = testName(error)
+    error = await testName(error)
 
     error = testTask(error)
     
@@ -250,7 +261,15 @@ async function createLesson() {
     }
 
     if (date.value) {
-        error.time = false
+        error.time.empty = false
+
+        let todaysTime = new Date();
+        if (date.value[0] >= todaysTime) {
+            error.time.start = false
+        }
+        if (date.value[1] >= todaysTime) {
+            error.time.end = false
+        }
     }
 
     if (teamSelected.value != 0) {
@@ -265,7 +284,7 @@ async function createLesson() {
     }
 }
 
-function testName(error) {
+async function testName(error) {
     if (nameInput.value != "") {
         error.name_errors.empty = false
     }
@@ -279,7 +298,7 @@ function testName(error) {
         error.name_errors.onlySpaces = false
     }
 
-    let lesson = getLesson({ name: nameInput.value })
+    let lesson = await getLesson({ name: nameInput.value })
 
     if (lesson.length == 0) {
         error.name_errors.exists = false
@@ -305,7 +324,9 @@ function isError(error) {
         error.name_errors.invalidAscii ||
         error.name_errors.onlySpaces ||
         error.load ||
-        error.time ||
+        error.time.empty ||
+        error.time.start ||
+        error.time.end ||
         error.task_errors.empty ||
         error.task_errors.short ||
         error.api

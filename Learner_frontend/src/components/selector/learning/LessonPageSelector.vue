@@ -38,8 +38,8 @@
             <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="containerExists && containerRunning"></iframe>
         </div>
     </div>
-    <div>
-        
+    <div class="error-page-container" :class="{ flex: error_msg }">
+        <p class="mt-2 ml-2 text-red-600">Error message: {{ error_msg }}</p>
     </div>
 </template>
 
@@ -61,6 +61,7 @@ let containerExists = ref(false)
 let containerRunning = ref(false)
 let url = ref("")
 let container = ref()
+let error_msg = ref('')
 
 const listLength = 6
 const horLength = 2
@@ -158,6 +159,8 @@ async function createContainer() {
     const data = await response.json()
     if (data.status) {
         containerExists.value = true
+    } else {
+        error_msg.value = data.msg
     }
 }
 
@@ -180,8 +183,7 @@ async function startContainer(container) {
     if (data.status) {
         containerRunning.value = true
     } else {
-        console.log("nope")
-        console.log(data.msg)
+        error_msg.value = data.msg
     }
 }
 
@@ -199,6 +201,11 @@ async function stopContainer() {
             })
         });
         const data = await response.json()
+        if (data.status) {
+            containerRunning.value = false
+        } else {
+            error_msg.value = data.msg
+        }
     }
 }
 

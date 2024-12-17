@@ -83,4 +83,7 @@
     .linux-button {
         @apply h-16 w-32 border-2 border-green-600 text-green-600;
     }
+    .error-page-container {
+        @apply w-[100%] h-16 border-red-600 border-b-2 border-x-2 flex-row hidden;
+    }
 }

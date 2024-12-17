@@ -43,18 +43,18 @@ def create_container():
                         container.remove()
                         return jsonify({
                             "status": False,
-                            "msg": 'There has been a problem with creating the container - while inserting it into database'
+                            "msg": 'There has been a problem with creating the container - contact support'
                         })
                 else:
                     return jsonify({
                         "status": False,
-                        "msg": 'There has been a problem with creating the container - while starting it'
+                        "msg": 'There has been a problem with creating the container - contact support'
                     })
 
             else:
                 return jsonify({
                     "status": False,
-                    "msg": 'There has been a problem with creating the container - while generating its credentials'
+                    "msg": 'There has been a problem with creating the container - contact support'
                 })
         else:
             return jsonify({
@@ -292,7 +292,7 @@ def stop_container():
             except Exception as e:
                 return jsonify({
                     "status": False,
-                    "msg": 'There has been a problem stoping the container'
+                    "msg": 'There has been a problem stoping your container - contact support'
                 })
             
             try:
@@ -300,7 +300,7 @@ def stop_container():
             except Exception as e:
                 return jsonify({
                             "status": False,
-                            "msg": 'There has been a problem starting your container - contact support'
+                            "msg": 'There has been a problem stoping your container - contact support'
                         })
             
             try:
@@ -308,18 +308,18 @@ def stop_container():
             except Exception as e:
                 return jsonify({
                             "status": False,
-                            "msg": 'There has been a problem starting your container - contact support'
+                            "msg": 'There has been a problem stoping your container - contact support'
                         })
 
         else:
             return jsonify({
                 "status": False,
-                "msg": 'no container found'
+                "msg": 'No container found - contact support'
             })
     else:
         return jsonify({
             "status": False,
-            "msg": 'no script found'
+            "msg": 'No script found - contact support'
         })
 
     return jsonify({
