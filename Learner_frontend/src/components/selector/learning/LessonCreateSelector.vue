@@ -77,6 +77,25 @@
         </div>
         <div @click="currentIndex = 5">
             <div class="selections-item" :class="{ selected: currentIndex === 5 }">
+                <h1 class="selections-item-content">Teams</h1>
+                <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
+                    <span v-if="!displayDetails || currentIndex != 5">▲</span>
+                    <span v-if="displayDetails && currentIndex == 5">▼</span>
+                </a>
+            </div>
+            <div class="selections-item-details" v-if="displayDetails && currentIndex == 5">
+                <div class="item-details-checkbox-container" :class="{ selected: subIndex3 === 0 }">
+                    <div class="item-details-checkbox" :class="{ checboxSelected: networkSelected }" @click="networkSelected = !networkSelected"></div>
+                    <label class="mr-1">Nano</label>
+                </div>
+                <div class="item-details-checkbox-container mb-3" :class="{ selected: subIndex3 === 1 }">
+                    <div class="item-details-checkbox" :class="{ checboxSelected: sudoSelected }" @click="sudoSelected = !sudoSelected"></div>
+                    <label class="mr-1">git</label>
+                </div>
+            </div>
+        </div>
+        <div @click="currentIndex = 6">
+            <div class="selections-item" :class="{ selected: currentIndex === 6 }">
                 <b class="selection-item-button" @click="createLesson">Create</b>
             </div>
         </div>
@@ -107,7 +126,6 @@ import { getTeam, getUserExtra, getUser, getLesson } from '@/supabase/getFunctio
 
 // router import a setup
 import { useRouter } from 'vue-router'
-import { data } from 'autoprefixer';
 const router = useRouter()
 
 // all the lesson information
@@ -144,15 +162,17 @@ let errors = ref({
 let apiErrorMsg = ref('')
 
 // listing stuff
-const listLength = 6
+const listLength = 7
 const subListLength1 = 4
 let subListLength2 = 0
+const subListLength3 = 2
 const adminTeams = ref([]);
 setAdminTeams()
 let displayDetails = ref(false)
 let currentIndex = ref(0)
 let subIndex1 = ref(0)
 let subIndex2 = ref(0)
+let subIndex3 = ref(0)
 
 // mounting handlers for controls
 onMounted(() => {
@@ -184,12 +204,18 @@ function handleKeyDown(event) {
         if (displayDetails.value && currentIndex.value == 4) {
             subIndex2.value = (subIndex2.value + 1) % subListLength2;
         }
+        if (displayDetails.value && currentIndex.value == 5) {
+            subIndex3.value = (subIndex3.value + 1) % subListLength3;
+        }
     } else if (event.key === 'ArrowUp' && event.ctrlKey) {
         if (displayDetails.value && currentIndex.value == 2) {
             subIndex1.value = (subIndex1.value - 1 + subListLength1) % subListLength1;
         }
         if (displayDetails.value && currentIndex.value == 4) {
             subIndex2.value = (subIndex2.value - 1 + subListLength2) % subListLength2;
+        }
+        if (displayDetails.value && currentIndex.value == 5) {
+            subIndex3.value = (subIndex3.value - 1 + subListLength3) % subListLength3;
         }
     } else if (event.key === 'ArrowDown') {
         displayDetails.value = false
@@ -203,7 +229,9 @@ function handleKeyDown(event) {
         selectContainerOptions()
     } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 4) {
         selectTeamOptions()
-    } else if (event.key === 'Enter' && currentIndex.value == 5) {
+    } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 5) {
+        selectPackageOptions()
+    } else if (event.key === 'Enter' && currentIndex.value == 6) {
         createLesson()
     } else if (event.key === 'Enter') {
         displayDetails.value = !displayDetails.value
@@ -228,6 +256,10 @@ function selectContainerOptions() {
 
 function selectTeamOptions() {
     teamSelected.value = adminTeams.value[subIndex2.value].id
+}
+
+function selectPackageOptions() {
+    
 }
 
 async function createLesson() {
