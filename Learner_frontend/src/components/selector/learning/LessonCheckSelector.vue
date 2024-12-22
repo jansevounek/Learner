@@ -8,12 +8,13 @@
         </div>
         <div @click="currentIndex = 1">
             <div class="selections-item" :class="{ selected: currentIndex === 1 }">
-                <b class="selection-item-button" @click="createLesson">Exit</b>
+                <button class="selection-item-button" @click='router.push("/learning/admin")'>Exit</button>
             </div>
         </div>
         <div @click="currentIndex = 2">
             <div class="selections-item h-[60vh]" :class="{ selected: currentIndex === 2 }">
-                
+                <button class="selection-item-button h-16" v-if="!containerRunning" @click="startContainer">Start container</button>
+                <iframe :src="url" frameborder="0" v-if="containerRunning"></iframe>
             </div>
         </div>
     </div>
@@ -22,12 +23,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { getContainer, getUserExtra } from '@/supabase/getFunctions.js'
+import { supabase } from '@/supabase/init';
 
 import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
 let currentIndex = ref(0)
+let containerRunning = ref(false)
+let url = ref('')
 const listLength = 3
 const container = ref()
 const userEmail = ref()
@@ -47,6 +51,28 @@ function handleKeyDown(event) {
         currentIndex.value = (currentIndex.value + 1) % listLength;
     } else if (event.key === 'ArrowUp') {
         currentIndex.value = (currentIndex.value - 1 + listLength) % listLength;
+    }
+}
+
+async function startContainer() {
+    const { data: { user } } = await supabase.auth.getUser();
+    const apiurl = import.meta.env.VITE_API_URL
+    const response = await fetch(apiurl + "/lessons/admin/start-container", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+            user_id: user.id,
+            container_id: container.value[0].id
+        })
+    });
+    const data = await response.json()
+    if (data.status) {
+        containerRunning.value = true
+    } else {
+        error_msg.value = data.msg
     }
 }
 

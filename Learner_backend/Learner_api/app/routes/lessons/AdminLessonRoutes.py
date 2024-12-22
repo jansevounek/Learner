@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson
+from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson, getContainer
 from ...services.docker_service import docker
 
 from datetime import datetime
@@ -126,4 +126,37 @@ def cancel_lesson():
     return jsonify({
         "status": True,
         "msg": 'Lesson "' + json["lesson_name"] + '" canceled successfully'
+        })
+
+@bp.route('/start-container', methods=['POST'])
+def start_container():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    extra = getUserExtra(user_id=json["user_id"])
+    container = getContainer(id=json["container_id"])
+
+    print(extra)
+    print(container)
+
+    if (extra):
+        if (container):
+            pass
+        else:
+            return jsonify({
+                "status": False,
+                "msg": 'Container not found - contact support'
+            })
+    else:
+        return jsonify({
+            "status": False,
+            "msg": 'Your user profile is incomplete - contact support'
+        })
+    
+    return jsonify({
+        "status": True,
+        "msg": 'On skibidi'
         })
