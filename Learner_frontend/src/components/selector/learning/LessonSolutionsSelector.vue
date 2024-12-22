@@ -19,13 +19,14 @@
             </div>
         </div>
         <div class="linux-container">
-            <div class="container-list" v-if="containers">
+            <div class="container-list" v-if="containers.length > 0">
                 <div class="container-list-item" v-for="(container, index) in containers" @click="currentIndex = 3 + index" :class="{ selected2: currentIndex === 3 + index }">
                     <p class="mx-auto">Container code-name: {{ container.name }}</p>
                     <p class="mx-auto">Container author: {{ container.email }}</p>
                     <button class="cmd-input-mobile-btn mb-0" @click="selectContainer()">Check container</button>
                 </div>
             </div>
+            <div v-if="containers.length == 0"><p class="text-red-600 text-2xl">No completions created</p></div>
         </div>
     </div>
 </template>
@@ -44,9 +45,9 @@ let lastControlIndex = ref(0)
 let lastContainerIndex = ref(0)
 
 let lesson = ref()
-let containers = ref([[]])
+let containers = ref([])
 
-let listLength = ref(4)
+let listLength = ref(3)
 const horLength = 2
 const lessonId = route.params.id
 
@@ -62,7 +63,6 @@ onUnmounted(() => {
 
 
 function handleKeyDown(event) {
-    console.log(listLength.value)
     if (event.key === 'ArrowDown') {
         currentIndex.value = (currentIndex.value + 1) % listLength.value;
         if (currentIndex.value == 4) {
@@ -109,7 +109,8 @@ function exit() {
 }
 
 function selectContainer() {
-    console.log("select")
+    let index = containers.value.length - (listLength.value - currentIndex.value)
+    router.push('/learning/solutions/container/' + containers.value[index].id)
 }
 
 async function setVariables() {
