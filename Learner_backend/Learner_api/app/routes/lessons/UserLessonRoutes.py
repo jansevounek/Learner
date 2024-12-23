@@ -337,7 +337,7 @@ def stop_container():
                             })
                 
                 try:
-                    supabase.table("limitations").update({"running_container_id": 0}).eq("id", limit[0].get("id")).execute()
+                    supabase.table("limitations").update({"running_container_id": 0, "checking_container_id": 0}).eq("id", limit[0].get("id")).execute()
                 except Exception as e:
                     return jsonify({
                                 "status": False,

@@ -1,6 +1,8 @@
+import os
+import subprocess
 from flask import Blueprint, jsonify, request
 
-from ...services.supabase_service import supabase, getUserExtra, getUserLimitations, getLesson, getContainer
+from ...services.supabase_service import getScript, supabase, getUserExtra, getUserLimitations, getLesson, getContainer
 from ...services.docker_service import docker
 
 from datetime import datetime
@@ -138,13 +140,83 @@ def start_container():
     
     extra = getUserExtra(user_id=json["user_id"])
     container = getContainer(id=json["container_id"])
+    script = getScript(container_id=json["container_id"])
 
     print(extra)
     print(container)
 
     if (extra):
-        if (container):
-            pass
+        if (container and script):
+            c = docker.containers.get(container[0].get("name"))
+            if (c):
+                args = [str(script[0].get("settings").get("cpu_load")), str(script[0].get("settings").get("network_load")), str(container[0].get("name"))]
+                command = ["python3", "container_script.py", *args] + args
+                target_cwd = os.path.abspath(os.path.join(os.path.abspath(__file__), "..", "..", "..", "..", "..", "Learner_scripts"))
+                process = False
+
+                try:
+                    process = subprocess.Popen(command, cwd=target_cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print(process.pid)
+                except Exception as e:
+                    return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem starting your container - contact support'
+                            })
+                
+                if (process):
+                    try:
+                        c.start()
+                    except Exception as e:
+                        process.kill()
+                        return jsonify({
+                            "status": False,
+                            "msg": 'There has been a problem starting your container - contact support'
+                        })
+                    
+                    data = {
+                        "pid": process.pid,
+                        "running": "true",
+                    }
+                    
+                    try:
+                        supabase.table("container_script").update(data).eq("container_id", container[0].get("id")).execute()
+                    except Exception as e:
+                        print(e)
+                        process.kill()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+
+                    try:
+                        supabase.table("container").update({"running": "true"}).eq("id", container[0].get("id")).execute()
+                    except Exception as e:
+                        process.kill()
+                        c.stop()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+
+                    try:
+                        supabase.table("limitations").update({"checking_container_id": container[0].get("id")}).eq("extra_id", extra[0].get("id")).execute()
+                    except Exception as e:
+                        process.kill()
+                        c.stop()
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+                else:
+                    return jsonify({
+                        "status": False,
+                        "msg": 'There has been a problem starting your container - contact support'
+                    })
+            else:
+                return jsonify({
+                    "status": False,
+                    "msg": 'Container not found - contact support'
+                })
         else:
             return jsonify({
                 "status": False,
