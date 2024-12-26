@@ -9,11 +9,11 @@
                     <p>Ends in: "{{ lesson.end_time }}"</p>
                 </div>
             </div>
-            <div class="selection-container-addon" @click="currentIndex = 1" :class="{ selected2: currentIndex === 1 }">
+            <div class="selection-container-addon" @click="currentIndex = 1" :class="{ selected2: currentIndex === 1 }" v-if="task">
                 <div class="mx-2">
                     <h1 class="selector-title">The task</h1>
                     <!--TODO change to task-->
-                    <p>Task: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <p class="whitespace-nowrap" v-for="(line) in task">{{ line }}</p>
                 </div>
             </div>
             <div class="selection-container-addon" @click="currentIndex = 2" :class="{ selected2: currentIndex === 2 }">
@@ -75,6 +75,7 @@ let containerRunning = ref(false)
 let url = ref("")
 let container = ref()
 let error_msg = ref('')
+let task = ref([])
 
 const listLength = 6
 const horLength = 2
@@ -155,6 +156,53 @@ function copyPassword() {
     
     text1.textContent = "copied"
     text2.textContent = "copy"
+}
+
+function formatText() {
+    let text = lesson.value.task
+    let words = text.split(" ")
+    const maxWords = 11
+    const maxChars = 60
+    const lines = []
+
+    let currentLine = [];
+    let currentLineLength = 0;
+
+    for (const word of words) {
+    
+        if (word.length > maxChars) {
+        
+            if (currentLine.length > 0) {
+                lines.push(currentLine.join(" "));
+                currentLine = [];
+                currentLineLength = 0;
+            }
+
+
+            for (let i = 0; i < word.length; i += maxChars) {
+                lines.push(word.slice(i, i + maxChars));
+            }
+            continue;
+        }
+
+        if (
+            currentLine.length + 1 > maxWords ||
+            currentLineLength + word.length + (currentLine.length > 0 ? 1 : 0) > maxChars
+        ) {
+            lines.push(currentLine.join(" "));
+            currentLine = [];
+            currentLineLength = 0;
+        }
+
+        currentLine.push(word);
+        currentLineLength += word.length + (currentLine.length > 1 ? 1 : 0);
+    }
+
+    if (currentLine.length > 0) {
+        lines.push(currentLine.join(" "));
+    }
+
+    task.value = lines
 }
 
 async function useContainer() {
@@ -254,5 +302,6 @@ async function setVariables() {
         }
     }
     container.value = c
+    formatText()
 }
 </script>
