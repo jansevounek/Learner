@@ -86,4 +86,8 @@
     .error-page-container {
         @apply w-[100%] h-16 border-red-600 border-b-2 border-x-2 flex-row hidden;
     }
+
+    .container-login-container {
+        @apply flex flex-row
+    }
 }

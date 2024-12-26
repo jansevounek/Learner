@@ -43,7 +43,7 @@
                 </div>
                 <div class="item-detail-input-container" :class="{ selected: subIndex1 === 2 }">
                     <p class="mx-2">What memory load is allowed</p>
-                    <input type="number" class="item-detail-input" placeholder="0-100" v-model="networkLoadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 2">
+                    <input type="number" class="item-detail-input" placeholder="10-100" v-model="networkLoadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 2">
                 </div>
                 <div class="item-detail-input-container mb-3" :class="{ selected: subIndex1 === 3 }">
                     <p class="mx-2">What cpu load is allowed</p>
@@ -77,21 +77,18 @@
         </div>
         <div @click="currentIndex = 5">
             <div class="selections-item" :class="{ selected: currentIndex === 5 }">
-                <h1 class="selections-item-content">Teams</h1>
+                <h1 class="selections-item-content">Packages to install</h1>
                 <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
                     <span v-if="!displayDetails || currentIndex != 5">▲</span>
                     <span v-if="displayDetails && currentIndex == 5">▼</span>
                 </a>
             </div>
             <div class="selections-item-details" v-if="displayDetails && currentIndex == 5">
-                <div class="item-details-checkbox-container" :class="{ selected: subIndex3 === 0 }">
-                    <div class="item-details-checkbox" :class="{ checboxSelected: networkSelected }" @click="networkSelected = !networkSelected"></div>
-                    <label class="mr-1">Nano</label>
+                <div class="item-details-checkbox-container" v-for="(name, index) in pckgList" :class="{ selected: subIndex3 === index }" >
+                    <div class="item-details-checkbox" :class="{ checboxSelected: pckgSelected.includes(name) }" @click="selectPackage(index)"></div>
+                    <label class="mr-1">{{ name }}</label>
                 </div>
-                <div class="item-details-checkbox-container mb-3" :class="{ selected: subIndex3 === 1 }">
-                    <div class="item-details-checkbox" :class="{ checboxSelected: sudoSelected }" @click="sudoSelected = !sudoSelected"></div>
-                    <label class="mr-1">git</label>
-                </div>
+                <span class="h-2"></span>
             </div>
         </div>
         <div @click="currentIndex = 6">
@@ -137,6 +134,7 @@ let networkLoadInput = ref('')
 let cpuLoadInput = ref(' ')
 let date = ref();
 let teamSelected = ref(0);
+let pckgSelected = ref(['nano']);
 
 // errors stuff
 let firstLoad = true
@@ -173,6 +171,7 @@ let currentIndex = ref(0)
 let subIndex1 = ref(0)
 let subIndex2 = ref(0)
 let subIndex3 = ref(0)
+const pckgList = ["nano", "git"]
 
 // mounting handlers for controls
 onMounted(() => {
@@ -258,8 +257,16 @@ function selectTeamOptions() {
     teamSelected.value = adminTeams.value[subIndex2.value].id
 }
 
-function selectPackageOptions() {
-    
+function selectPackage(index) {
+    const item = pckgList[index]
+
+    if (pckgSelected.value.includes(item)) {
+        let index = pckgSelected.value.indexOf(item)
+        
+        pckgSelected.value.splice(index, 1)
+    } else {
+        pckgSelected.value.push(pckgList[index])
+    }
 }
 
 async function createLesson() {
@@ -288,7 +295,7 @@ async function createLesson() {
 
     error = testTask(error)
     
-    if (networkLoadInput.value > 0 && networkLoadInput.value < 100 && cpuLoadInput.value > 0 && cpuLoadInput.value < 100) {
+    if (networkLoadInput.value > 10 && networkLoadInput.value < 100 && cpuLoadInput.value > 0 && cpuLoadInput.value < 100) {
         error.load = false
     }
 
@@ -398,6 +405,7 @@ async function create() {
                 cpu_load: cpuLoadInput.value
             },
             date: date.value,
+            pckg: pckgSelected.value,
             team_id: teamSelected.value
         })
     })

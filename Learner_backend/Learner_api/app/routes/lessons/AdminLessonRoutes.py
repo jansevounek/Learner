@@ -37,7 +37,8 @@ def create_lesson():
                         "task": json["task"],
                         "name": json["name"],
                         "team_id": json["team_id"],
-                        "settings": json["container_settings"]
+                        "settings": json["container_settings"],
+                        "packages": json["pckg"]
                     }
                     try:
                         supabase.table("lesson").insert(data).execute()

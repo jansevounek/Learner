@@ -104,6 +104,13 @@ def createContainer(data, lesson):
         "SIAB_PKGS" : "nano"
     }
 
+    packages = ""
+    for pckg in lesson[0].get("packages"):
+        packages += pckg + " "
+
+    if packages:
+        env_var.update({"SIAB_PKGS" : packages[:-1]})
+
     ports = {
         str(data["port"]) + '/tcp': data["port"],
     }

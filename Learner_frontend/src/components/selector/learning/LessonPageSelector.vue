@@ -25,16 +25,29 @@
                     <p>Sudo: {{ lesson.settings.sudo }}</p>
                 </div>
             </div>
-            <div class="selection-container-addon lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 3" :class="{ selected2: currentIndex === 3 }">
-                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 3 }" @click="router.push('/learning/user')">Exit</button>
+            <div class="selection-container-addon" @click="currentIndex = 3" :class="{ selected2: currentIndex === 3 }" v-if="containerExists">
+                <div class="mx-2">
+                    <h1 class="selector-title">Your container login</h1>
+                    <div class="container-login-container">
+                        <p>Login: {{ container[0].login }}</p>
+                        <p class="ml-auto my-auto text-blue-700" @click="copyLogin()" id="login-copy">copy</p>
+                    </div>
+                    <div class="container-login-container">
+                        <p>Password: {{ container[0].password }}</p>
+                        <p class="ml-auto my-auto text-blue-700" @click="copyPassword()" id="password-copy">copy</p>
+                    </div>
+                </div>
             </div>
-            <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 4" :class="{ selected2: currentIndex === 4 }">
-                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 4, disabled_button: containerRunning == false }" @click="stopContainer()">Stop Container</button>
+            <div class="selection-container-addon lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 4" :class="{ selected2: currentIndex === 4 }">
+                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 4 }" @click="router.push('/learning/user')">Exit</button>
+            </div>
+            <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 5" :class="{ selected2: currentIndex === 5 }">
+                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 5, disabled_button: containerRunning == false }" @click="stopContainer()">Stop Container</button>
             </div>
         </div>
-        <div class="linux-container" @click="currentIndex = 5" :class="{ selected2: currentIndex === 5 }">
-            <button class="linux-button" :class="{ selected_button: currentIndex === 5 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
-            <button class="linux-button" :class="{ selected_button: currentIndex === 5 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
+        <div class="linux-container" @click="currentIndex = 6" :class="{ selected2: currentIndex === 6 }">
+            <button class="linux-button" :class="{ selected_button: currentIndex === 6 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 6 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
             <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="containerExists && containerRunning"></iframe>
         </div>
     </div>
@@ -117,13 +130,32 @@ function handleKeyDown(event) {
         } else if (horIndex.value == 1) {
             currentIndex.value = 5;
         }
-    } else if (event.key === 'Enter' && currentIndex.value == 3) {
-        router.push("/learning/user")
     } else if (event.key === 'Enter' && currentIndex.value == 4) {
+        router.push("/learning/user")
+    } else if (event.key === 'Enter' && currentIndex.value == 5) {
+        stopContainer()
+    } else if (event.key === 'Enter' && currentIndex.value == 6) {
         useContainer()
     }
 }
 
+function copyLogin() {
+    let text1 = document.getElementById("login-copy")
+    let text2 = document.getElementById("password-copy")
+    navigator.clipboard.writeText(container.value[0].login);
+
+    text1.textContent = "copied"
+    text2.textContent = "copy"
+}
+
+function copyPassword() {
+    let text1 = document.getElementById("password-copy")
+    let text2 = document.getElementById("login-copy")
+    navigator.clipboard.writeText(container.value[0].password);
+    
+    text1.textContent = "copied"
+    text2.textContent = "copy"
+}
 
 async function useContainer() {
     const extra = await getUserExtra()
