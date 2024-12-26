@@ -3,9 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Setup instructions for Learner</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <p>Here will be all the info about the project</p>
+    <div class="navbar">
+        <div class="navbar-item">
+            <a href="#downloads" class="navbar-link" style="color: greenyellow">Downloads</a>
+        </div>
+        <div class="navbar-item">
+            <a href="#guide" class="navbar-link" style="color: skyblue">Guide</a>
+        </div>
+    </div>
+    <div class="downloads">
+        <h1 id="downloads">Downloads</h1>
+        <p>The link below takes you to a google drvie folder from which you can download all the files you need to setup this project</p>
+        <a href="https://drive.google.com/drive/folders/19VByjicYhiY0F0k6UytDBPnuEsRgCAPL?usp=drive_link" class="navbar-link" style="color: greenyellow;">Google drive</a>
+    </div>
+    <div class="guide">
+        <h1 id="guide">Guide</h1>
+        <p>This guide will walk you throw the setup of this project. However the creator of this project <b>Strongly</b> advices against trying it. Here we go!</p>
+        <p>First of all this setup guide is recommended for linux however it can also be done on windows. But once again it is recommended not to waste your time on that. Life is too short for it :).</p>
+        <p>Second of all it is important to say you need sudo rights and access to the docker socket.</p>
+        <p>To begin with clone this <a href="https://github.com/jansevounek/Learner" class="guide-link">repository</a>.</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="git-clone">git clone ...</p>
+            <button class="copy-button" onclick="copy('git-clone')" id="git-clone-btn">copy</button>
+        </div>
+        <p>Now the time has come for you to unzip the supabase folder you can download <a href="/supabase.zip" download="supabase.zip" class="guide-link">Here</a>.</p>
+        <p>On linux ;)</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="unzip">unzip supabase.zip</p>
+            <button class="copy-button" onclick="copy('unzip')" id="unzip-btn">copy</button>
+        </div>
+        <p>Now comes the part where you are going to need to go to the supabase <a href="https://drive.google.com/drive/folders/19VByjicYhiY0F0k6UytDBPnuEsRgCAPL?usp=drive_link" class="guide-link">website</a> and you are going to scroll to the part where you get to create the anon key and the service key. These you will take and put into the .env file located in supabase/docker/.env into the variables "anon_key=" and "service_key=".</p>
+        <div class="code multi-line">
+            <p style="margin-left: 20px;">anon_key="jndfs..."</p>
+            <p style="margin-left: 20px;">service_key="asda..."</p>
+        </div>
+        <p>And that is it for supabase -> now to the project</p>
+        <p>Now you are going to need to go to the stripe <a href="https://dashboard.stripe.com/login" class="guide-link">website</a> and setup an account (if you do not have it) and get the stripe api key, stripe publishable key and create a product and get its price id (this product is just a one time buy not a subscription)</p>
+        <p>And now that you have them and them to the .env.example file and rename it to just .env</p>
+        <div class="code multi-line">
+            <p style="margin-left: 20px;">.env.example -> .env</p>
+            <p style="margin-left: 20px;">STRIPE_API_KEY=...</p>
+            <p style="margin-left: 20px;">VITE_STRIPE_PUBLISHABLE_KEY=...</p>
+            <p style="margin-left: 20px;">STRIPE_PRICE_ID=...</p>
+        </div>
+        <p>Now that you have that you should be ready to go and install the frontend folder (Learner_frontend/) and run:</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="npm-install">npm install</p>
+            <button class="copy-button" onclick="copy('npm-install')" id="npm-install-btn">copy</button>
+        </div>
+        <p>After that you first need to go to the Learner_backend/ folder create a venv</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="python-venv">python3 -m venv venv</p>
+            <button class="copy-button" onclick="copy('python-venv')" id="python-venv-btn">copy</button>
+        </div>
+        <p>And after that install the dependecies: </p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="pip-install">pip install -r requirements.txt</p>
+            <button class="copy-button" onclick="copy('pip-install')" id="pip-install-btn">copy</button>
+        </div>
+        <p>And after that you should be pretty much set to run the project so first of all go back to the Learner_frontend/ folder and run:</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="npm-run">npm run dev</p>
+            <button class="copy-button" onclick="copy('npm-run')" id="npm-run-btn">copy</button>
+        </div>
+        <p>Second of all run the backend side of the application by going into the Learner_backend/Learner_api/ folder and running:</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="python-run">python3 run.py</p>
+            <button class="copy-button" onclick="copy('python-run')" id="python-run-btn">copy</button>
+        </div>
+        <p>And lastly you must run the supabase project so go back to the supabase/docker folder and run:</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="docker-compose">sudo docker compose up -d</p>
+            <button class="copy-button" onclick="copy('docker-compose')" id="docker-compose-btn">copy</button>
+        </div>
+        <p>After you did all of this your application should be running (hopefully) :). Congrats to those who made it here!</p>
+        <h3>Notes</h3>
+        <p>1) For deployment go throw all the setup until the run commands (the first one being "npm run dev") and in the hom folder of the project just run + however you will need to run the supabase project with the same command in its folder</p>
+        <div class="code">
+            <p style="margin-left: 20px;" id="docker-compose-2">sudo docker compose up -d</p>
+            <button class="copy-button" onclick="copy('docker-compose-2')" id="docker-compose-2-btn">copy</button>
+        </div>
+        <p>2) For those who look into working on the project (don't) i have included two download links for two scripts that if run setup the application instantly (use them in the base directory on linux!) -> just run ;)</p>
+        <div class="code multi-line">
+            <p style="margin-left: 20px;">./backend.sh</p>
+            <p style="margin-left: 20px;">./frontend.sh</p>
+        </div>
+        <p>3) enjoy if it works for you :]</p>
+        <p>4) My other project - <a href="http://raycaster.domovprojekt.com/" class="guide-link">here</a></p>
+        <p>Goodbye!</p>
+    </div>
+
+    <script>
+        function copy(name) {
+            switch (name) {
+                case "git-clone":
+                    navigator.clipboard.writeText("git clone https://github.com/jansevounek/Learner")
+                    btn = document.getElementById(name + "-btn")
+                    btn.textContent = "copied"
+                    return
+            }
+
+            element = document.getElementById(name)
+            btn = document.getElementById(name + "-btn")
+
+            navigator.clipboard.writeText(element.textContent)
+
+            btn.textContent = "copied"
+        }
+    </script>
 </body>
 </html>
