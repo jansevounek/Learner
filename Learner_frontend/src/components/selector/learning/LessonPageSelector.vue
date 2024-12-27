@@ -44,10 +44,13 @@
             <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 5" :class="{ selected2: currentIndex === 5 }">
                 <button class="selector-addon-button" :class="{ selected_button: currentIndex === 5, disabled_button: containerRunning == false }" @click="stopContainer()">Stop Container</button>
             </div>
+            <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 6" :class="{ selected2: currentIndex === 6 }">
+                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 6, disabled_button: resetAvailable == false }" @click="resetContainer()">Reset Container</button>
+            </div>
         </div>
-        <div class="linux-container" @click="currentIndex = 6" :class="{ selected2: currentIndex === 6 }">
-            <button class="linux-button" :class="{ selected_button: currentIndex === 6 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
-            <button class="linux-button" :class="{ selected_button: currentIndex === 6 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
+        <div class="linux-container" @click="currentIndex = 7" :class="{ selected2: currentIndex === 7 }">
+            <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
             <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="containerExists && containerRunning"></iframe>
         </div>
     </div>
@@ -57,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { supabase } from '@/supabase/init.js'
 import { getUserExtra, getLesson, getContainer } from '@/supabase/getFunctions.js'
 
@@ -77,7 +80,7 @@ let container = ref()
 let error_msg = ref('')
 let task = ref([])
 
-const listLength = 6
+const listLength = 8
 const horLength = 2
 const lessonId = route.params.id
 
@@ -105,6 +108,13 @@ supabase
   .channel('realtime')
   .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'container' }, handleRunningChange)
   .subscribe()
+
+const resetAvailable = computed(() => {
+    if (!containerRunning.value && containerExists.value) {
+        return true
+    }
+    return false
+})
 
 function handleKeyDown(event) {
     if (event.key === 'ArrowDown') {
@@ -136,6 +146,8 @@ function handleKeyDown(event) {
     } else if (event.key === 'Enter' && currentIndex.value == 5) {
         stopContainer()
     } else if (event.key === 'Enter' && currentIndex.value == 6) {
+        resetContainer()
+    } else if (event.key === 'Enter' && currentIndex.value == 7) {
         useContainer()
     }
 }
@@ -278,6 +290,31 @@ async function stopContainer() {
             },
             body: JSON.stringify({
                 name: container.value[0].name,
+            })
+        });
+        const data = await response.json()
+        if (data.status) {
+            containerRunning.value = false
+        } else {
+            error_msg.value = data.msg
+        }
+    }
+}
+
+async function resetContainer() {
+    if (resetAvailable.value) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/lessons/user/reset-container", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: container.value[0].name,
+                lesson_id: lessonId,
+                user_id: user.id
             })
         });
         const data = await response.json()

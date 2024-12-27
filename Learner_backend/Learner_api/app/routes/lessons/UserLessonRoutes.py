@@ -370,3 +370,85 @@ def stop_container():
         "status": True,
         "msg": 'on skibidi'
         })
+
+@bp.route('/reset-container', methods=['POST'])
+def reset_container():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    c = docker.containers.get(json["name"])
+    container = getContainer(name=json["name"])
+    lesson = getLesson(id=json["lesson_id"])
+    limit = getUserLimitations(user_id=json["user_id"])
+
+    if (limit):
+        if limit[0].get("resets") < limit[0].get("reset_limit"):
+            if (lesson):
+                if (c and container):
+                    if not container[0].get("running") and not c.status == "running":
+                        try:
+                            c.remove()
+                        except Exception as e:
+                            return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem reseting your container - contact support'
+                            })
+
+                        data = {
+                            "running": "false",
+                            "name": container[0].get("name"),
+                            "login": container[0].get("login"),
+                            "password": container[0].get("password"),
+                            "port": container[0].get("port")
+                        }
+
+                        try:
+                            createContainer(data, lesson)
+                        except Exception as e:
+                            return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem reseting your container - contact support'
+                            })
+
+                        try:
+                            i = limit[0].get("resets") + 1
+                            supabase.table("limitations").update({"resets": i}).eq("id", limit[0].get("id")).execute()
+                        except Exception as e:
+                            return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem reseting your container - contact support'
+                            })
+
+                    else:
+                        return jsonify({
+                            "status": False,
+                            "msg": 'The container is running - contact support'
+                        })
+                else:
+                    return jsonify({
+                        "status": False,
+                        "msg": 'No container found - contact support'
+                    })
+            else:
+                return jsonify({
+                    "status": False,
+                    "msg": 'No lesson found - contact support'
+                })
+        else:
+            return jsonify({
+                "status": False,
+                "msg": 'You have reached the maximum amount of resets'
+            })
+    else:
+        return jsonify({
+            "status": False,
+            "msg": 'User profile incomplete - contact support'
+        })
+    
+    return jsonify({
+        "status": True,
+        "msg": 'on skibidi'
+        })

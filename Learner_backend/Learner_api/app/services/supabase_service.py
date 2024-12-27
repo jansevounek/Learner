@@ -199,6 +199,7 @@ def getContainer(**kwargs):
     id = kwargs.get("id")
     extra_id = kwargs.get("extra_id")
     lesson_id = kwargs.get("lesson_id")
+    name = kwargs.get("name")
 
     if id:
         try:
@@ -213,6 +214,13 @@ def getContainer(**kwargs):
             return response.data
         except Exception as e:
             print(f"Error during Supabase query (during getting container by extra_id): {e}")
+            return "Error occured", 500
+    elif name:
+        try:
+            response = supabase.table("container").select("*").eq("name", name).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting container by name): {e}")
             return "Error occured", 500
     else:
         raise ValueError("(lesson_id and extra_id) or id not provided - failed to fetch container")
