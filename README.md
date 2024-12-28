@@ -1,7 +1,5 @@
 # Giberish about project
 
-Please do not try to test setup this project it will be annoying but continue if you feel like it
-
 will be here womp womp
 
 # Setup guide
