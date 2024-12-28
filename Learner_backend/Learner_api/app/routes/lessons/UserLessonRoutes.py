@@ -452,3 +452,18 @@ def reset_container():
         "status": True,
         "msg": 'on skibidi'
         })
+
+@bp.route('/test', methods=['POST'])
+def test():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+    else:
+        return jsonify({'status': 'Content-Type not supported!'})
+    
+    print(json)
+    
+    return jsonify({
+        "status": True,
+        "msg": 'on skibidi'
+        })
