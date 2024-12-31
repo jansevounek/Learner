@@ -1,25 +1,21 @@
-# Start with a base Python image
-FROM python:3.11-slim
+# Use a lightweight Python image as the base
+FROM python:3.9-slim
 
-# Set environment variables
-ENV FLASK_APP=run.py
-ENV FLASK_ENV=development
 ENV PYTHONUNBUFFERED=1
-
-# Create a working directory
 WORKDIR /app
 
-# Copy the requirements.txt into the container
+RUN apt-get update && apt-get install -y \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY Learner_api /app/Learner_api
+
+COPY Learner_scripts /app/Learner_scripts
+
 COPY requirements.txt /app/
 
-# Install dependencies from the requirements file
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy the rest of the application code into the container
-COPY . /app/
-
-# Expose the port that Flask will run on
 EXPOSE 5050
 
-# Define the command to run the Flask application
-CMD ["python3", "run.py"]
+CMD ["python", "/app/Learner_api/run.py"]
