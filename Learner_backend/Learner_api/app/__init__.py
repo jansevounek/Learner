@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_supabase import Supabase
-import os
 
 from .routes.teams import UserTeamRoutes, AdminTeamRoutes
 from .routes.lessons import AdminLessonRoutes, UserLessonRoutes

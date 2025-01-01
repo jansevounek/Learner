@@ -44,3 +44,4 @@ websocket-client
 websockets
 Werkzeug
 stripe
+gunicorn
