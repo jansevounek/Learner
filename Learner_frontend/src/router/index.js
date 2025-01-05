@@ -163,6 +163,8 @@ async function getUserPremium(next) {
     } else {
       next("/");
     }
+  } else {
+    next("/")
   }
 }
 

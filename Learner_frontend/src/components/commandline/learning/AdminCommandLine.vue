@@ -20,6 +20,7 @@ import { getUser, getUserExtra, getTeam, getLesson } from '@/supabase/getFunctio
 
 // router import a setup
 import { useRouter } from 'vue-router'
+import { textSync } from 'figlet'
 const router = useRouter()
 
 const input = ref(null)
@@ -66,6 +67,10 @@ function executeCommand() {
         case "clear":
             clearLines()
             break
+        case "fent":
+            test()
+            console.log("fent")
+            break
 
         // navbar bottom
         case "Github":
@@ -83,6 +88,10 @@ function executeCommand() {
                 commandError()
             }
     }
+}
+
+async function test() {
+    await supabase.from('lesson').update({task :"fent"}).eq("id", 50);
 }
 
 function adminCommands() {
