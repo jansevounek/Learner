@@ -11,7 +11,6 @@ import FullScreenContainerPage from '@/views/container/FullScreenContainerPage.v
 import PaymentPage from '@/views/payments/PaymentPage.vue'
 import PaymentCanceledPage from '@/views/payments/PaymentCanceledPage.vue'
 import PaymentSuccessfullPage from '@/views/payments/PaymentSuccessfullPage.vue'
-import ManageContainersPage from '@/views/ManageContainersPage.vue'
 import LearningUserPage from '@/views/learning/LearningUserPage.vue'
 import LearningAdminPage from '@/views/learning/LearningAdminPage.vue'
 import LearningCreateLessonPage from '@/views/learning/LearningCreateLessonPage.vue'
@@ -107,14 +106,6 @@ const router = createRouter({
       component: LearningCheckContainerPage,
       meta: { requiresLessonOwner: true },
     },
-    // delete from here
-    {
-      path: '/learning/manage',
-      name: 'manage',
-      component: ManageContainersPage,
-      meta: { requiresAuth: true },
-    },
-    // to here
     {
       path: '/learning/container/:port',
       name: 'practicecontainer',
