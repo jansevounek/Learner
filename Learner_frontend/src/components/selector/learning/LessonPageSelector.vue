@@ -173,8 +173,14 @@ function copyPassword() {
 function formatText() {
     let text = lesson.value.task
     let words = text.split(" ")
-    const maxWords = 11
-    const maxChars = 60
+    let maxWords = 11
+    let maxChars = 60
+
+    if (window.innerWidth <= 500 && window.innerHeight <= 900) {
+        maxWords = 5
+        maxChars = 35
+    }
+
     const lines = []
 
     let currentLine = [];
