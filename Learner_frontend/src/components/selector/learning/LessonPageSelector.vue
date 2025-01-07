@@ -25,7 +25,7 @@
                     <p>Sudo: {{ lesson.settings.sudo }}</p>
                 </div>
             </div>
-            <div class="selection-container-addon" @click="currentIndex = 3" :class="{ selected2: currentIndex === 3 }" v-if="containerExists">
+            <div class="selection-container-addon" @click="currentIndex = 3" :class="{ selected2: currentIndex === 3 }" v-if="!(siteState == 'start')">
                 <div class="mx-2">
                     <h1 class="selector-title">Your container login</h1>
                     <div class="container-login-container">
@@ -42,16 +42,20 @@
                 <button class="selector-addon-button" :class="{ selected_button: currentIndex === 4 }" @click="router.push('/learning/user')">Exit</button>
             </div>
             <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 5" :class="{ selected2: currentIndex === 5 }">
-                <button class="selector-addon-button" :class="{ selected_button: currentIndex === 5, disabled_button: containerRunning == false }" @click="stopContainer()">Stop Container</button>
+                <button class="selector-addon-button" 
+                :class="{ selected_button: currentIndex === 5, disabled_button: siteState == 'container_exists' || siteState == 'container_loading' || siteState == 'container_stoping' }" 
+                @click="stopContainer()">Stop Container</button>
             </div>
             <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 6" :class="{ selected2: currentIndex === 6 }">
                 <button class="selector-addon-button" :class="{ selected_button: currentIndex === 6, disabled_button: resetAvailable == false }" @click="resetContainer()">Reset Container</button>
             </div>
         </div>
         <div class="linux-container" @click="currentIndex = 7" :class="{ selected2: currentIndex === 7 }">
-            <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="!containerExists && !containerRunning">Create Container</button>
-            <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="containerExists && !containerRunning">Use Container</button>
-            <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="containerExists && containerRunning"></iframe>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="siteState == 'start'">Create Container</button>
+            <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="siteState == 'container_exists'">Use Container</button>
+            <p class="font-mono text-green-600" v-if="siteState == 'container_loading'">Starting your container ...</p>
+            <p class="font-mono text-green-600" v-if="siteState == 'container_stoping'">Stoping your container ...</p>
+            <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="siteState == 'container_running'" id="iframe_id"></iframe>
         </div>
     </div>
     <div class="error-page-container" :class="{ flex: error_msg }">
@@ -75,6 +79,7 @@ let lastControlIndex = ref(0);
 let lesson = ref(false)
 let containerExists = ref(false)
 let containerRunning = ref(false)
+let siteState = ref("start")
 let url = ref("")
 let container = ref()
 let error_msg = ref('')
@@ -105,9 +110,9 @@ const handleRunningChange = (payload) => {
 }
 
 supabase
-  .channel('realtime')
-  .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'container' }, handleRunningChange)
-  .subscribe()
+    .channel('realtime')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'container' }, handleRunningChange)
+    .subscribe()
 
 const resetAvailable = computed(() => {
     if (!containerRunning.value && containerExists.value) {
@@ -129,7 +134,7 @@ function handleKeyDown(event) {
         if (horIndex.value == 0) {
             currentIndex.value = lastControlIndex.value;
         } else if (horIndex.value == 1) {
-            currentIndex.value = 5;
+            currentIndex.value = 7;
         }
     }  else if (event.key === 'ArrowRight') {
         if (currentIndex.value < 4) {
@@ -139,7 +144,7 @@ function handleKeyDown(event) {
         if (horIndex.value == 0) {
             currentIndex.value = lastControlIndex.value;
         } else if (horIndex.value == 1) {
-            currentIndex.value = 5;
+            currentIndex.value = 7;
         }
     } else if (event.key === 'Enter' && currentIndex.value == 4) {
         router.push("/learning/user")
@@ -148,7 +153,9 @@ function handleKeyDown(event) {
     } else if (event.key === 'Enter' && currentIndex.value == 6) {
         resetContainer()
     } else if (event.key === 'Enter' && currentIndex.value == 7) {
-        useContainer()
+        if (siteState.value != "container_loading" || siteState.value != "container_stoping") {
+            useContainer()
+        }
     }
 }
 
@@ -244,12 +251,12 @@ async function createContainer() {
     const { data: { user } } = await supabase.auth.getUser();
     const apiurl = import.meta.env.VITE_API_URL
     const response = await fetch(apiurl + "/lessons/user/create-container", {
-      method: 'POST',
-      headers: {
+        method: 'POST',
+        headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+        },
+        body: JSON.stringify({
             user_id: user.id,
             lesson_id: lessonId,
         })
@@ -266,12 +273,12 @@ async function startContainer(container) {
     const { data: { user } } = await supabase.auth.getUser();
     const apiurl = import.meta.env.VITE_API_URL
     const response = await fetch(apiurl + "/lessons/user/start-container", {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
             user_id: user.id,
             lesson_id: lessonId,
             container_id: container[0].id
@@ -279,14 +286,19 @@ async function startContainer(container) {
     });
     const data = await response.json()
     if (data.status) {
-        containerRunning.value = true
+        siteState.value = "container_loading"
+        // Timeout from https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+        await new Promise(r => setTimeout(r, 9000));
+
+        siteState.value = "container_running"
     } else {
         error_msg.value = data.msg
     }
 }
 
 async function stopContainer() {
-    if (containerRunning.value == true) {
+    if (siteState.value == "container_running") {
+        siteState.value = "container_stoping"
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/lessons/user/stop-container", {
             method: 'POST',
@@ -300,10 +312,13 @@ async function stopContainer() {
         });
         const data = await response.json()
         if (data.status) {
-            containerRunning.value = false
+            siteState.value = "container_exists"
         } else {
+            siteState.value = "container_running"
             error_msg.value = data.msg
         }
+    } else {
+        siteState.value = "container_running"
     }
 }
 
@@ -338,9 +353,11 @@ async function setVariables() {
     const extra = await getUserExtra()
     const c = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
     if (c.length) {
+        siteState.value = "container_exists"
         containerExists.value = true
         url.value = "http://127.0.0.1:" + String(c[0].port)
         if (c[0].running) {
+            siteState.value = "container_running"
             containerRunning.value = true
         }
     }

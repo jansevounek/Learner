@@ -1,6 +1,6 @@
 <template>
-  <div class="title-container">
-    <pre class="ascii-container text-[6px] lg:text-sm" id="ascii-art">                                                                                          
+    <div class="title-container">
+        <pre class="ascii-container text-[6px] lg:text-sm" id="ascii-art">                                                                                          
  ____             ______          ____        _____  _____   ______        ______        _____   
 |    |        ___|\     \    ____|\   \   ___|\    \|\    \ |\     \   ___|\     \   ___|\    \  
 |    |       |     \     \  /    /\    \ |    |\    \\\    \| \     \ |     \     \ |    |\    \ 
@@ -14,14 +14,14 @@
   \(    )/     \( |_____|/   \(      )/    \(     )/     \(       )/    \( |_____|/   \(     )/  
    '    '       '    )/       '      '      '     '       '       '      '    )/       '     '   
                      '                                                        '  
-    </pre>
-    <p class="title-warning-text">Dont worry you are on the right page - dont run away and try typing "help"</p>
-    <p class="title-ps-text">PS: this site is meant to look like this and you will soon see why</p>
-    <hr class="title-hr">
-  </div>
-  <div class="main-container">
-    <HomeCommandLine />
-  </div>
+        </pre>
+        <p class="title-warning-text">Dont worry you are on the right page - dont run away and try typing "help"</p>
+        <p class="title-ps-text">PS: this site is meant to look like this and you will soon see why</p>
+        <hr class="title-hr">
+    </div>
+    <div class="main-container">
+      <HomeCommandLine />
+    </div>
 </template>
 
 <script setup>
