@@ -12,6 +12,8 @@ key: str = os.environ.get("VITE_SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 def main():
+    print("Lesson script running TODO - rework this")
+
     while True:
         sleep(1)
         lessons = supabase.table("lesson").select("*").execute().data

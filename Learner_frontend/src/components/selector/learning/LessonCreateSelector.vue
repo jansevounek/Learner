@@ -134,7 +134,7 @@ let networkLoadInput = ref('')
 let cpuLoadInput = ref(' ')
 let date = ref();
 let teamSelected = ref(0);
-let pckgSelected = ref(['nano']);
+let pckgSelected = ref([]);
 
 // errors stuff
 let firstLoad = true
@@ -171,7 +171,7 @@ let currentIndex = ref(0)
 let subIndex1 = ref(0)
 let subIndex2 = ref(0)
 let subIndex3 = ref(0)
-const pckgList = ["nano", "git"]
+const pckgList = ["nano", "git", "tmux", "ufw", "vim", "emacs"]
 
 // mounting handlers for controls
 onMounted(() => {
