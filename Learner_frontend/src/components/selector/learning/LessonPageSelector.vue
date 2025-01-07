@@ -153,7 +153,8 @@ function handleKeyDown(event) {
     } else if (event.key === 'Enter' && currentIndex.value == 6) {
         resetContainer()
     } else if (event.key === 'Enter' && currentIndex.value == 7) {
-        if (siteState.value != "container_loading" || siteState.value != "container_stoping") {
+        if (siteState.value == "container_exists" || siteState.value == "start") {
+            console.log("do")
             useContainer()
         }
     }
