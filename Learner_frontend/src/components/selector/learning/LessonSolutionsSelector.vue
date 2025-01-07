@@ -21,9 +21,9 @@
         <div class="linux-container">
             <div class="container-list" v-if="containers.length > 0">
                 <div class="container-list-item" v-for="(container, index) in containers" @click="currentIndex = 3 + index" :class="{ selected2: currentIndex === 3 + index }">
-                    <p class="mx-auto">Container code-name: {{ container.name }}</p>
-                    <p class="mx-auto">Container author: {{ container.email }}</p>
-                    <button class="cmd-input-mobile-btn mb-0" @click="selectContainer()">Check container</button>
+                    <p class="mx-auto" @click="selectContainer(index)">Container code-name: {{ container.name }}</p>
+                    <p class="mx-auto" @click="selectContainer(index)">Container author: {{ container.email }}</p> 
+                    <button class="cmd-input-mobile-btn mb-0" @click="selectContainer(index)">Check container</button>
                 </div>
             </div>
             <div v-if="containers.length == 0"><p class="text-red-600 text-2xl">No completions created</p></div>
@@ -98,7 +98,7 @@ function handleKeyDown(event) {
             currentIndex.value = lastContainerIndex.value
         }
     } else if (event.key === "Enter" && currentIndex.value >= 3) {
-        selectContainer()
+        selectContainer(-1)
     } else if (event.key === "Enter" && currentIndex.value == 2) {
         exit()
     }
@@ -108,8 +108,12 @@ function exit() {
     router.push('/learning/admin')
 }
 
-function selectContainer() {
-    let index = containers.value.length - (listLength.value - currentIndex.value)
+function selectContainer(i) {
+    let index = i
+
+    if (index < 0) {
+        index = containers.value.length - (listLength.value - currentIndex.value)
+    }
     router.push('/learning/solutions/container/' + containers.value[index].id)
 }
 

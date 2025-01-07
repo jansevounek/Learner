@@ -77,8 +77,6 @@ let currentIndex = ref(0)
 let horIndex = ref(0)
 let lastControlIndex = ref(0);
 let lesson = ref(false)
-let containerExists = ref(false)
-let containerRunning = ref(false)
 let siteState = ref("start")
 let url = ref("")
 let container = ref()
@@ -102,9 +100,7 @@ onUnmounted(() => {
 const handleRunningChange = (payload) => {
     if (payload.new.id == container.value[0].id) {
         if (!payload.new.running) {
-            containerRunning.value = false
-        } else if (payload.new.running) {
-            containerRunning.value = true
+            siteState.value = "container_exists"
         }
     }
 }
@@ -115,7 +111,7 @@ supabase
     .subscribe()
 
 const resetAvailable = computed(() => {
-    if (!containerRunning.value && containerExists.value) {
+    if (siteState.value == "container_exists") {
         return true
     }
     return false
@@ -154,7 +150,6 @@ function handleKeyDown(event) {
         resetContainer()
     } else if (event.key === 'Enter' && currentIndex.value == 7) {
         if (siteState.value == "container_exists" || siteState.value == "start") {
-            console.log("do")
             useContainer()
         }
     }
@@ -264,7 +259,7 @@ async function createContainer() {
     });
     const data = await response.json()
     if (data.status) {
-        containerExists.value = true
+        siteState.value = "container_exists"
     } else {
         error_msg.value = data.msg
     }
@@ -341,7 +336,7 @@ async function resetContainer() {
         });
         const data = await response.json()
         if (data.status) {
-            containerRunning.value = false
+            siteState.value = "container_exists"
         } else {
             error_msg.value = data.msg
         }
@@ -355,11 +350,9 @@ async function setVariables() {
     const c = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
     if (c.length) {
         siteState.value = "container_exists"
-        containerExists.value = true
         url.value = "http://127.0.0.1:" + String(c[0].port)
         if (c[0].running) {
             siteState.value = "container_running"
-            containerRunning.value = true
         }
     }
     container.value = c

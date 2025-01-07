@@ -13,13 +13,15 @@
         </div>
         <div @click="currentIndex = 2">
             <div class="selections-item" :class="{ selected: currentIndex === 2 }">
-                <button class="selection-item-button" :class="{ selected_button: currentIndex === 4, disabled_button: containerRunning == false }" @click='stopContainer'>Stop container</button>
+                <button class="selection-item-button" :class="{ selected_button: currentIndex === 4, disabled_button: siteState == 'start' }" @click='stopContainer'>Stop container</button>
             </div>
         </div>
         <div @click="currentIndex = 3">
             <div class="selections-item h-[60vh]" :class="{ selected: currentIndex === 3 }">
-                <button class="selection-item-button h-16" v-if="!containerRunning" @click="startContainer">Start container</button>
-                <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="containerRunning"></iframe>
+                <button class="selection-item-button h-16" v-if="siteState == 'start'" @click="startContainer">Start container</button>
+                <p class="font-mono text-green-600 mx-auto" v-if="siteState == 'starting'">Starting the container ...</p>
+                <p class="font-mono text-green-600 mx-auto" v-if="siteState == 'stoping'">Stoping the container ...</p>
+                <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="siteState == 'running'"></iframe>
             </div>
         </div>
     </div>
@@ -36,6 +38,7 @@ const route = useRoute()
 
 let currentIndex = ref(0)
 let containerRunning = ref(false)
+let siteState = ref("start")
 let url = ref('')
 const listLength = 4
 const container = ref()
@@ -66,29 +69,39 @@ function handleKeyDown(event) {
 }
 
 async function startContainer() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const apiurl = import.meta.env.VITE_API_URL
-    const response = await fetch(apiurl + "/lessons/admin/start-container", {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-            user_id: user.id,
-            container_id: container.value[0].id
-        })
-    });
-    const data = await response.json()
-    if (data.status) {
-        containerRunning.value = true
-    } else {
-        error_msg.value = data.msg
+    if (siteState.value == "start") {
+        const { data: { user } } = await supabase.auth.getUser();
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/lessons/admin/start-container", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: user.id,
+                container_id: container.value[0].id
+            })
+        });
+        const data = await response.json()
+        if (data.status) {
+            siteState.value = "starting"
+            console.log(siteState.value)
+
+            // Timeout from https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+            await new Promise(r => setTimeout(r, 9000));
+
+            siteState.value = "running"
+            console.log(siteState.value)
+        } else {
+            error_msg.value = data.msg
+        }
     }
 }
 
 async function stopContainer() {
-    if (containerRunning.value == true) {
+    if (siteState.value == "running") {
+        siteState.value = "stoping"
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/lessons/user/stop-container", {
             method: 'POST',
@@ -102,7 +115,7 @@ async function stopContainer() {
         });
         const data = await response.json()
         if (data.status) {
-            containerRunning.value = false
+            siteState.value = "start"
         } else {
             error_msg.value = data.msg
         }
@@ -113,6 +126,7 @@ async function setVariables() {
     container.value = await getContainer({ id: containerId })
     let extra = await getUserExtra({ id: container.value[0].user_id })
     if (container.value[0].running) {
+        siteState.value = "running"
         containerRunning.value = true
     }
     userEmail.value = extra[0].email
