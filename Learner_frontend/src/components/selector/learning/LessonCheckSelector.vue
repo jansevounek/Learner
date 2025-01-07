@@ -8,7 +8,7 @@
         </div>
         <div @click="currentIndex = 1">
             <div class="selections-item" :class="{ selected: currentIndex === 1 }">
-                <button class="selection-item-button" @click='router.push("/learning/admin")'>Exit</button>
+                <button class="selection-item-button" @click='router.back()'>Exit</button>
             </div>
         </div>
         <div @click="currentIndex = 2">
@@ -37,7 +37,6 @@ const router = useRouter()
 const route = useRoute()
 
 let currentIndex = ref(0)
-let containerRunning = ref(false)
 let siteState = ref("start")
 let url = ref('')
 const listLength = 4
@@ -60,7 +59,8 @@ function handleKeyDown(event) {
     } else if (event.key === 'ArrowUp') {
         currentIndex.value = (currentIndex.value - 1 + listLength) % listLength;
     } else if (event.key === 'Enter' && currentIndex.value == 1) {
-        router.push("/learning/admin")
+        // Taken from https://www.geeksforgeeks.org/how-to-go-back-route-back-on-vue-router/
+        router.back()
     } else if (event.key === 'Enter' && currentIndex.value == 3) {
         startContainer()
     } else if (event.key === 'Enter' && currentIndex.value == 2) {
@@ -127,7 +127,6 @@ async function setVariables() {
     let extra = await getUserExtra({ id: container.value[0].user_id })
     if (container.value[0].running) {
         siteState.value = "running"
-        containerRunning.value = true
     }
     userEmail.value = extra[0].email
     url.value = "http://127.0.0.1:" + container.value[0].port
