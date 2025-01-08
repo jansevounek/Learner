@@ -71,6 +71,7 @@ function handleKeyDown(event) {
             horIndex.value = 1
         } else {
             horIndex.value = 0
+            lastContainerIndex.value = listLength.value - 1
         }
     } else if (event.key === 'ArrowUp') {
         currentIndex.value = (currentIndex.value - 1 + listLength.value) % listLength.value;
@@ -80,6 +81,7 @@ function handleKeyDown(event) {
             horIndex.value = 1
         } else {
             horIndex.value = 0
+            lastContainerIndex.value = 3
         }
     } else if (event.key === 'ArrowLeft') {
         if (currentIndex.value < 3) {
