@@ -120,10 +120,24 @@ const resetAvailable = computed(() => {
 function handleKeyDown(event) {
     if (event.key === 'ArrowDown') {
         currentIndex.value = (currentIndex.value + 1) % listLength;
+
+        if (currentIndex.value == 7) {
+            lastControlIndex.value = 6
+            horIndex.value = 1
+        } else {
+            horIndex.value = 0
+        }
     } else if (event.key === 'ArrowUp') {
         currentIndex.value = (currentIndex.value - 1 + listLength) % listLength;
+
+        if (currentIndex.value == 7) {
+            lastControlIndex.value = 0
+            horIndex.value = 1
+        } else {
+            horIndex.value = 0
+        }
     } else if (event.key === 'ArrowLeft') {
-        if (currentIndex.value < 4) {
+        if (currentIndex.value < 7) {
             lastControlIndex.value = currentIndex.value
         }
         horIndex.value = (horIndex.value - 1 + horLength) % horLength;
@@ -132,8 +146,8 @@ function handleKeyDown(event) {
         } else if (horIndex.value == 1) {
             currentIndex.value = 7;
         }
-    }  else if (event.key === 'ArrowRight') {
-        if (currentIndex.value < 4) {
+    } else if (event.key === 'ArrowRight') {
+        if (currentIndex.value < 7) {
             lastControlIndex.value = currentIndex.value
         }
         horIndex.value = (horIndex.value + 1) % horLength;

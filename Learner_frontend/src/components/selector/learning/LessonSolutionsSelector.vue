@@ -65,13 +65,21 @@ onUnmounted(() => {
 function handleKeyDown(event) {
     if (event.key === 'ArrowDown') {
         currentIndex.value = (currentIndex.value + 1) % listLength.value;
-        if (currentIndex.value == 4) {
-            lastControlIndex.value = 3
+
+        if (currentIndex.value >= 3) {
+            lastControlIndex.value = 2
+            horIndex.value = 1
+        } else {
+            horIndex.value = 0
         }
     } else if (event.key === 'ArrowUp') {
         currentIndex.value = (currentIndex.value - 1 + listLength.value) % listLength.value;
-        if (currentIndex.value == 4) {
-            lastControlIndex.value = 3
+
+        if (currentIndex.value >= 3) {
+            lastControlIndex.value = 0
+            horIndex.value = 1
+        } else {
+            horIndex.value = 0
         }
     } else if (event.key === 'ArrowLeft') {
         if (currentIndex.value < 3) {

@@ -143,9 +143,6 @@ def start_container():
     container = getContainer(id=json["container_id"])
     script = getScript(container_id=json["container_id"])
 
-    print(extra)
-    print(container)
-
     if (extra):
         if (container and script):
             c = docker.containers.get(container[0].get("name"))
