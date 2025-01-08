@@ -42,6 +42,10 @@ onUnmounted(() => {
 })
 
 function executeCommand() {
+    if (cmdinput.value !== ''){
+        executedList.value.push(cmdinput.value)
+        executedIndex.value = executedList.value.length
+    }
     switch(cmdinput.value) {
 
         // navbar commands
@@ -307,6 +311,29 @@ async function seeSolutions(c) {
     }
 }
 
+function getHelp() {
+    commandOutput('\nTo navigate and use THIS PART of the application you can use these commands: \n' +
+            '\n' +
+            ' Essential commands: \n' +
+            ' "help" - this command displayed this info about how to use the app \n' +
+            ' "go " + (number / The name written below the number "Home", etc.) - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
+            ' "clear" - using this command simply clears the lines that you writing your commands created \n \n' +
+            ' Team related commands: \n' +
+            ' "team create <name>" - here the "<name>" is replaced with the name you want to give to the team you are creating with this command\n' +
+            ' "team delete <name>" - The "<name>" tag is in this instance replaced with the name of the team you wnat to delete\n' +
+            ' "team ps" - This command simply tells how many and what teams you have created \n \n' +
+            ' Lessons related commands: \n' +
+            ' "lesson ps" - This command shows you which different lessons you have created \n' +
+            ' "lesson create" - This command lets you create a new lesson for a certain team \n' +
+            ' "lesson cancel <name>" - Here the "<name>" tag is replaced by the name of a lesson you want to cancel \n' +
+            ' "lesson solution <name>" - The "<name>" tag in this instance is replaced with the name of the lesson of which you want to check the completions\n \n' +
+            ' Extra commands: \n' +
+            ' "Github" - This command takes you to the github page of this web application \n' +
+            ' "Socials" - This command takes you to the social pages of this application \n' +
+            ' "License" - This command displays the MIT license under which the application is published \n'
+            )
+}
+
 function commandOutput(output) {
     executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
                         output + "\n"
@@ -327,6 +354,10 @@ function commandError() {
 function clearLines() {
     executedCommands.value = ''
     cmdinput.value = ''
+}
+
+function changeCommand(){
+    cmdinput.value = executedList.value[executedIndex.value]
 }
 
 // handels the "ctrl + c" shortcut

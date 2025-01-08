@@ -124,18 +124,30 @@ function clearLines() {
 function getHelp() {
     commandOutput('\nTo navigate and use this application you can use these commands: \n' +
             '\n' +
+            ' Essential commands: \n' +
             ' "help" - this command displayed this info about how to use the app \n' +
-            ' ("go " + number) / (The name written below the number "Home", etc.) - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
-            ' "clear" - using this command simply clears the lines that you writing your commands created \n' +
+            ' "go " + (number / The name written below the number "Home", etc.) - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
+            ' "clear" - using this command simply clears the lines that you writing your commands created \n \n' +
+            ' Extra commands: \n' +
+            ' "Github" - This command takes you to the github page of this web application \n' +
+            ' "Socials" - This command takes you to the social pages of this application \n' +
+            ' "License" - This command displays the MIT license under which the application is published \n' +
             '\n' +
-            'further information about other parts of the app will be provided as soon as you get there :) \n' + 
+            'further information about other parts of the app will be provided as soon as you get there - use the magic command "help" again ;) \n' + 
             '\n' +
             "You will be able to learn and use the app as soon as you sign up/log in. \n")
 }
 
 // returns a string containing info about the company
 function getAboutUs() {
-    commandOutput('\nHere the user will get giberish about my project' + '\n')
+    commandOutput('\nFIRST OF ALL: This web application was created just as a project needed for Graduation.' + '\n' +
+                    "I hope you enjoy what the application has to offer and its (in the creators humble opinion :)) unique style \n" +
+                    "There is really no real real reason for deployment, however if you are reading this you are either reading this code or it has been deployed. \n" + 
+                    "Never the less i hope it is usefull to someone (even as a source of code). \n" +
+                    "All of the source code is openly availible at https://github.com/jansevounek/Learner with the complete documentation and if you want to try and \n" + 
+                    "set it up for yourself (don't :)) there is a guide available at https://jansevounek.github.io/Learner/ \n" +
+                    "Any kind of feedback is greatly appreciated! \n"
+    )
 }
 
 function commandOutput(output) {
