@@ -46,16 +46,15 @@ function executeCommand() {
         executedList.value.push(cmdinput.value)
         executedIndex.value = executedList.value.length
     }
-    let output = ''
     let command = cmdinput.value
     switch (command) {
 
         // Essentials
         case "clear":
-            output = clearLines()
+            clearLines()
             break
         case "help":
-            output = getHelp()
+            getHelp()
             break
 
         // Navbar top
@@ -111,18 +110,7 @@ function executeCommand() {
         case "":
             break
         default:
-            output = 'Command: "' + command + '" is not recognised as a command that can be used'
-    }
-    // solving the graphical output
-    if (output === 'none') {
-        executedCommands.value = ''
-        cmdinput.value = ''
-    } else if (output === '') {
-        executedCommands.value += 'user@linuxlearning:~$ \n'
-        cmdinput.value = ''
-    } else {
-        executedCommands.value += 'user@linuxlearning:~$ ' + command + '\n' + output + '\n'
-        cmdinput.value = ''
+            commandOutput('Command: "' + command + '" is not recognised as a command')
     }
 }
 
@@ -130,12 +118,11 @@ function executeCommand() {
 function clearLines() {
     executedCommands.value = ''
     cmdinput.value = ''
-    return 'none'
 }
 
 // returns a string containing help info
 function getHelp() {
-    return 'To navigate and use this application you can use these commands: \n' +
+    commandOutput('\nTo navigate and use this application you can use these commands: \n' +
             '\n' +
             ' "help" - this command displayed this info about how to use the app \n' +
             ' ("go " + number) / (The name written below the number "Home", etc.) - this command lets you navigate throw our app (by chosing the number written above the place you want to go in the navigation bar) \n' +
@@ -143,12 +130,18 @@ function getHelp() {
             '\n' +
             'further information about other parts of the app will be provided as soon as you get there :) \n' + 
             '\n' +
-            "You will be able to learn and use the app as soon as you sign up/log in. \n"
+            "You will be able to learn and use the app as soon as you sign up/log in. \n")
 }
 
 // returns a string containing info about the company
 function getAboutUs() {
-    return 'Here the user will get giberish about my project' + '\n'
+    commandOutput('\nHere the user will get giberish about my project' + '\n')
+}
+
+function commandOutput(output) {
+    executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
+                        output + "\n"
+    cmdinput.value = ""
 }
 
 // handels the "ctrl + c" shortcut

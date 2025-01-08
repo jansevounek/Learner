@@ -81,16 +81,15 @@ function trySendEmail() {
     if(testEmail(email)){
         sendEmail(email)
     } else {
-        executedCommands.value += " \n >  "+ cmdinput.value + "\n This is not a valid email adress \n \n Please enter your email adress:"
+        commandOutput("This is not a valid email adress")
     }
 }
 
 async function sendEmail(email) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://127.0.0.1/update-password',
+        redirectTo: 'https://127.0.0.1/update-password',
     })
-    executedCommands.value += " \n >  "+ cmdinput.value + "\n Your email has been sent \n \n Please enter your email adress:"
-    cmdinput.value =''
+    commandOutput("Your email has been sent")
 }
 
 const isEmail = computed(() => {
@@ -104,8 +103,12 @@ function testEmail(email) {
     return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)
 }
 
-// clears all the lines of output
-v
+function commandOutput(output) {
+    executedCommands.value +=  " \n >  "+ cmdinput.value + "\n" +
+                        output + "\n \n" + "Please enter your email adress:"
+    cmdinput.value = ""
+}
+
 
 // handles the "ctrl + c" shortcut
 function handleKeyDown(event) {

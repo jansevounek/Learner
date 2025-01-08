@@ -9,7 +9,7 @@
                 <h1>></h1>
                 <input :type="!showText ? 'password' : 'text'" class="cmd-input"  
                 :class="[{'text-red-600': isEmail === false}]" id="cmd-input"
-                 v-on:keyup.enter="executeCommand" v-model="cmdinput" ref="input">
+                v-on:keyup.enter="executeCommand" v-model="cmdinput" ref="input">
             </div>
             <div class="cmd-password-strength-container" v-if="showStrength">
                 <p class="cmd-strength-indicator" :class="strengthLevel >= 2 ? 'text-red-600' : 'text-white'">#</p>
@@ -102,9 +102,6 @@ function executeCommand() {
             break
 
         // the stuff that logs you in
-        case "google":
-            loginWithGoogle()
-            break
         default:
             processCredential()
     }
@@ -293,7 +290,7 @@ function errorMessage() {
 }
 
 async function login() {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
         email: credentials.value[0],
         password: credentials.value[1]
     })
@@ -310,7 +307,7 @@ async function login() {
 }
 
 async function signup() {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
         email: credentials.value[0],
         password: credentials.value[1]
     })
@@ -319,12 +316,6 @@ async function signup() {
     } else {
         router.push('/')
     }
-}
-
-async function loginWithGoogle(){
-    supabase.auth.signInWithOAuth({
-        provider: 'google',
-    })
 }
 
 // handles the "ctrl + c" shortcut

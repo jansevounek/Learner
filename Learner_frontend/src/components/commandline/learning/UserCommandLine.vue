@@ -16,7 +16,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase/init.js'
-import { getUser, getUserExtra, getTeam, getLesson } from '@/supabase/getFunctions.js'
+import { getUser, getTeam, getLesson } from '@/supabase/getFunctions.js'
 
 // router import a setup
 import { useRouter } from 'vue-router'
@@ -119,12 +119,12 @@ async function joinTeam(c) {
         const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/user/join", {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 user_id: user.id,
                 team_code: teamCode,
             })
@@ -141,12 +141,12 @@ async function leaveTeam(c) {
         const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/user/leave", {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 user_id: user.id,
                 team_name: teamName,
             })

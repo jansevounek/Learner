@@ -20,7 +20,6 @@ import { getUser, getUserExtra, getTeam, getLesson } from '@/supabase/getFunctio
 
 // router import a setup
 import { useRouter } from 'vue-router'
-import { textSync } from 'figlet'
 const router = useRouter()
 
 const input = ref(null)
@@ -67,10 +66,6 @@ function executeCommand() {
         case "clear":
             clearLines()
             break
-        case "fent":
-            test()
-            console.log("fent")
-            break
 
         // navbar bottom
         case "Github":
@@ -88,10 +83,6 @@ function executeCommand() {
                 commandError()
             }
     }
-}
-
-async function test() {
-    await supabase.from('lesson').update({task :"fent"}).eq("id", 50);
 }
 
 function adminCommands() {
@@ -137,12 +128,12 @@ async function createTeam(c) {
         const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/admin/create", {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 user_id: user.id,
                 team_name: name,
             })
@@ -166,7 +157,7 @@ async function printTeams() {
 
     if (teams.length == 0){
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
-                                 + "No teams found \n"
+                                + "No teams found \n"
     } else {
         for (let i = 0; i < teams.length; i++) {
             output += i + 1 + '.\n name: "' + teams[i].name + '"\n'
@@ -186,12 +177,12 @@ async function deleteTeam(c) {
         const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/teams/admin/delete", {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 user_id: user.id,
                 team_name: name,
             })
@@ -247,12 +238,12 @@ async function cancelLesson(c) {
         const user = await getUser();
         const apiurl = import.meta.env.VITE_API_URL
         const response = await fetch(apiurl + "/lessons/admin/cancel", {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 user_id: user.id,
                 lesson_name: name,
             })
@@ -272,7 +263,7 @@ async function printLessons() {
 
     if (lessons.length == 0) {
         executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n"
-                                 + "No lessons found \n"
+                                + "No lessons found \n"
     } else {
         for (let i = 0; i < lessons.length; i++) {
             const team = await getTeam({ id : lessons[i].team_id })
