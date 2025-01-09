@@ -105,6 +105,12 @@ function adminCommands() {
         case command.startsWith("team delete"):
             deleteTeam(command);
             return true
+        case command.startsWith("team users"):
+            printTeamUsers(command);
+            return true
+        case command.startsWith("team kick"):
+            kickUser(command);
+            return true
         //done
         case command === "lesson create":
             createLesson();
@@ -196,6 +202,62 @@ async function deleteTeam(c) {
         commandOutput(data.msg)
     } else {
         commandOutput("No name provided - please provide a name")
+    }
+}
+
+async function printTeamUsers(c) {
+    let name = c.replace("team users ", "")
+
+    if (name) {
+        const extra = await getUserExtra()
+        const { data: team , error } = await supabase
+            .from('team')
+            .select('id')
+            .eq('creator_id', extra[0].id)
+            .eq('name', name);
+        if (error) {
+            commandOutput("A problem when searching for the team occured - contact support")
+            return
+        }
+        if (team.length > 0) {
+            // taken from https://stackoverflow.com/questions/76052148/supabase-check-if-a-postgres-json-array-contains-a-number
+            const { data: extra, error } = await supabase
+                .from("user")
+                .select("*")
+                .contains("teams", [team[0].id])
+                if (error) {
+                    commandOutput("A problem when searching for the team occured - contact support")
+                    return
+                }
+                if (extra.length > 0) {
+                    let output = "Users: \n"
+                    for (let i = 0; i < extra.length; i++) {
+                        output += (i + 1) + ") " + extra[i].email
+                    }
+                    commandOutput(output)
+                }
+        } else {
+            commandOutput('No team with name "'+ name +'" found')
+            return
+        }
+    }
+}
+
+async function kickUser(c) {
+    const firstPart = c.replace("team kick ", "")
+
+    if (firstPart) {
+        const params = firstPart.split(" ")
+        console.log(params)
+        if (params.length == 2) {
+            //TODO
+        } else if (params.length > 2) {
+            commandOutput("Command received too many parameters")
+            return
+        } else {
+            commandOutput("Command didn't receive enought parameters")
+            return
+        }
     }
 }
 
