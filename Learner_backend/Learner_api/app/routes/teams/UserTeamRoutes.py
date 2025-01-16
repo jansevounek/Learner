@@ -17,16 +17,21 @@ def leave_team():
 
     if (extra):
         if (team):
-            arr = extra[0].get("teams")
-
-            for i in range(len(team)):
-                arr.remove(team[i].get("id"))
+            if extra[0].get("id") == team[0].get("creator_id"):
+                return jsonify({
+                    "status": False,
+                    "msg": 'You cannot leave a team you have created'
+                })
+            else:
+                arr = extra[0].get("teams")
+                for i in range(len(team)):
+                    arr.remove(team[i].get("id"))
             
-            try:
-                supabase.table("user").update({ "teams": arr }).eq("id", extra[0].get("id")).execute()
-            except Exception as e:
-                print(f"Error during Supabase query (during updating the user teams column): {e}")
-                return "Error occured", 500
+                try:
+                    supabase.table("user").update({ "teams": arr }).eq("id", extra[0].get("id")).execute()
+                except Exception as e:
+                    print(f"Error during Supabase query (during updating the user teams column): {e}")
+                    return "Error occured", 500
         else:
             return jsonify({
                 "status": False,

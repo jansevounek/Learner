@@ -164,6 +164,10 @@ async function getUserTeam(to, next) {
   const lesson = await getLesson({ id : to.params.id })
 
   if (user && lesson) {
+    if (user[0].id == lesson[0].creator_id) {
+      next("/");
+      return
+    }
     // taken from https://stackoverflow.com/questions/7378228/check-if-an-element-is-present-in-an-array
     if (user[0].teams.includes(lesson[0].team_id)) {
       next();
