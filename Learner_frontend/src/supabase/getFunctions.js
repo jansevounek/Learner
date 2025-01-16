@@ -20,7 +20,7 @@ export async function getUser() {
     }   
 }
 
-export async function getUserExtra({id = null, user_id= null} = {}) {
+export async function getUserExtra({id = null, user_id = null, email = null, code = null} = {}) {
     try {
         let queryField = "user_id"
         let queryValue = null
@@ -30,6 +30,12 @@ export async function getUserExtra({id = null, user_id= null} = {}) {
             queryValue = id
         } else if (user_id) {
             queryValue = user_id
+        } else if (email) {
+            queryField = "email"
+            queryValue = email
+        } else if (code) {
+            queryField = "user_code"
+            queryValue = code
         } else {
             const user = await getUser()
             queryValue = user.id

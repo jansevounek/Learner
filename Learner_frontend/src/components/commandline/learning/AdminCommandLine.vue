@@ -232,9 +232,12 @@ async function printTeamUsers(c) {
                 if (extra.length > 0) {
                     let output = "Users: \n"
                     for (let i = 0; i < extra.length; i++) {
-                        output += (i + 1) + ") " + extra[i].email
+                        output += (i + 1) + ".\n email: " + extra[i].email + "\n user code: " + extra[i].user_code + "\n"
                     }
                     commandOutput(output)
+                } else {
+                    commandOutput('This team is currently empty')
+                    return
                 }
         } else {
             commandOutput('No team with name "'+ name +'" found')
@@ -246,18 +249,34 @@ async function printTeamUsers(c) {
 async function kickUser(c) {
     const firstPart = c.replace("team kick ", "")
 
-    if (firstPart) {
-        const params = firstPart.split(" ")
-        console.log(params)
-        if (params.length == 2) {
-            //TODO
-        } else if (params.length > 2) {
-            commandOutput("Command received too many parameters")
-            return
+    if (firstPart == "" || firstPart != "team kick") {
+        // Taken from https://stackoverflow.com/questions/10272773/split-string-on-the-first-white-space-occurrence
+        const userCode = firstPart.substring(0, firstPart.indexOf(' '))
+        const teamName = firstPart.substring(firstPart.indexOf(' ') + 1)
+
+        if (userCode && teamName) {
+            const user = await getUser();
+            const apiurl = import.meta.env.VITE_API_URL
+            const response = await fetch(apiurl + "/teams/admin/kick", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    user_code: userCode,
+                    team_name: teamName
+                })
+            });
+
+            const data = await response.json()
+            commandOutput(data.msg)
         } else {
-            commandOutput("Command didn't receive enought parameters")
-            return
+            commandOutput("No name provided - please provide a name")
         }
+    } else {
+        commandOutput("No name user code and team name provided - please provide")
     }
 }
 

@@ -11,6 +11,8 @@ supabase: Client = create_client(url, key)
 def getUserExtra(**kwargs):
     extra_id = kwargs.get("extra_id")
     user_id = kwargs.get("user_id")
+    code = kwargs.get("code")
+
     if user_id:
         try:
             response = supabase.table("user").select("*").eq("user_id", user_id).execute()
@@ -21,6 +23,13 @@ def getUserExtra(**kwargs):
     elif extra_id:
         try:
             response = supabase.table("user").select("*").eq("id", extra_id).execute()
+            return response.data
+        except Exception as e:
+            print(f"Error during Supabase query (during getting user extra): {e}")
+            return "Error occured", 500
+    elif code:
+        try:
+            response = supabase.table("user").select("*").eq("user_code", code).execute()
             return response.data
         except Exception as e:
             print(f"Error during Supabase query (during getting user extra): {e}")
