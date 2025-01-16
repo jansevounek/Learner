@@ -13,108 +13,60 @@ def getUserExtra(**kwargs):
     user_id = kwargs.get("user_id")
     code = kwargs.get("code")
 
-    if user_id:
-        try:
-            response = supabase.table("user").select("*").eq("user_id", user_id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting user extra): {e}")
-            return "Error occured", 500
-    elif extra_id:
-        try:
-            response = supabase.table("user").select("*").eq("id", extra_id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting user extra): {e}")
-            return "Error occured", 500
-    elif code:
-        try:
-            response = supabase.table("user").select("*").eq("user_code", code).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting user extra): {e}")
-            return "Error occured", 500
+    querry_field = ""
+    querry_value = ""
+
+    if (extra_id):
+        querry_field = "id"
+        querry_value = extra_id
+    elif (user_id):
+        querry_field = "user_id"
+        querry_value = user_id
+    elif (code):
+        querry_field = "user_code"
+        querry_value = code
     else:
         raise ValueError("user_id or extra info id not provided - failed to fetch user extra")
     
-# gets all of users containers
-def getUserContainers(**kwargs):
-    extra_id = kwargs.get("extra_id")
-    user_id = kwargs.get("user_id")
-    name = kwargs.get("name")
-    id = kwargs.get("id")
-    if id:
-        try:
-            response = supabase.table("container").select("*").eq("id", id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting users containers): {e}")
-            return "Error occured", 500
-    elif user_id:
-        try:
-            r = supabase.table("user").select("*").eq("user_id", user_id).execute()
-            i = r.data[0].get("id")
-            response = supabase.table("container").select("*").eq("extra_id", i).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting users containers): {e}")
-            return "Error occured", 500
-    elif extra_id:
-        try:
-            response = supabase.table("container").select("*").eq("extra_id", extra_id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting users containers): {e}")
-            return "Error occured", 500
-    elif name:
-        try:
-            response = supabase.table("container").select("*").eq("name", name).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting users containers): {e}")
-            return "Error occured", 500
-    else:
-        raise ValueError("user_id, extra_id, name or id not provided - failed to fetch users containers")
-
+    try:
+        response = supabase.table("user").select("*").eq(querry_field, querry_value).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error during Supabase query (during getting user extra): {e}")
+        return "Error occured", 500
+    
 # gets user limitations
 def getUserLimitations(**kwargs):
     extra_id = kwargs.get("extra_id")
     user_id = kwargs.get("user_id")
     id = kwargs.get("id")
 
-    if id:
-        try:
-            response = supabase.table("limitations").select("*").eq("id", id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting users limitations): {e}")
-            return "Error occured", 500
-    elif user_id:
+    querry_field = ""
+    querry_value = ""
+
+    if (extra_id):
+        querry_field = "extra_id"
+        querry_value = extra_id
+    elif (user_id):
+        querry_field = "extra_id"
         try:
             r = supabase.table("user").select("*").eq("user_id", user_id).execute()
             i = r.data[0].get("id")
-            response = supabase.table("limitations").select("*").eq("extra_id", i).execute()
-            return response.data
+            querry_value = i
         except Exception as e:
-            print(f"Error during Supabase query (during getting users limitations): {e}")
+            print(f"Error during Supabase query (during getting user extra): {e}")
             return "Error occured", 500
-    elif extra_id:
-        try:
-            response = supabase.table("limitations").select("*").eq("extra_id", extra_id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting users limitations): {e}")
-            return "Error occured", 500
+    elif (id):
+        querry_field = "id"
+        querry_value = id
     else:
-        raise ValueError("user_id, extra_id, name or id not provided - failed to fetch users limitations")
+        raise ValueError("user_id, extra_id or id not provided - failed to fetch users limitations")
     
-# gets the container that is to be deleted
-def getContainerByIdName(name, extra_id):
     try:
-        response = supabase.table("container").select("*").eq("name", name).eq("extra_id", extra_id).execute()
+        response = supabase.table("limitations").select("*").eq(querry_field, querry_value).execute()
         return response.data
     except Exception as e:
-        print(f"Error during Supabase query (during getting users containers): {e}")
+        print(f"Error during Supabase query (during getting limitations): {e}")
         return "Error occured", 500
     
 def getTeam(**kwargs):
@@ -122,32 +74,30 @@ def getTeam(**kwargs):
     name = kwargs.get("name")
     code = kwargs.get("code")
 
-    if id:
-        try:
-            response = supabase.table("team").select("*").eq("id", id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting team by id): {e}")
-            return "Error occured", 500
-    elif name:
-        try:
-            response = supabase.table("team").select("*").eq("name", name).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting team by name): {e}")
-            return "Error occured", 500
-    elif code:
-        try:
-            if (is_uuid(code)):
-                response = supabase.table("team").select("*").eq("team_code", code).execute()
-                return response.data
-            else:
-                return []
-        except Exception as e:
-            print(f"Error during Supabase query (during getting team by code): {e}")
-            return "Error occured", 500
+    querry_field = ""
+    querry_value = ""
+
+    if (name):
+        querry_field = "name"
+        querry_value = name
+    elif (code):
+        if (is_uuid(code)):
+            querry_field = "team_code"
+            querry_value = code
+        else:
+            return []
+    elif (id):
+        querry_field = "id"
+        querry_value = id
     else:
-        raise ValueError("name or id not provided - failed to fetch team")
+        raise ValueError("name, id or team_code not provided - failed to fetch team")
+    
+    try:
+        response = supabase.table("team").select("*").eq(querry_field, querry_value).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error during Supabase query (during getting team): {e}")
+        return "Error occured", 500
 
 # taken from https://stackoverflow.com/questions/53847404/how-to-check-uuid-validity-in-python
 def is_uuid(val):
@@ -164,45 +114,39 @@ def getLesson(**kwargs):
     name = kwargs.get("name")
     team_id = kwargs.get("team_id")
 
-    if id:
-        try:
-            response = supabase.table("lesson").select("*").eq("id", id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting lesson by id): {e}")
-            return "Error occured", 500
-    elif extra_id:
-        try:
-            response = supabase.table("lesson").select("*").eq("creator_id", extra_id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting lesson by extra_id): {e}")
-            return "Error occured", 500
-    elif name:
-        try:
-            response = supabase.table("lesson").select("*").eq("name", name).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting lesson by name): {e}")
-            return "Error occured", 500
-    elif user_id:
+    querry_field = ""
+    querry_value = ""
+
+    if (extra_id):
+        querry_field = "extra_id"
+        querry_value = extra_id
+    elif (user_id):
+        querry_field = "creator_id"
         try:
             r = supabase.table("user").select("*").eq("user_id", user_id).execute()
             i = r.data[0].get("id")
-            response = supabase.table("lesson").select("*").eq("creator_id", i).execute()
-            return response.data
+            querry_value = i
         except Exception as e:
-            print(f"Error during Supabase query (during getting lesson by user_id): {e}")
+            print(f"Error during Supabase query (during getting user extra): {e}")
             return "Error occured", 500
-    elif team_id:
-        try:
-            response = supabase.table("lesson").select("*").eq("team_id", team_id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting lesson by name): {e}")
-            return "Error occured", 500
+    elif (id):
+        querry_field = "id"
+        querry_value = id
+    elif (name):
+        querry_field = "name"
+        querry_value = name
+    elif (team_id):
+        querry_field = "team_id"
+        querry_value = team_id
     else:
         raise ValueError("user_id, extra_id or id not provided - failed to fetch lesson")
+    
+    try:
+        response = supabase.table("lesson").select("*").eq(querry_field, querry_value).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error during Supabase query (during getting lesson): {e}")
+        return "Error occured", 500
     
 def getContainer(**kwargs):
     id = kwargs.get("id")
@@ -264,4 +208,4 @@ def getScript(**kwargs):
         raise ValueError("container_id or id not provided - failed to fetch script")
 
 
-__all__ = ['supabase', 'getUserExtra', 'getUserContainers', 'getUserLimitations', 'getToBeDeletedContainer']
+__all__ = ['supabase', 'getUserExtra', 'getUserLimitations', 'getToBeDeletedContainer']
