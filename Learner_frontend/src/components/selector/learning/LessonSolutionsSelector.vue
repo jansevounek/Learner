@@ -6,6 +6,7 @@
                     <h1 class="selector-title">Main info</h1>
                     <p>Name: "{{ lesson.name }}"</p>
                     <p>Ended at: "{{ lesson.end_time }}"</p>
+                    <p class="text-red-600">Note: you cannot check solutions on a mobile device</p>
                 </div>
             </div>
             <div class="selection-container-addon" @click="currentIndex = 1" :class="{ selected2: currentIndex === 1 }">
@@ -18,12 +19,11 @@
                 <button class="selector-addon-button" :class="{ selected_button: currentIndex === 2 }" @click="router.push('/learning/admin')">Exit</button>
             </div>
         </div>
-        <div class="linux-container">
+        <div class="linux-container-items">
             <div class="container-list" v-if="containers.length > 0">
                 <div class="container-list-item" v-for="(container, index) in containers" @click="currentIndex = 3 + index" :class="{ selected2: currentIndex === 3 + index }">
                     <p class="mx-auto" @click="selectContainer(index)">Container code-name: {{ container.name }}</p>
                     <p class="mx-auto" @click="selectContainer(index)">Container author: {{ container.email }}</p> 
-                    <button class="cmd-input-mobile-btn mb-0" @click="selectContainer(index)">Check container</button>
                 </div>
             </div>
             <div v-if="containers.length == 0"><p class="text-red-600 text-2xl">No completions created</p></div>
@@ -124,7 +124,16 @@ function selectContainer(i) {
     if (index < 0) {
         index = containers.value.length - (listLength.value - currentIndex.value)
     }
-    router.push('/learning/solutions/container/' + containers.value[index].id)
+
+    // taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
+    let details = navigator.userAgent; 
+
+    let regexp = /android|iphone|kindle|ipad/i; 
+    let isMobileDevice = regexp.test(details);
+
+    if (!isMobileDevice) {
+        router.push('/learning/solutions/container/' + containers.value[index].id)
+    }
 }
 
 async function setVariables() {

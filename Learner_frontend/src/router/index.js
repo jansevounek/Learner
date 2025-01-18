@@ -107,7 +107,10 @@ const router = createRouter({
       path: '/learning/solutions/container/:id',
       name: 'lesson-solutions-container',
       component: LearningCheckContainerPage,
-      meta: { requiresLessonOwner: true },
+      meta: { 
+        requiresLessonOwner: true,
+        requiresDesktop: true
+      },
     },
     {
       path: '/learning/container/:port',
@@ -180,6 +183,8 @@ async function getUserTeam(to, next) {
         } else {
           next();
         }
+      } else {
+        next();
       }
     } else {
       next("/");
@@ -207,7 +212,16 @@ async function getLessonOwnership(to, next) {
 
       if (lesson.length > 0) {
         if (lesson[0].creator_id == user[0].id) {
-          next();
+          if (to.meta.requiresDesktop) {
+            // taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
+            if (isMobile()) {
+              next("/");
+            } else {
+              next();
+            }
+          } else {
+            next();
+          }
         } else {
           next("/")
         }

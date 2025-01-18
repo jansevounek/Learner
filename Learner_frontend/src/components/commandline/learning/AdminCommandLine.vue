@@ -386,7 +386,9 @@ async function seeSolutions(c) {
     if (name) {
         const lesson = await getLesson({ name : name })
 
-        router.push("/learning/solutions/" + lesson[0].id)
+        if (lesson) {
+            router.push("/learning/solutions/" + lesson[0].id)
+        }
     } else {
         commandOutput("No name provided - please provide a name")
     }

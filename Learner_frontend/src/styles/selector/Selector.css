@@ -68,7 +68,7 @@
         @apply mx-auto flex flex-col;
     }
     .container-list {
-        @apply flex flex-col h-[100%] w-[100%] text-green-600 font-mono;
+        @apply flex flex-col lg:h-[100%] w-[100%] text-green-600 font-mono;
     }
     .container-list-item {
         @apply w-[100%] text-center border-b-2 border-green-600 flex flex-col lg:flex-row;
@@ -82,6 +82,9 @@
     }
     .linux-container {
         @apply h-[70vh] w-[100%] border-x-2 border-b-2 lg:border-y-2 lg:border-r-2 lg:border-l-0 border-green-600 flex flex-row justify-center items-center;
+    }
+    .linux-container-items {
+        @apply h-auto lg:h-[70vh] w-[100%] border-x-2 border-b-0 lg:border-b-2 lg:border-y-2 lg:border-r-2 lg:border-l-0 border-green-600 flex flex-row justify-center items-start lg:items-center;
     }
     .linux-button {
         @apply h-16 w-32 border-2 border-green-600 text-green-600;
