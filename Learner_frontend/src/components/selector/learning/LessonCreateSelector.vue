@@ -83,8 +83,8 @@
                     <span v-if="displayDetails && currentIndex == 5">▼</span>
                 </a>
             </div>
-            <div class="selections-item-details" v-if="displayDetails && currentIndex == 5">
-                <div class="item-details-checkbox-container" v-for="(name, index) in pckgList" :class="{ selected: subIndex3 === index }" >
+            <div class="selections-item-details-pckg" v-if="displayDetails && currentIndex == 5">
+                <div class="item-details-checkbox-container lg:mb-2" v-for="(name, index) in pckgList" :class="{ selected: subIndex3 === index }" >
                     <div class="item-details-checkbox" :class="{ checboxSelected: pckgSelected.includes(name) }" @click="selectPackage(index)"></div>
                     <label class="mr-1">{{ name }}</label>
                 </div>
@@ -229,7 +229,7 @@ function handleKeyDown(event) {
     } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 4) {
         selectTeamOptions()
     } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 5) {
-        selectPackageOptions()
+        selectPackage()
     } else if (event.key === 'Enter' && currentIndex.value == 6) {
         createLesson()
     } else if (event.key === 'Enter') {

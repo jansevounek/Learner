@@ -16,6 +16,9 @@
     .selections-item-details {
         @apply border-x-2 border-b-2 border-green-700 w-[100%] flex flex-col;
     }
+    .selections-item-details-pckg {
+        @apply border-x-2 border-b-2 border-green-700 w-[100%] flex flex-col lg:flex-row;
+    }
     .item-details-commands {
         @apply flex flex-row relative items-center;
     }

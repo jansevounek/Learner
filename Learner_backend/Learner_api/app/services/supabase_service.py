@@ -183,29 +183,27 @@ def getScript(**kwargs):
     container_id = kwargs.get("container_id")
     container_name = kwargs.get("container_name")
 
-    if id:
-        try:
-            response = supabase.table("container_script").select("*").eq("id", id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting script by id): {e}")
-            return "Error occured", 500
-    elif container_id:
-        try:
-            response = supabase.table("container_script").select("*").eq("container_id", container_id).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting script by container_id): {e}")
-            return "Error occured", 500
-    elif container_name:
-        try:
-            response = supabase.table("container_script").select("*").eq("container_name", container_name).execute()
-            return response.data
-        except Exception as e:
-            print(f"Error during Supabase query (during getting script by container_id): {e}")
-            return "Error occured", 500
+    querry_field = ""
+    querry_value = ""
+
+    if (container_id):
+        querry_field = "container_id"
+        querry_value = container_id
+    elif (container_name):
+        querry_field = "container_name"
+        querry_value = container_name
+    elif (id):
+        querry_field = "id"
+        querry_value = id
     else:
         raise ValueError("container_id or id not provided - failed to fetch script")
+    
+    try:
+        response = supabase.table("container_script").select("*").eq(querry_field, querry_value).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error during Supabase query (during getting team): {e}")
+        return "Error occured", 500
 
 
 __all__ = ['supabase', 'getUserExtra', 'getUserLimitations', 'getToBeDeletedContainer']
