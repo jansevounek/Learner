@@ -92,7 +92,10 @@ const router = createRouter({
       path: '/learning/lesson/:id',
       name: 'lesson-do',
       component: LessonPage,
-      meta: { requiresTeam: true },
+      meta: { 
+        requiresTeam: true,
+        requiresDesktop: true
+      },
     },
     {
       path: '/learning/solutions/:id',
@@ -170,13 +173,29 @@ async function getUserTeam(to, next) {
     }
     // taken from https://stackoverflow.com/questions/7378228/check-if-an-element-is-present-in-an-array
     if (user[0].teams.includes(lesson[0].team_id)) {
-      next();
+      if (to.meta.requiresDesktop) {
+        // taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
+        if (isMobile()) {
+          next("/");
+        } else {
+          next();
+        }
+      }
     } else {
       next("/");
     }
   } else {
     next("/");
   }
+}
+
+function isMobile() {
+  let details = navigator.userAgent; 
+
+  let regexp = /android|iphone|kindle|ipad/i; 
+  let isMobileDevice = regexp.test(details);
+
+  return isMobileDevice
 }
 
 async function getLessonOwnership(to, next) {

@@ -290,7 +290,7 @@ async function createLesson() {
             .select('lesson_limit, lessons, teams')
             .eq('extra_id', extra.id);
         if (error) {
-            commandOutput("User information incomplete - contact support")
+            commandOutput("User information incomp lete - contact support")
             return
         }
 

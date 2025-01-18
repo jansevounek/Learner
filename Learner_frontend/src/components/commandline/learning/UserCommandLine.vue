@@ -214,45 +214,53 @@ async function doLesson(c){
     let lessonName = c.replace("lesson do ", "")
     const extra = await getUserExtra()
 
-    if (lessonName) {
-        const lesson = await getLesson({ name: lessonName })
-        const l = await getLesson({ creator_id: extra[0].id })
-        const teams = await getTeam()
+    // taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
+    let details = navigator.userAgent; 
 
-        if (l.length == 0) {
+    let regexp = /android|iphone|kindle|ipad/i; 
+    let isMobileDevice = regexp.test(details);
+
+    if (lessonName) {
+        if (!isMobileDevice) {
+            const lesson = await getLesson({ name: lessonName })
+            const teams = await getTeam()
+
             if (lesson.length == 0) {
                 commandOutput('No lesson with name "' + lessonName + '" found')
                 return
             } else if (lesson.length > 1) {
                 commandOutput('More then one lessons with name "' + lessonName + '" found - contact support')
-                return
+                    return
             } else {
-
-                for (let i = 0; i < teams.length; i++) {
-                    if (lesson[0].team_id == teams[i].id) {
-                        let todaysTime = new Date();
-                        let startTime = new Date(lesson[0].start_time);
-                        let endTime = new Date(lesson[0].end_time);
-                        if (startTime < todaysTime) {
-                            if (endTime > todaysTime) {
-                                router.push("/learning/lesson/" + lesson[0].id)
+                if (lesson[0].creator_id !== extra[0].id) {
+                    for (let i = 0; i < teams.length; i++) {
+                        if (lesson[0].team_id == teams[i].id) {
+                            let todaysTime = new Date();
+                            let startTime = new Date(lesson[0].start_time);
+                            let endTime = new Date(lesson[0].end_time);
+                            if (startTime < todaysTime) {
+                                if (endTime > todaysTime) {
+                                    router.push("/learning/lesson/" + lesson[0].id)
+                                } else {
+                                    commandOutput("The lesson is already over")
+                                    return
+                                }
                             } else {
-                                commandOutput("The lesson is already over")
+                                commandOutput("The lesson hasnt started yet")
                                 return
                             }
-                        } else {
-                            commandOutput("The lesson hasnt started yet")
-                            return
                         }
                     }
-                }
 
-                commandOutput('No lesson with name "' + lessonName + '" found')
-                return
+                    commandOutput('No lesson with name "' + lessonName + '" found')
+                    return
+                } else {
+                    commandOutput('You cannot do a lesson you have created')
+                    return
+                }
             }
         } else {
-            commandOutput('You cannot do a lesson you have created')
-            return
+            commandOutput("You cannot do a lesson on a mobile device")
         }
     } else {
         commandOutput("No name provided - please provide a name")
