@@ -145,6 +145,35 @@ def kick_user():
                 newTeams = user[0].get("teams")
                 newTeams.remove(team[0].get("id"))
 
+                lessons = getLesson(team_id=team[0].get("id"))
+
+                for lesson in lessons:
+                    try:
+                        c = supabase.table("container").select("*").eq("user_id", user[0].get("id")).eq("lesson_id", lesson.get("id")).execute()
+                        container = c.data
+                    except Exception as e:
+                        print(f"Error during Supabase query (during gettin to be deleted containers): {e}")
+                        return "Error occured", 500
+                    
+                    if len(container) == 1:
+
+                        docker_container = docker.containers.get(container[0].get("name"))
+
+                        if docker_container.status == "running":
+                            docker_container.stop()
+                        docker_container.remove()
+                        
+                        try:
+                            supabase.table("container").delete().eq("id", container[0].get("id")).execute()
+                        except Exception as e:
+                            print(f"Error during Supabase query (during deleting a container): {e}")
+                            return "Error occured", 500
+                    elif len(container) > 1:
+                        return jsonify({
+                            "status": False,
+                            "msg": 'There has been a problem processing your request - contact support'
+                        })
+
                 try:
                     supabase.table("user").update({"teams": newTeams}).eq("id", user[0].get("id")).execute()
                 except Exception as e:
@@ -168,5 +197,5 @@ def kick_user():
     
     return jsonify({
             "status": True,
-            "msg": 'You successfully deleted team(s) "' + json["team_name"] + '"'
+            "msg": 'You successfully kicked user with email "' + extra[0].get("email") + '"'
         })
