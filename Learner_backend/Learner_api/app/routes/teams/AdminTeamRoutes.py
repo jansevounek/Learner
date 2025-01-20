@@ -15,15 +15,25 @@ def create_team():
     
     extra = getUserExtra(user_id=json["user_id"])
     limit = getUserLimitations(user_id=json["user_id"])
-    team = getTeam(name=json["team_name"])
+    existing_team = getTeam(name=json["team_name"])
 
     if (extra and limit):
-        if (not team):
+        if (not existing_team):
             if limit[0].get("team_limit") > limit[0].get("teams"):
                 try:
-                    supabase.table("team").insert({ "name": json["team_name"], "creator_id": extra[0].get("id") }).execute()
+                    t = supabase.table("team").insert({ "name": json["team_name"], "creator_id": extra[0].get("id") }).execute()
+                    team = t.data
                 except Exception as e:
                     print(f"Error during Supabase query (during inserting when creating new team): {e}")
+                    return "Error occured", 500
+                
+                new_teams = extra[0].get("teams")
+                new_teams.append(team[0].get("id"))
+
+                try:
+                    supabase.table("user").update({ "teams": new_teams }).eq("id", extra[0].get("id")).execute()
+                except Exception as e:
+                    print(f"Error during Supabase query (during updating user information on teams): {e}")
                     return "Error occured", 500
 
                 try:

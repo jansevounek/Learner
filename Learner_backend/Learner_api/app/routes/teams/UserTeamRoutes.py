@@ -17,7 +17,7 @@ def leave_team():
     extra = getUserExtra(user_id=json["user_id"])
     lessons = getLesson(team_id=team[0].get("id"))
 
-    if (extra and lessons):
+    if (extra):
         if (team):
             if extra[0].get("id") == team[0].get("creator_id"):
                 return jsonify({
@@ -25,32 +25,33 @@ def leave_team():
                     "msg": 'You cannot leave a team you have created'
                 })
             else:
-                for lesson in lessons:
-                    try:
-                        c = supabase.table("container").select("*").eq("user_id", extra[0].get("id")).eq("lesson_id", lesson.get("id")).execute()
-                        container = c.data
-                    except Exception as e:
-                        print(f"Error during Supabase query (during gettin to be deleted containers): {e}")
-                        return "Error occured", 500
-                    
-                    if len(container) == 1:
-
-                        docker_container = docker.containers.get(container[0].get("name"))
-
-                        if docker_container.status == "running":
-                            docker_container.stop()
-                        docker_container.remove()
-                        
+                if (lessons):
+                    for lesson in lessons:
                         try:
-                            supabase.table("container").delete().eq("id", container[0].get("id")).execute()
+                            c = supabase.table("container").select("*").eq("user_id", extra[0].get("id")).eq("lesson_id", lesson.get("id")).execute()
+                            container = c.data
                         except Exception as e:
-                            print(f"Error during Supabase query (during deleting a container): {e}")
+                            print(f"Error during Supabase query (during gettin to be deleted containers): {e}")
                             return "Error occured", 500
-                    elif len(container) > 1:
-                        return jsonify({
-                            "status": False,
-                            "msg": 'There has been a problem processing your request - contact support'
-                        })
+                        
+                        if len(container) == 1:
+                        
+                            docker_container = docker.containers.get(container[0].get("name"))
+    
+                            if docker_container.status == "running":
+                                docker_container.stop()
+                            docker_container.remove()
+                            
+                            try:
+                                supabase.table("container").delete().eq("id", container[0].get("id")).execute()
+                            except Exception as e:
+                                print(f"Error during Supabase query (during deleting a container): {e}")
+                                return "Error occured", 500
+                        elif len(container) > 1:
+                            return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem processing your request - contact support'
+                            })
 
                 arr = extra[0].get("teams")
                 for i in range(len(team)):
