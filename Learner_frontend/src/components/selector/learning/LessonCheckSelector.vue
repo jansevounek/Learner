@@ -65,6 +65,8 @@ function handleKeyDown(event) {
         startContainer()
     } else if (event.key === 'Enter' && currentIndex.value == 2) {
         stopContainer()
+    } else if (event.ctrlKey && event.key === 'c') {
+        router.back()
     }
 }
 

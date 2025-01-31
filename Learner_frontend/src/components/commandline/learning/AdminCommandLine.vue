@@ -386,6 +386,8 @@ async function seeSolutions(c) {
     if (name) {
         const lesson = await getLesson({ name : name })
 
+        console.log(lesson)
+
         if (lesson) {
             router.push("/learning/solutions/" + lesson[0].id)
         }

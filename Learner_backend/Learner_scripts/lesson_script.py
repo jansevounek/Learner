@@ -18,9 +18,6 @@ def main():
         sleep(1)
         lessons = supabase.table("lesson").select("*").execute().data
 
-        if len(lessons) == 0:
-            break
-
         currentDateTime = datetime.now()
 
         for lesson in lessons:

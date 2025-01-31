@@ -63,9 +63,16 @@ const currentRoute = computed(() => {
 const isWithoutCmd = computed(() => {
     const regex1 = /^\/container\/\d+$/;
     const regex2 = /^\/learning\/container\/\d+$/;
-    if (regex1.test(currentRoute.value) 
+    const regex3 = /^\/learning\/solutions\/\d+$/;
+    const regex4 = /^\/learning\/solutions\/container\/\d+$/;
+    if (
+        regex1.test(currentRoute.value) 
         || currentRoute.value === '/learning/create-lesson'
-        || regex2.test(currentRoute.value)){
+        || regex2.test(currentRoute.value)
+        || regex3.test(currentRoute.value)
+        || regex4.test(currentRoute.value)
+    )
+    {
         return true
     }
     return false

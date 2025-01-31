@@ -111,6 +111,8 @@ function handleKeyDown(event) {
         selectContainer(-1)
     } else if (event.key === "Enter" && currentIndex.value == 2) {
         exit()
+    } else if (event.ctrlKey && event.key === 'c') {
+        exit()
     }
 }
 
