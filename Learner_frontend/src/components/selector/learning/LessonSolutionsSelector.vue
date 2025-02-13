@@ -121,7 +121,7 @@ function exit() {
 }
 
 function selectContainer() {
-    index = containers.value.length - (listLength.value - currentIndex.value)
+    let index = containers.value.length - (listLength.value - currentIndex.value)
 
     // taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
     let details = navigator.userAgent; 
