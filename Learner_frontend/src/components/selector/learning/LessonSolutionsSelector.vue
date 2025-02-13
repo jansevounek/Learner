@@ -108,7 +108,7 @@ function handleKeyDown(event) {
             currentIndex.value = lastContainerIndex.value
         }
     } else if (event.key === "Enter" && currentIndex.value >= 3) {
-        selectContainer(-1)
+        selectContainer()
     } else if (event.key === "Enter" && currentIndex.value == 2) {
         exit()
     } else if (event.ctrlKey && event.key === 'c') {
@@ -120,12 +120,8 @@ function exit() {
     router.push('/learning/admin')
 }
 
-function selectContainer(i) {
-    let index = i
-
-    if (index < 0) {
-        index = containers.value.length - (listLength.value - currentIndex.value)
-    }
+function selectContainer() {
+    index = containers.value.length - (listLength.value - currentIndex.value)
 
     // taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
     let details = navigator.userAgent; 

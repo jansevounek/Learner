@@ -166,6 +166,8 @@ function handleKeyDown(event) {
         if (siteState.value == "container_exists" || siteState.value == "start") {
             useContainer()
         }
+    } else if (event.ctrlKey && event.key === 'c') {
+        router.push("/learning/user")
     }
 }
 
