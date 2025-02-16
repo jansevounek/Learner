@@ -249,7 +249,11 @@ async function doLesson(c){
                                 commandOutput("The lesson hasnt started yet")
                                 return
                             }
+                        } else {
+                            commandOutput("The lesson does not exist")
+                            return
                         }
+
                     }
 
                     commandOutput('No lesson with name "' + lessonName + '" found')

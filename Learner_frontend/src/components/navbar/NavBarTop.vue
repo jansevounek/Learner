@@ -17,10 +17,12 @@
                 <h1>4</h1>
                 <h1>About us</h1>
             </div>
+            <!--
             <div class="navbar-top-item text-pink-500" v-if="!localUser && currentRoute !== '/resetpassword' && !isWithoutCmd">
                 <h1>5</h1>
                 <h1>Forgot Password?</h1>
             </div>
+            -->
             <div class="navbar-top-item text-green-500" v-if="localUser && !isWithoutCmd">
                 <h1>6</h1>
                 <h1>Logout</h1>

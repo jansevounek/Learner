@@ -31,7 +31,6 @@ import { supabase } from '@/supabase/init.js'
 // import a setup of the router
 import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
-const route = useRoute()
 
 const input = ref(null)
 

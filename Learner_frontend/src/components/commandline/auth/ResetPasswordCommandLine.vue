@@ -87,8 +87,12 @@ function trySendEmail() {
 
 async function sendEmail(email) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://127.0.0.1/update-password',
+        redirectTo: 'https://127.0.0.1:5173/updateuser',
     })
+    if (error) {
+        console.log(error)
+    }
+    
     commandOutput("Your email has been sent")
 }
 
