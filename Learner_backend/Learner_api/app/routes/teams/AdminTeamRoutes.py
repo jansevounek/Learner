@@ -189,6 +189,12 @@ def kick_user():
                 except Exception as e:
                     print(f"Error during Supabase query (during deletion of a team): {e}")
                     return "Error occured", 500
+                
+                try:
+                    supabase.table("team").update({ "member_count": team[0].get("member_count") - 1 }).eq("id", team[0].get("id")).execute()
+                except Exception as e:
+                    print(f"Error during Supabase query (during updating the team member_count column): {e}")
+                    return "Error occured", 500
             else:
                 return jsonify({
                     "status": False,

@@ -384,12 +384,24 @@ async function seeSolutions(c) {
     let name = c.replace("lesson solution ", "")
 
     if (name) {
-        const lesson = await getLesson({ name : name })
+        const extra = await getUserExtra()
+        
+        const { data: lesson, error } = await supabase
+            .from('lesson')
+            .select('id')
+            .eq('creator_id', extra[0].id)
+            .eq('name', name)
 
-        console.log(lesson)
+        if (error) {
+            commandOutput("A wild problem appeared - user used click - not effective (contact support :()")
+            return
+        }
 
-        if (lesson) {
+        if (lesson.length > 0) {
             router.push("/learning/solutions/" + lesson[0].id)
+        } else {
+            commandOutput('No lesson "' + name + '" found.')
+            return
         }
     } else {
         commandOutput("No name provided - please provide a name")

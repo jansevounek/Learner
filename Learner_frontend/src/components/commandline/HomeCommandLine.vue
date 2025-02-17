@@ -106,11 +106,8 @@ function executeCommand() {
             router.push('/payment/getpremium')
             break
 
-        // other possibilities
-        case "":
-            break
         default:
-            commandOutput('Command: "' + command + '" is not recognised as a command')
+            commandError()
     }
 }
 
@@ -154,6 +151,17 @@ function commandOutput(output) {
     executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" +
                         output + "\n"
     cmdinput.value = ""
+}
+
+function commandError() {
+    let input = cmdinput.value
+    if (input === "") {
+        executedCommands.value += "user@linuxlearning:~$ \n"
+        cmdinput.value = ""
+    } else {
+        executedCommands.value += "user@linuxlearning:~$ " + cmdinput.value + "\n" + 'Command: "' + cmdinput.value + '" is not recognised as a command that can be used \n'
+        cmdinput.value = ""
+    }
 }
 
 // handels the "ctrl + c" shortcut

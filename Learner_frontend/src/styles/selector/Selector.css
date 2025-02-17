@@ -96,4 +96,7 @@
     .container-login-container {
         @apply flex flex-row
     }
+    .selection-item-credentials {
+        @apply flex flex-col w-[100%];
+    }
 }

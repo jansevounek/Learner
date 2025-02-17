@@ -119,7 +119,7 @@ def check_container_network(stats, container):
                     "last_rx": stat['networks']['eth0']['rx_bytes'],
                     "last_tx": stat['networks']['eth0']['tx_bytes']
                 }
-             })
+            })
             
             return " - network: Not yet calculated"
 
