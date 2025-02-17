@@ -10,7 +10,7 @@
         @apply relative flex flex-row w-[100%] text-green-600 mb-0 lg:mb-12;
     }
     .cmd-input {
-        @apply bg-inherit w-40 outline-none ml-2 font-mono;
+        @apply bg-inherit w-[100%] outline-none ml-2 font-mono;
     }
     .cmd-input-mobile-btn {
         @apply bg-inherit text-blue-500 inline-block lg:hidden mb-12;
