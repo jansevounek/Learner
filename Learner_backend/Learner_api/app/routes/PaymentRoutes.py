@@ -51,6 +51,9 @@ def payment_successful():
             supabase.table("user").update({"premium": "true"}).eq("user_id", user_id).execute()
         except Exception as e:
             print(f"Error during Supabase input (premium update): {e}")
-            return "Error occured", 500
+            return jsonify({
+                "status": False,
+                "msg": 'There has been a problem upgrading your account - contact support'
+            })
 
     return jsonify({'status': 'done'})

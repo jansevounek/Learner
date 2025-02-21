@@ -26,7 +26,10 @@ def create_lesson():
             response = supabase.table("lesson").select("*").eq("name", json["name"]).eq("creator_id", extra[0].get("id")).execute()
         except Exception as e:
             print(f"Error during Supabase query (during checking for same lesson names): {e}")
-            return "Error occured", 500
+            return jsonify({
+                "status": False,
+                "msg": 'There has been a problem creating your lesson - contact support'
+            })
         if not response.data:
             if datetime.strptime(json["date"][1], "%Y-%m-%dT%H:%M:%S.%fZ") > datetime.now():
                 if limit[0].get("lesson_limit") > limit[0].get("lessons"):
@@ -44,13 +47,19 @@ def create_lesson():
                         supabase.table("lesson").insert(data).execute()
                     except Exception as e:
                         print(f"Error during Supabase query (during creation of a lesson): {e}")
-                        return "Error occured", 500
+                        return jsonify({
+                            "status": False,
+                            "msg": 'There has been a problem creating your lesson - contact support'
+                        })
 
                     try:
                         supabase.table("limitations").update({ "lessons": limit[0].get("lessons") + 1 }).eq("extra_id", extra[0].get("id")).execute()
                     except Exception as e:
                         print(f"Error during Supabase query (during updating user limitations): {e}")
-                        return "Error occured", 500
+                        return jsonify({
+                            "status": False,
+                            "msg": 'There has been a problem creating your lesson - contact support'
+                        })
                 else:
                     return jsonify({
                         "status": False,
@@ -96,7 +105,10 @@ def cancel_lesson():
                 supabase.table("lesson").delete().eq("name", json["lesson_name"]).eq("creator_id", extra[0].get("id")).execute()
             except Exception as e:
                 print(f"Error during Supabase query (during creation of a lesson): {e}")
-                return "Error occured", 500
+                return jsonify({
+                    "status": False,
+                    "msg": 'There has been a problem canceling lesson: "' + json["lesson_name"] + '" - contact support'
+                })
             
             try:
                 containers = docker.containers.list(all=True)
@@ -108,13 +120,19 @@ def cancel_lesson():
                         container.remove()
             except Exception as e:
                 print(f"Error during deleting containers - lesson cancel: {e}")
-                return "Error occured", 500
+                return jsonify({
+                    "status": False,
+                    "msg": 'There has been a problem canceling lesson: "' + json["lesson_name"] + '" - contact support'
+                })
             
             try:
                 supabase.table("limitations").update({ "lessons": limit[0].get("lessons") - 1 }).eq("extra_id", extra[0].get("id")).execute()
             except Exception as e:
                 print(f"Error during Supabase query (during creation of a lesson): {e}")
-                return "Error occured", 500
+                return jsonify({
+                    "status": False,
+                    "msg": 'There has been a problem canceling lesson: "' + json["lesson_name"] + '" - contact support'
+                })
         else:
             return jsonify({
                 "status": False,

@@ -32,7 +32,10 @@ def leave_team():
                             container = c.data
                         except Exception as e:
                             print(f"Error during Supabase query (during gettin to be deleted containers): {e}")
-                            return "Error occured", 500
+                            return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem leaving the team: "' + json["team_name"] +'" - contact support'
+                            })
                         
                         if len(container) == 1:
                         
@@ -46,7 +49,10 @@ def leave_team():
                                 supabase.table("container").delete().eq("id", container[0].get("id")).execute()
                             except Exception as e:
                                 print(f"Error during Supabase query (during deleting a container): {e}")
-                                return "Error occured", 500
+                                return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem leaving the team: "' + json["team_name"] +'" - contact support'
+                                })
                         elif len(container) > 1:
                             return jsonify({
                                 "status": False,
@@ -61,13 +67,19 @@ def leave_team():
                     supabase.table("user").update({ "teams": arr }).eq("id", extra[0].get("id")).execute()
                 except Exception as e:
                     print(f"Error during Supabase query (during updating the user teams column): {e}")
-                    return "Error occured", 500
+                    return jsonify({
+                        "status": False,
+                        "msg": 'There has been a problem leaving the team: "' + json["team_name"] +'" - contact support'
+                    })
                 
                 try:
                     supabase.table("team").update({ "member_count": team[0].get("member_count") - 1 }).eq("id", team[0].get("id")).execute()
                 except Exception as e:
                     print(f"Error during Supabase query (during updating the team member_count column): {e}")
-                    return "Error occured", 500
+                    return jsonify({
+                        "status": False,
+                        "msg": 'There has been a problem leaving the team: "' + json["team_name"] +'" - contact support'
+                    })
         else:
             return jsonify({
                 "status": False,
@@ -123,13 +135,19 @@ def join_team():
                 supabase.table("user").update({ "teams": arr }).eq("id", extra[0].get("id")).execute()
             except Exception as e:
                 print(f"Error during Supabase query (during updating the user teams column): {e}")
-                return "Error occured", 500
+                return jsonify({
+                    "status": False,
+                    "msg": 'There has been a problem joining the team - contact support'
+                })
             
             try:
                 supabase.table("team").update({ "member_count": count }).eq("team_code", json["team_code"]).execute()
             except Exception as e:
                 print(f"Error during Supabase query (during updating the user teams column): {e}")
-                return "Error occured", 500
+                return jsonify({
+                    "status": False,
+                    "msg": 'There has been a problem joining the team - contact support'
+                })
 
         else:
             return jsonify({
