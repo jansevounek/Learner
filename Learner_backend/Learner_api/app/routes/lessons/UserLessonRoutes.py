@@ -97,7 +97,7 @@ def createContainer(data, lesson):
     env_var = {
         "SIAB_PASSWORD" : data["password"],
         "SIAB_USER" : data["login"],
-        "SIAB_SUDO" : lesson[0].get("settings").get("sudo"),
+        "SIAB_SUDO" : "false",
         "SIAB_SSL" : "false", #TODO change this
         "SIAB_PORT" : data["port"],
         "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173",
@@ -205,6 +205,16 @@ def start_container():
                                         "status": False,
                                         "msg": 'There has been a problem starting your container - contact support'
                                     })
+                        
+                        try:
+                            supabase.table("limitations").update({"running_container_id": container[0].get("id") }).eq("extra_id", extra[0].get("id")).execute()
+                        except Exception as e:
+                            print(e)
+                            process.kill()
+                            return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem starting your container - contact support'
+                            })
                     else:
                         return jsonify({
                                     "status": False,
@@ -261,19 +271,20 @@ def start_container():
                                         "status": False,
                                         "msg": 'There has been a problem starting your container - contact support'
                                     })
+                        try:
+                            supabase.table("limitations").update({"running_container_id": container[0].get("id") }).eq("extra_id", extra[0].get("id")).execute()
+                        except Exception as e:
+                            print(e)
+                            process.kill()
+                            return jsonify({
+                                "status": False,
+                                "msg": 'There has been a problem starting your container - contact support'
+                            })
                     else:
                         return jsonify({
                                         "status": False,
                                         "msg": 'There has been a problem starting your container - contact support'
                                     })
-                    
-                try:
-                    supabase.table("limitations").update({"running_container_id": container[0].get("id") }).eq("extra_id", extra[0].get("id")).execute()
-                except Exception as e:
-                    return jsonify({
-                        "status": False,
-                        "msg": 'There has been a problem starting your container - contact support'
-                    })
             else:
                 return jsonify({
                     "status": False,
@@ -447,21 +458,6 @@ def reset_container():
             "status": False,
             "msg": 'User profile incomplete - contact support'
         })
-    
-    return jsonify({
-        "status": True,
-        "msg": 'on skibidi'
-        })
-
-@bp.route('/test', methods=['POST'])
-def test():
-    content_type = request.headers.get('Content-Type')
-    if (content_type == 'application/json'):
-        json = request.json
-    else:
-        return jsonify({'status': 'Content-Type not supported!'})
-    
-    print(json)
     
     return jsonify({
         "status": True,

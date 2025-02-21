@@ -4,7 +4,7 @@
         <div @click="currentIndex = 0">
             <div class="selections-item" :class="{ selected: currentIndex === 0, firstitem: true }">
                 <h1 class="selections-item-content">Name</h1>
-                <p class="selections-item-content">name: 
+                <p class="selections-item-content flex flex-row">name: 
                     <input type="text" class="cmd-input" v-focus="currentIndex === 0" v-model="nameInput">
                 </p>
             </div>
@@ -33,19 +33,11 @@
                 </a>
             </div>
             <div class="selections-item-details" v-if="displayDetails && currentIndex == 2">
-                <div class="item-details-checkbox-container" :class="{ selected: subIndex1 === 0 }">
-                    <div class="item-details-checkbox" :class="{ checboxSelected: networkSelected }" @click="networkSelected = !networkSelected"></div>
-                    <label class="mr-1">Network required</label>
-                </div>
-                <div class="item-details-checkbox-container" :class="{ selected: subIndex1 === 1 }">
-                    <div class="item-details-checkbox" :class="{ checboxSelected: sudoSelected }" @click="sudoSelected = !sudoSelected"></div>
-                    <label class="mr-1">Sudo required</label>
-                </div>
-                <div class="item-detail-input-container" :class="{ selected: subIndex1 === 2 }">
+                <div class="item-detail-input-container" :class="{ selected: subIndex1 === 0 }">
                     <p class="mx-2">What memory load is allowed</p>
                     <input type="number" class="item-detail-input" placeholder="10-100" v-model="networkLoadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 2">
                 </div>
-                <div class="item-detail-input-container mb-3" :class="{ selected: subIndex1 === 3 }">
+                <div class="item-detail-input-container mb-3" :class="{ selected: subIndex1 === 1 }">
                     <p class="mx-2">What cpu load is allowed</p>
                     <input type="number" class="item-detail-input" placeholder="0-100" v-model="cpuLoadInput" v-focus="displayDetails && currentIndex == 2 && subIndex1 == 3">
                 </div>
@@ -160,10 +152,11 @@ let errors = ref({
 let apiErrorMsg = ref('')
 
 // listing stuff
+const pckgList = ["nano", "git", "tmux", "ufw", "vim", "emacs"]
 const listLength = 7
-const subListLength1 = 4
+const subListLength1 = 2
 let subListLength2 = 0
-const subListLength3 = 2
+const subListLength3 = pckgList.length
 const adminTeams = ref([]);
 setAdminTeams()
 let displayDetails = ref(false)
@@ -171,7 +164,6 @@ let currentIndex = ref(0)
 let subIndex1 = ref(0)
 let subIndex2 = ref(0)
 let subIndex3 = ref(0)
-const pckgList = ["nano", "git", "tmux", "ufw", "vim", "emacs"]
 
 // mounting handlers for controls
 onMounted(() => {
@@ -389,7 +381,7 @@ async function create() {
     const user = await getUser();
     const apiurl = import.meta.env.VITE_API_URL
     const response = await fetch(apiurl + "/lessons/admin/create", {
-      method: 'POST',
+        method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -399,8 +391,6 @@ async function create() {
             name: nameInput.value,
             task: taskArea.value,
             container_settings: {
-                network: networkSelected.value,
-                sudo: sudoSelected.value,
                 network_load: networkLoadInput.value,
                 cpu_load: cpuLoadInput.value
             },

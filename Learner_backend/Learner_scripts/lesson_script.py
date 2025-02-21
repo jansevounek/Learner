@@ -15,7 +15,7 @@ def main():
     print("Lesson script running TODO - rework this")
 
     while True:
-        sleep(1)
+        sleep(600)
         lessons = supabase.table("lesson").select("*").execute().data
 
         currentDateTime = datetime.now()
