@@ -2,14 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/supabase/init.js'
 import { getContainer, getLesson, getUserExtra } from '@/supabase/getFunctions'
 import HomePage from '@/views/HomePage.vue'
-import LoginPage from '@/views/auth/LoginPage.vue'
-import SignupPage from '@/views/auth/SignupPage.vue'
 import ResetPasswordPage from '@/views/auth/ResetPasswordPage.vue'
 import UpdateUserPage from '@/views/auth/UpdateUserPage.vue'
-import PracticeContainerPage from '@/views/container/PracticeContainerPage.vue'
-import FullScreenContainerPage from '@/views/container/FullScreenContainerPage.vue'
-import PaymentCanceledPage from '@/views/payments/PaymentCanceledPage.vue'
-import PaymentSuccessfullPage from '@/views/payments/PaymentSuccessfullPage.vue'
 import LearningUserPage from '@/views/learning/LearningUserPage.vue'
 import LearningAdminPage from '@/views/learning/LearningAdminPage.vue'
 import LearningCreateLessonPage from '@/views/learning/LearningCreateLessonPage.vue'
@@ -28,18 +22,6 @@ const router = createRouter({
       component: HomePage
     },
     {
-      path: '/login',
-      name: 'login',
-      component: LoginPage,
-      meta: { requiresUnAuth: true }
-    },
-    {
-      path: '/signup',
-      name: 'signup',
-      component: SignupPage,
-      meta: { requiresUnAuth: true }
-    },
-    {
       path: '/resetpassword',
       name: 'resetpassword',
       component: ResetPasswordPage,
@@ -50,24 +32,12 @@ const router = createRouter({
       component: UpdateUserPage,
     },
     {
-      path: '/payment/failiure',
-      name: 'payment-failiure',
-      component: PaymentCanceledPage,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/payment/success',
-      name: 'payment-success',
-      component: PaymentSuccessfullPage,
-      meta: { requiresAuth: true },
-    },
-    {
       path: '/learning/admin',
       name: 'admin-lessons',
       component: LearningAdminPage,
       meta: { 
         requiresPremium: true
-       },
+      },
     },
     {
       path: '/learning/user',
@@ -104,18 +74,6 @@ const router = createRouter({
         requiresLessonOwner: true,
         requiresDesktop: true
       },
-    },
-    {
-      path: '/learning/container/:port',
-      name: 'practicecontainer',
-      component: PracticeContainerPage,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/container/:port',
-      name: 'fullscreencontainer',
-      component: FullScreenContainerPage,
-      meta: { requiresAuth: true },
     },
   ]
 })
