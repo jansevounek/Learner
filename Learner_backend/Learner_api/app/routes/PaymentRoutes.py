@@ -20,7 +20,7 @@ def create_session():
 
     session = stripe.checkout.Session.create(
         mode="payment",
-        success_url="http://localhost:5173/payment/success",
+        success_url="http://localhost:5173/",
         cancel_url="http://localhost:5173/payment/failiure",
         line_items=[{
             "price": os.getenv("STRIPE_PRICE_ID"),

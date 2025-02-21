@@ -8,7 +8,6 @@ import ResetPasswordPage from '@/views/auth/ResetPasswordPage.vue'
 import UpdateUserPage from '@/views/auth/UpdateUserPage.vue'
 import PracticeContainerPage from '@/views/container/PracticeContainerPage.vue'
 import FullScreenContainerPage from '@/views/container/FullScreenContainerPage.vue'
-import PaymentPage from '@/views/payments/PaymentPage.vue'
 import PaymentCanceledPage from '@/views/payments/PaymentCanceledPage.vue'
 import PaymentSuccessfullPage from '@/views/payments/PaymentSuccessfullPage.vue'
 import LearningUserPage from '@/views/learning/LearningUserPage.vue'
@@ -49,12 +48,6 @@ const router = createRouter({
       path: '/updateuser',
       name: 'updateuser',
       component: UpdateUserPage,
-    },
-    {
-      path: '/payment/getpremium',
-      name: 'getpremium',
-      component: PaymentPage,
-      meta: { requiresAuth: true },
     },
     {
       path: '/payment/failiure',

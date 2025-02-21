@@ -16,12 +16,16 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase/init.js'
+import { getUser } from '@/supabase/getFunctions.js'
+import { loadStripe } from '@stripe/stripe-js';
 
 // router import a setup
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const input = ref(null)
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
 const cmdinput = ref('');
 let executedCommands = ref('')
@@ -55,6 +59,9 @@ function executeCommand() {
             break
         case "help":
             getHelp()
+            break
+        case "buy premium":
+            createCheckout()
             break
 
         // Navbar top
@@ -129,6 +136,7 @@ function getHelp() {
             ' "Github" - This command takes you to the github page of this web application \n' +
             ' "Socials" - This command takes you to the social pages of this application \n' +
             ' "License" - This command displays the MIT license under which the application is published \n' +
+            ' "buy premium" - Redirects you to a site where you can buy a premium account \n' +
             '\n' +
             'further information about other parts of the app will be provided as soon as you get there - use the magic command "help" again ;) \n' + 
             '\n' +
@@ -189,6 +197,31 @@ function changeCommand(){
 // handles if the user clicks somewhere
 function handleClick() {
     document.getElementById('cmd-input').focus();
+}
+
+async function createCheckout() {
+    const user = await getUser()
+    if (user.premium == false) {
+        const apiurl = import.meta.env.VITE_API_URL
+        const response = await fetch(apiurl + "/payments/create-stripe-session", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user.id),
+        });
+
+        if (response) {
+            const stripe = await stripePromise
+            const data = await response.json()
+            const sessionId = data.sessionId
+            await stripe.redirectToCheckout({ sessionId });
+        } else {
+            commandOutput("There has been a problem redirecting you to the payment page - contact support")
+        }
+    } else {
+        commandOutput("You already have a premium account")
+    }
 }
 
 async function logout(){
