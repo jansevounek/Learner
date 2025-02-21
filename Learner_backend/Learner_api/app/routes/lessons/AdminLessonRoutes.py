@@ -181,6 +181,7 @@ def start_container():
                     except Exception as e:
                         print(e)
                         process.kill()
+                        c.stop()
                         return jsonify({
                                     "status": False,
                                     "msg": 'There has been a problem starting your container - contact support'
