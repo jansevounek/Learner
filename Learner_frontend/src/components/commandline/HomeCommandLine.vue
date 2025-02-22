@@ -136,7 +136,7 @@ function getHelp() {
             ' "Github" - This command takes you to the github page of this web application \n' +
             ' "Socials" - This command takes you to the social pages of this application \n' +
             ' "License" - This command displays the MIT license under which the application is published \n' +
-            ' "buy premium" - Redirects you to a site where you can buy a premium account \n' +
+            ' "buy premium" - Redirects you to a site where you can buy a premium account - note: if you have bought the premium account and you didnt get the upgrade - contact support \n' +
             '\n' +
             'further information about other parts of the app will be provided as soon as you get there - use the magic command "help" again ;) \n' + 
             '\n' +

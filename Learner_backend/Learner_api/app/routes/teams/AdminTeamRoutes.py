@@ -82,8 +82,6 @@ def delete_team():
     extra = getUserExtra(user_id=json["user_id"])
     team = getTeam(name=json["team_name"])
 
-    lesson = getLesson(team_id=team[0].get("id"))
-
     if (extra):
         if (team):
             lesson = getLesson(team_id=team[0].get("id"))
