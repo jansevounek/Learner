@@ -90,7 +90,7 @@ def check_container_timeout(container):
 
     elapsed = datetime.now(last_interaction_time.tzinfo) - last_interaction_time
 
-    if elapsed > timedelta(minutes=5):
+    if elapsed > timedelta(minutes=2):
         return False
     
     return " - last activity: " + str(elapsed) + "\n"
