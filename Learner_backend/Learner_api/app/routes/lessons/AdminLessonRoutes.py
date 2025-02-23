@@ -157,81 +157,88 @@ def start_container():
         return jsonify({'status': 'Content-Type not supported!'})
     
     extra = getUserExtra(user_id=json["user_id"])
+    limit = getUserLimitations(user_id=json["user_id"])
     container = getContainer(id=json["container_id"])
     script = getScript(container_id=json["container_id"])
 
     if (extra):
         if (container and script):
-            c = docker.containers.get(container[0].get("name"))
-            if (c):
-                args = [str(script[0].get("settings").get("cpu_load")), str(script[0].get("settings").get("network_load")), str(container[0].get("name"))]
-                command = ["python3", "container_script.py", *args] + args
-                target_cwd = os.path.abspath(os.path.join(os.path.abspath(__file__), "..", "..", "..", "..", "..", "Learner_scripts"))
-                process = False
+            if (not limit[0].get("running_container_id") and not limit[0].get("checking_container_id")):
+                c = docker.containers.get(container[0].get("name"))
+                if (c):
+                    args = [str(script[0].get("settings").get("cpu_load")), str(script[0].get("settings").get("network_load")), str(container[0].get("name"))]
+                    command = ["python3", "container_script.py", *args] + args
+                    target_cwd = os.path.abspath(os.path.join(os.path.abspath(__file__), "..", "..", "..", "..", "..", "Learner_scripts"))
+                    process = False
 
-                try:
-                    process = subprocess.Popen(command, cwd=target_cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    print(process.pid)
-                except Exception as e:
-                    return jsonify({
+                    try:
+                        process = subprocess.Popen(command, cwd=target_cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print(process.pid)
+                    except Exception as e:
+                        return jsonify({
+                                    "status": False,
+                                    "msg": 'There has been a problem starting your container - contact support'
+                                })
+
+                    if (process):
+                        try:
+                            c.start()
+                        except Exception as e:
+                            process.kill()
+                            return jsonify({
                                 "status": False,
                                 "msg": 'There has been a problem starting your container - contact support'
                             })
-                
-                if (process):
-                    try:
-                        c.start()
-                    except Exception as e:
-                        process.kill()
+
+                        data = {
+                            "pid": process.pid,
+                            "running": "true",
+                        }
+
+                        try:
+                            supabase.table("container_script").update(data).eq("container_id", container[0].get("id")).execute()
+                        except Exception as e:
+                            print(e)
+                            process.kill()
+                            c.stop()
+                            return jsonify({
+                                        "status": False,
+                                        "msg": 'There has been a problem starting your container - contact support'
+                                    })
+
+                        try:
+                            supabase.table("container").update({"running": "true"}).eq("id", container[0].get("id")).execute()
+                        except Exception as e:
+                            process.kill()
+                            c.stop()
+                            return jsonify({
+                                        "status": False,
+                                        "msg": 'There has been a problem starting your container - contact support'
+                                    })
+
+                        try:
+                            supabase.table("limitations").update({"checking_container_id": container[0].get("id")}).eq("extra_id", extra[0].get("id")).execute()
+                        except Exception as e:
+                            process.kill()
+                            c.stop()
+                            return jsonify({
+                                        "status": False,
+                                        "msg": 'There has been a problem starting your container - contact support'
+                                    })
+                    else:
                         return jsonify({
                             "status": False,
                             "msg": 'There has been a problem starting your container - contact support'
                         })
-                    
-                    data = {
-                        "pid": process.pid,
-                        "running": "true",
-                    }
-                    
-                    try:
-                        supabase.table("container_script").update(data).eq("container_id", container[0].get("id")).execute()
-                    except Exception as e:
-                        print(e)
-                        process.kill()
-                        c.stop()
-                        return jsonify({
-                                    "status": False,
-                                    "msg": 'There has been a problem starting your container - contact support'
-                                })
-
-                    try:
-                        supabase.table("container").update({"running": "true"}).eq("id", container[0].get("id")).execute()
-                    except Exception as e:
-                        process.kill()
-                        c.stop()
-                        return jsonify({
-                                    "status": False,
-                                    "msg": 'There has been a problem starting your container - contact support'
-                                })
-
-                    try:
-                        supabase.table("limitations").update({"checking_container_id": container[0].get("id")}).eq("extra_id", extra[0].get("id")).execute()
-                    except Exception as e:
-                        process.kill()
-                        c.stop()
-                        return jsonify({
-                                    "status": False,
-                                    "msg": 'There has been a problem starting your container - contact support'
-                                })
                 else:
                     return jsonify({
                         "status": False,
-                        "msg": 'There has been a problem starting your container - contact support'
+                        "msg": 'Container not found - contact support'
                     })
             else:
                 return jsonify({
                     "status": False,
-                    "msg": 'Container not found - contact support'
+                    "msg": 'You can only run one container at a time stop the other container you are running - contact support'
                 })
         else:
             return jsonify({

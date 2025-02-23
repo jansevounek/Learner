@@ -39,6 +39,12 @@
                 <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="siteState == 'running'"></iframe>
             </div>
         </div>
+        <div>
+            <div class="selections-error" v-if="error_msg">
+                <p class="selection-error">{{ error_msg }}</p>
+            </div>
+        </div>
+        <span class="mb-12"></span>
     </div>
 </template>
 
@@ -53,6 +59,7 @@ const route = useRoute()
 
 let currentIndex = ref(0)
 let siteState = ref("start")
+let error_msg = ref("")
 let url = ref('')
 const listLength = 4
 const container = ref()

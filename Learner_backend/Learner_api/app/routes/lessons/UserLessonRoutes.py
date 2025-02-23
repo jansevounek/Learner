@@ -148,7 +148,7 @@ def start_container():
     if (extra and lesson and limit):
         
         if (container):
-            if (not limit[0].get("running_container_id")):
+            if (not limit[0].get("running_container_id") and not limit[0].get("checking_container_id")):
                 script = getScript(container_id=json["container_id"])
                 if (len(script) == 0):
                     args = [str(lesson[0].get("settings").get("cpu_load")), str(lesson[0].get("settings").get("network_load")), str(container[0].get("name"))]
