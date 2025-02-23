@@ -20,7 +20,6 @@ def create_lesson():
     extra = getUserExtra(user_id=json["user_id"])
     limit = getUserLimitations(user_id=json["user_id"])
 
-
     if (extra and limit):
         try:
             response = supabase.table("lesson").select("*").eq("name", json["name"]).eq("creator_id", extra[0].get("id")).execute()

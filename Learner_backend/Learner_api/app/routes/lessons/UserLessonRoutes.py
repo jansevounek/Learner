@@ -98,10 +98,11 @@ def createContainer(data, lesson):
         "SIAB_PASSWORD" : data["password"],
         "SIAB_USER" : data["login"],
         "SIAB_SUDO" : "false",
-        "SIAB_SSL" : "false", #TODO change this
+        "SIAB_SSL" : "false",
         "SIAB_PORT" : data["port"],
         "SIAB_MESSAGES_ORIGIN" : "127.0.0.1:5173",
-        "SIAB_PKGS" : "nano"
+        "SIAB_PKGS" : "nano",
+        "SIAB_THEME" : "White_on_black.css"
     }
 
     packages = ""
