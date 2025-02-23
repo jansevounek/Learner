@@ -152,7 +152,7 @@ let errors = ref({
 let apiErrorMsg = ref('')
 
 // listing stuff
-const pckgList = ["nano", "git", "tmux", "ufw", "vim", "emacs"]
+const pckgList = ["nano", "git", "tmux", "vim", "emacs", "nmap"]
 const listLength = 7
 const subListLength1 = 2
 let subListLength2 = 0

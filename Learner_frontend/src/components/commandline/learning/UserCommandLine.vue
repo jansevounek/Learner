@@ -193,7 +193,7 @@ async function printLessons() {
                     output += index + ". \n" +
                         'lesson name: "' + lessons[k].name + '"\n' +
                         'from team: "' + team[i].name + '"\n' +
-                        'starts: "' + lessons[k].start_tkme + '"\n' +
+                        'starts: "' + lessons[k].start_time + '"\n' +
                         'ends: "' + lessons[k].end_time + '"\n'
                     index++
                 }
