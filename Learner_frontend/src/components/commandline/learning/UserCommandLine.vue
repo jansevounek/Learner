@@ -234,7 +234,6 @@ async function doLesson(c){
             } else {
                 if (lesson[0].creator_id !== extra[0].id) {
                     for (let i = 0; i < teams.length; i++) {
-                        console.log(teams[i].id)
                         if (lesson[0].team_id == teams[i].id) {
                             let todaysTime = new Date();
                             let startTime = new Date(lesson[0].start_time);

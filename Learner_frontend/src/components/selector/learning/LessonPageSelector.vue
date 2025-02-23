@@ -275,7 +275,12 @@ async function createContainer() {
     });
     const data = await response.json()
     if (data.status) {
-        siteState.value = "container_exists"
+        const extra = await getUserExtra()
+        const c = await getContainer({ extra_id : extra[0].id, lesson_id : lessonId })
+        if (c) {
+            container.value = c
+            siteState.value = "container_exists"
+        }
     } else {
         error_msg.value = data.msg
     }
