@@ -36,7 +36,8 @@
             <p style="margin-left: 20px;" id="unzip">unzip supabase.zip</p>
             <button class="copy-button" onclick="copy('unzip')" id="unzip-btn">copy</button>
         </div>
-        <p>Now comes the part where you are going to need to go to the supabase <a href="https://drive.google.com/drive/folders/19VByjicYhiY0F0k6UytDBPnuEsRgCAPL?usp=drive_link" class="guide-link">website</a> and you are going to scroll to the part where you get to create the anon key and the service key. These you will take and put into the .env file located in supabase/docker/.env into the variables "anon_key=" and "service_key=".</p>
+        <p>First you need to create a file .env in the folder /supabase/docker and copy into it the contents of file .env.example and in it customise some parameters - mainly add the email part and other parts (read the file)</p>
+        <p>Now comes the part where you are going to need to go to the supabase <a href="https://supabase.com/docs/guides/self-hosting/docker" class="guide-link">website</a> and you are going to scroll to the part where you get to create the anon key and the service key. These you will take and put into the .env file located in supabase/docker/.env into the variables "anon_key=" and "service_key=".</p>
         <div class="code multi-line">
             <p style="margin-left: 20px;">anon_key="jndfs..."</p>
             <p style="margin-left: 20px;">service_key="asda..."</p>
