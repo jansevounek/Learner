@@ -52,3 +52,4 @@ supabase_up.sh
 # temporary
 target_script.py
 test.py
+test.js

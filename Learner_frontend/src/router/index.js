@@ -154,6 +154,7 @@ function isMobile() {
   return isMobileDevice
 }
 
+// taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
 async function getLessonOwnership(to, next) {
     const container = await getContainer({ id : to.params.id })
     const user = await getUserExtra()
@@ -164,7 +165,6 @@ async function getLessonOwnership(to, next) {
       if (lesson.length > 0) {
         if (lesson[0].creator_id == user[0].id) {
           if (to.meta.requiresDesktop) {
-            // taken from https://www.geeksforgeeks.org/how-to-detect-whether-the-website-is-being-opened-in-a-mobile-device-or-a-desktop-in-javascript/
             if (isMobile()) {
               next("/");
             } else {

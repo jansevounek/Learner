@@ -12,7 +12,7 @@
             <div class="selection-container-addon" @click="currentIndex = 1" :class="{ selected2: currentIndex === 1 }">
                 <div class="mx-2">
                     <h1 class="selector-title">Task</h1>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatum, tenetur. Enim maiores, necessitatibus sint consequatur placeat ad commodi, fuga harum consectetur, atque dolorum veniam modi impedit laborum! Eos, iusto voluptate!</p>
+                    <p class="whitespace-nowrap" v-for="(line) in task">{{ line }}</p>
                 </div>
             </div>
             <div class="selection-container-addon border-b-0 lg:border-b-2 h-16 flex justify-center items-center" @click="currentIndex = 2" :class="{ selected2: currentIndex === 2 }">
@@ -46,6 +46,7 @@ let lastContainerIndex = ref(0)
 
 let lesson = ref()
 let containers = ref([])
+let task = ref([])
 
 let listLength = ref(3)
 const horLength = 2
@@ -138,6 +139,59 @@ function selectContainer(i) {
     }
 }
 
+function formatText() {
+    let text = lesson.value.task
+    let words = text.split(" ")
+    let maxWords = 11
+    let maxChars = 60
+
+    if (window.innerWidth <= 500 && window.innerHeight <= 900) {
+        maxWords = 5
+        maxChars = 35
+    }
+
+    const lines = []
+
+    let currentLine = [];
+    let currentLineLength = 0;
+
+    for (const word of words) {
+    
+        if (word.length > maxChars) {
+        
+            if (currentLine.length > 0) {
+                lines.push(currentLine.join(" "));
+                currentLine = [];
+                currentLineLength = 0;
+            }
+
+
+            for (let i = 0; i < word.length; i += maxChars) {
+                lines.push(word.slice(i, i + maxChars));
+            }
+            continue;
+        }
+
+        if (
+            currentLine.length + 1 > maxWords ||
+            currentLineLength + word.length + (currentLine.length > 0 ? 1 : 0) > maxChars
+        ) {
+            lines.push(currentLine.join(" "));
+            currentLine = [];
+            currentLineLength = 0;
+        }
+
+        currentLine.push(word);
+        currentLineLength += word.length + (currentLine.length > 1 ? 1 : 0);
+    }
+
+    if (currentLine.length > 0) {
+        lines.push(currentLine.join(" "));
+    }
+
+    task.value = lines
+}
+
 async function setVariables() {
     const data = await getLesson({ id : lessonId })
     lesson.value = data[0]
@@ -150,5 +204,6 @@ async function setVariables() {
             containers.value[i].email = extra[0].email
         }
     }
+    formatText()
 }
 </script>
