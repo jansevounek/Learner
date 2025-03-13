@@ -63,6 +63,9 @@ function executeCommand() {
         case "buy premium":
             createCheckout()
             break
+        case "mode":
+            changeMode()
+            break
 
         // Navbar top
         case "Admin":
@@ -192,6 +195,20 @@ function handleKeyDown(event) {
 
 function changeCommand(){
     cmdinput.value = executedList.value[executedIndex.value]
+}
+
+function changeMode() {
+    console.log(localStorage.theme)
+    // taken from https://dev.to/dirheimerb/implementing-custom-dark-mode-with-tailwind-css-a-complete-guide-3n0h
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = "light"
+        commandOutput("Dark mode enabled")
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = "dark"
+        commandOutput("Light mode enabled")
+    }
 }
 
 // handles if the user clicks somewhere

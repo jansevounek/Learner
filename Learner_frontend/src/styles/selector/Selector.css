@@ -5,19 +5,19 @@
 
 @layer components {
     .selections-container {
-        @apply font-mono text-green-600 relative flex flex-col mx-2 mb-10 mt-3;
+        @apply font-mono dark:text-green-600 relative flex flex-col mx-2 mb-10 mt-3;
     }
     .selections-item {
-        @apply w-[100%] h-16 border-x-2 border-b-2 border-green-700 flex flex-row items-center;
+        @apply w-[100%] h-16 border-x-2 border-b-2 dark:border-green-700 border-black flex flex-row items-center;
     }
     .selections-item-content {
         @apply mx-auto;
     }
     .selections-item-details {
-        @apply border-x-2 border-b-2 border-green-700 w-[100%] flex flex-col;
+        @apply border-x-2 border-b-2 dark:border-green-700 border-black w-[100%] flex flex-col;
     }
     .selections-item-details-pckg {
-        @apply border-x-2 border-b-2 border-green-700 w-[100%] flex flex-col lg:flex-row;
+        @apply border-x-2 border-b-2 dark:border-green-700 border-black first-line:w-[100%] flex flex-col lg:flex-row;
     }
     .item-details-commands {
         @apply flex flex-row relative items-center;
@@ -26,19 +26,19 @@
         @apply text-lg text-center text-red-600 underline;
     }
     .selected {
-        @apply bg-white text-black font-bold;
+        @apply dark:bg-white bg-black dark:text-black text-white font-bold;
     }
     .firstitem {
         @apply border-t-2;
     }
     .start-lesson-button {
-        @apply text-red-600 underline mb-2 relative;
+        @apply dark:text-red-600 text-black underline mb-2 relative;
     }
     .textarea-input {
-        @apply bg-inherit h-60 outline-none font-mono mx-2 text-green-600;
+        @apply bg-inherit h-60 outline-none font-mono mx-2 dark:text-green-600;
     }
     .item-details-checkbox-container {
-        @apply mx-auto flex flex-row relative items-start justify-center mt-2 border-2 border-green-600;
+        @apply mx-auto flex flex-row relative items-start justify-center mt-2 border-2 dark:border-green-600 border-black;
     }
     .item-details-checkbox {
         @apply h-4 w-4 my-auto mx-1 border-2 border-red-600 bg-red-600
@@ -47,16 +47,16 @@
         @apply border-green-600 bg-green-600;
     }
     .item-detail-input-container {
-        @apply mx-auto flex flex-col relative mt-2 border-2 border-green-600;
+        @apply mx-auto flex flex-col relative mt-2 border-2 dark:border-green-600 border-black;
     }
     .item-detail-input {
         @apply bg-inherit w-11 outline-none font-mono text-center mx-auto;
     }
     .selections-item-date {
-        @apply w-[100%] h-24 border-x-2 border-b-2 border-green-600 flex flex-col lg:flex-row justify-center lg:items-center;
+        @apply w-[100%] h-24 border-x-2 border-b-2 dark:border-green-600 border-black flex flex-col lg:flex-row justify-center lg:items-center;
     }
     .selection-item-button {
-        @apply mx-auto border-2 border-green-600 px-2
+        @apply mx-auto border-2 dark:border-green-600 border-white px-2
     }
     .selections-error {
         @apply w-[100%] border-x-2 border-b-2 border-red-700 flex flex-col justify-center text-red-600;
@@ -68,26 +68,26 @@
         @apply mx-auto flex flex-col;
     }
     .container-list {
-        @apply flex flex-col lg:h-[100%] w-[100%] text-green-600 font-mono;
+        @apply flex flex-col lg:h-[100%] w-[100%] dark:text-green-600  font-mono;
     }
     .container-list-item {
-        @apply w-[100%] text-center border-b-2 border-green-600 flex flex-col lg:flex-row;
+        @apply w-[100%] text-center border-b-2 dark:border-green-600 border-black flex flex-col lg:flex-row;
     }
 
     .split-container {
         @apply relative flex flex-col lg:flex-row;
     }
     .control-container {
-        @apply w-[100%] lg:w-[60%] border-2 border-green-600
+        @apply w-[100%] lg:w-[60%] border-2 dark:border-green-600 border-black;
     }
     .linux-container {
-        @apply h-[70vh] w-[100%] border-x-2 border-b-2 lg:border-y-2 lg:border-r-2 lg:border-l-0 border-green-600 flex flex-row justify-center items-center;
+        @apply h-[70vh] w-[100%] border-x-2 border-b-2 lg:border-y-2 lg:border-r-2 lg:border-l-0 dark:border-green-600 border-black flex flex-row justify-center items-center;
     }
     .linux-container-items {
-        @apply h-auto lg:h-[70vh] w-[100%] border-x-2 border-b-0 lg:border-b-2 lg:border-y-2 lg:border-r-2 lg:border-l-0 border-green-600 flex flex-row justify-center items-start lg:items-center;
+        @apply h-auto lg:h-[70vh] w-[100%] border-x-2 border-b-0 lg:border-b-2 lg:border-y-2 lg:border-r-2 lg:border-l-0 dark:border-green-600 border-black flex flex-row justify-center items-start lg:items-center;
     }
     .linux-button {
-        @apply h-16 w-32 border-2 border-green-600 text-green-600;
+        @apply h-16 w-32 border-2 dark:border-green-600 border-black dark:text-green-600;
     }
     .error-page-container {
         @apply w-[100%] h-16 border-red-600 border-b-2 border-x-2 flex-row hidden;

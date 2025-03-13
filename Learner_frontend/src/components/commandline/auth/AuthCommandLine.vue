@@ -86,6 +86,9 @@ function executeCommand() {
         case "clear":
             clearLines()
             break
+        case "mode":
+            changeMode()
+            break
 
         // navbar bottom
         case "Github":
@@ -326,6 +329,20 @@ function handleKeyDown(event) {
         clearLines()    
     } else if (event.ctrlKey && event.key === 'i' && (currentStep.value > 0 && currentStep.value < 3)) {
         showPassword.value = !showPassword.value
+    }
+}
+
+function changeMode() {
+    console.log(localStorage.theme)
+    // taken from https://dev.to/dirheimerb/implementing-custom-dark-mode-with-tailwind-css-a-complete-guide-3n0h
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = "light"
+        commandOutput("Dark mode enabled")
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = "dark"
+        commandOutput("Light mode enabled")
     }
 }
 

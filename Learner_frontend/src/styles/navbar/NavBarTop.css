@@ -4,7 +4,7 @@
 
 @layer components {
     .navbar-top {
-        @apply h-16 w-screen flex flex-col fixed font-mono text-white bg-black z-50;
+        @apply h-16 w-screen flex flex-col fixed font-mono bg-white dark:bg-black text-black dark:text-white z-50;
     }
     .navbar-top-item-container {
         @apply w-screen flex flex-row;
@@ -13,6 +13,10 @@
         @apply font-mono mx-auto flex flex-col justify-center items-center;
     }
     .navbar-top-spliter {
-        @apply ml-4 mr-4;
+        @apply ml-4 mr-4 border-black dark:border-white;
+    }
+
+    .rainbow-text {
+        @apply bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-violet-500 text-transparent bg-clip-text;
     }
 }

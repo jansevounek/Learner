@@ -30,11 +30,11 @@
                     <h1 class="selector-title">Your container login</h1>
                     <div class="container-login-container">
                         <p>Login: {{ container[0].login }}</p>
-                        <p class="ml-auto my-auto text-blue-700" @click="copyLogin()" id="login-copy">copy</p>
+                        <p class="ml-auto my-auto dark:text-blue-700" @click="copyLogin()" id="login-copy">copy</p>
                     </div>
                     <div class="container-login-container">
                         <p>Password: {{ container[0].password }}</p>
-                        <p class="ml-auto my-auto text-blue-700" @click="copyPassword()" id="password-copy">copy</p>
+                        <p class="ml-auto my-auto dark:text-blue-700" @click="copyPassword()" id="password-copy">copy</p>
                     </div>
                 </div>
             </div>
@@ -53,8 +53,8 @@
         <div class="linux-container" @click="currentIndex = 7" :class="{ selected2: currentIndex === 7 }">
             <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="siteState == 'start'">Create Container</button>
             <button class="linux-button" :class="{ selected_button: currentIndex === 7 }" @click="useContainer()" v-if="siteState == 'container_exists'">Use Container</button>
-            <p class="font-mono text-green-600" v-if="siteState == 'container_loading'">Starting your container ...</p>
-            <p class="font-mono text-green-600" v-if="siteState == 'container_stoping'">Stoping your container ...</p>
+            <p class="font-mono dark:text-green-600" v-if="siteState == 'container_loading'">Starting your container ...</p>
+            <p class="font-mono dark:text-green-600" v-if="siteState == 'container_stoping'">Stoping your container ...</p>
             <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="siteState == 'container_running'" id="iframe_id"></iframe>
         </div>
     </div>
@@ -159,9 +159,13 @@ function handleKeyDown(event) {
     } else if (event.key === 'Enter' && currentIndex.value == 4) {
         router.push("/learning/user")
     } else if (event.key === 'Enter' && currentIndex.value == 5) {
-        stopContainer()
+        if (siteState.value == "container_running") {
+            stopContainer()
+        }
     } else if (event.key === 'Enter' && currentIndex.value == 6) {
-        resetContainer()
+        if (siteState.value == "container_exists") {
+            resetContainer()
+        }
     } else if (event.key === 'Enter' && currentIndex.value == 7) {
         if (siteState.value == "container_exists" || siteState.value == "start") {
             useContainer()

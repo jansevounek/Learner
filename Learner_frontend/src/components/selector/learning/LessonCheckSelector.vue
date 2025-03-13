@@ -34,8 +34,8 @@
         <div @click="currentIndex = 4">
             <div class="selections-item h-[60vh]" :class="{ selected: currentIndex === 4 }">
                 <button class="selection-item-button h-16" v-if="siteState == 'start'" @click="startContainer">Start container</button>
-                <p class="font-mono text-green-600 mx-auto" v-if="siteState == 'starting'">Starting the container ...</p>
-                <p class="font-mono text-green-600 mx-auto" v-if="siteState == 'stoping'">Stoping the container ...</p>
+                <p class="font-mono dark:text-green-600 mx-auto" v-if="siteState == 'starting'">Starting the container ...</p>
+                <p class="font-mono dark:text-green-600 mx-auto" v-if="siteState == 'stoping'">Stoping the container ...</p>
                 <iframe :src="url" width="100%" height="100%" frameborder="0" class="practice-cmd" v-if="siteState == 'running'"></iframe>
             </div>
         </div>
@@ -61,7 +61,7 @@ let currentIndex = ref(0)
 let siteState = ref("start")
 let error_msg = ref("")
 let url = ref('')
-const listLength = 4
+const listLength = 5
 const container = ref()
 const userEmail = ref()
 const containerId = route.params.id

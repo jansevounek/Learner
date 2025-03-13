@@ -4,7 +4,7 @@
 
 @layer components {
     .navbar-bottom {
-        @apply h-10 w-screen flex flex-col fixed font-mono text-white bg-black z-50 bottom-0 left-0;
+        @apply h-10 w-screen flex flex-col fixed font-mono text-black z-50 bottom-0 left-0 bg-white dark:bg-black;
     }
     .navbar-bottom-item-container {
         @apply w-screen flex flex-row;
@@ -13,6 +13,19 @@
         @apply font-mono mx-auto flex flex-col justify-center items-center;
     }
     .navbar-bottom-spliter {
-        @apply ml-4 mr-4;
+        @apply ml-4 mr-4 border-black dark:border-white;
+    }
+
+    .instagram-gradient {
+        @apply bg-gradient-to-r from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888] text-transparent bg-clip-text;
+    }
+    .license-gradient {
+        @apply bg-gradient-to-r from-[#1e3a8a] to-[#10b981] text-transparent bg-clip-text;
+    }
+    .premium-gradient {
+        @apply bg-gradient-to-r from-[#ffd700] to-white text-transparent bg-clip-text;
+    }
+    .github-gradient {
+        @apply bg-gradient-to-r from-[#6e5494] to-[#8a63d2] text-transparent bg-clip-text;
     }
 }

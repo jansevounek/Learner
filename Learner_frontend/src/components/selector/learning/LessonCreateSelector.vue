@@ -13,7 +13,7 @@
         <div @click="currentIndex = 1">
             <div class="selections-item" :class="{ selected: currentIndex === 1 }">
                 <h1 class="selections-item-content">The task</h1>
-                <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
+                <a class="selections-item-content dark:text-blue-600" @click="displayDetails = !displayDetails">expand 
                     <span v-if="!displayDetails || currentIndex != 1">▲</span>
                     <span v-if="displayDetails && currentIndex == 1">▼</span>
                 </a>
@@ -27,7 +27,7 @@
         <div @click="currentIndex = 2">
             <div class="selections-item" :class="{ selected: currentIndex === 2 }">
                 <h1 class="selections-item-content">Container settings</h1>
-                <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
+                <a class="selections-item-content dark:text-blue-600" @click="displayDetails = !displayDetails">expand 
                     <span v-if="!displayDetails || currentIndex != 2">▲</span>
                     <span v-if="displayDetails && currentIndex == 2">▼</span>
                 </a>
@@ -54,7 +54,7 @@
         <div @click="currentIndex = 4">
             <div class="selections-item" :class="{ selected: currentIndex === 4 }">
                 <h1 class="selections-item-content">Teams</h1>
-                <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
+                <a class="selections-item-content dark:text-blue-600" @click="displayDetails = !displayDetails">expand 
                     <span v-if="!displayDetails || currentIndex != 4">▲</span>
                     <span v-if="displayDetails && currentIndex == 4">▼</span>
                 </a>
@@ -70,7 +70,7 @@
         <div @click="currentIndex = 5">
             <div class="selections-item" :class="{ selected: currentIndex === 5 }">
                 <h1 class="selections-item-content">Packages to install</h1>
-                <a class="selections-item-content text-blue-600" @click="displayDetails = !displayDetails">expand 
+                <a class="selections-item-content dark:text-blue-600" @click="displayDetails = !displayDetails">expand 
                     <span v-if="!displayDetails || currentIndex != 5">▲</span>
                     <span v-if="displayDetails && currentIndex == 5">▼</span>
                 </a>

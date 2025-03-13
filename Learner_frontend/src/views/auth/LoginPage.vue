@@ -23,7 +23,7 @@ import { onMounted } from 'vue'
 // generates the random color for the title
 onMounted(() => {
     const random = Math.floor(Math.random() * 5);
-    const colors = ["text-blue-600", "text-green-600", "text-red-600", "text-orange-600", "text-violet-600",];
+    const colors = ["dark:text-blue-600", "dark:text-green-600", "dark:text-red-600", "dark:text-orange-600", "dark:text-violet-600",];
     const ascii = document.getElementById("ascii-art")
     ascii.classList.add(colors[random])
 })

@@ -4,19 +4,19 @@
 
 @layer components {
     .selection-container-addon {
-        @apply border-b-2 border-green-600 text-green-600
+        @apply border-b-2 dark:border-green-600 border-black dark:text-green-600
     }
     .selector-addon-button {
-        @apply border-2 border-green-600 px-2;
+        @apply border-2 dark:border-green-600 border-black px-2;
     }
     .selected2 {
-        @apply bg-white text-black font-bold border-black;
+        @apply dark:bg-white bg-black dark:text-black text-white font-bold border-black;
     }
     .selected_button {
-        @apply bg-black text-white border-black
+        @apply dark:bg-black text-white dark:border-black border-white
     }
     .disabled_button {
-        @apply bg-black text-red-600 border-black
+        @apply dark:bg-black text-red-600 dark:border-black border-red-600
     }
     .selector-title {
         @apply text-center font-bold text-lg;

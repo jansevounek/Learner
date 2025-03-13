@@ -1,41 +1,35 @@
 <template>
     <div class="navbar-top">
         <div class="navbar-top-item-container">
-            <div class="navbar-top-item text-orange-500" v-if="currentRoute !== '/' && !isWithoutCmd">
+            <div class="navbar-top-item dark:text-orange-500" v-if="currentRoute !== '/' && !isWithoutCmd">
                 <h1>1</h1>
                 <h1>Home</h1>
             </div>
-            <div class="navbar-top-item text-blue-500" v-if="currentRoute !== '/login' && !localUser && !isWithoutCmd">
+            <div class="navbar-top-item dark:text-blue-500" v-if="currentRoute !== '/login' && !localUser && !isWithoutCmd">
                 <h1>2</h1>
                 <h1>Login</h1>
             </div>
-            <div class="navbar-top-item text-red-500" v-if="currentRoute !== '/signup' && !localUser && !isWithoutCmd">
+            <div class="navbar-top-item dark:text-red-500" v-if="currentRoute !== '/signup' && !localUser && !isWithoutCmd">
                 <h1>3</h1>
                 <h1>Signup</h1>
             </div>
-            <div class="navbar-top-item text-purple-500" v-if="currentRoute == '/' && !isWithoutCmd">
+            <div class="navbar-top-item dark:text-purple-500" v-if="currentRoute == '/' && !isWithoutCmd">
                 <h1>4</h1>
                 <h1>About us</h1>
             </div>
-            <!--
-            <div class="navbar-top-item text-pink-500" v-if="!localUser && currentRoute !== '/resetpassword' && !isWithoutCmd">
-                <h1>5</h1>
-                <h1>Forgot Password?</h1>
-            </div>
-            -->
-            <div class="navbar-top-item text-green-500" v-if="localUser && !isWithoutCmd">
+            <div class="navbar-top-item dark:text-green-500" v-if="localUser && !isWithoutCmd">
                 <h1>6</h1>
                 <h1>Logout</h1>
             </div>
-            <div class="navbar-top-item rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/user' && !isWithoutCmd">
+            <div class="navbar-top-item dark:rainbow-text" v-if="localUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/user' && !isWithoutCmd">
                 <h1>7</h1>
                 <h1>Lets Learn</h1>
             </div>
-            <div class="navbar-top-item text-red-500" v-if="localUser && premiumUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/admin' && !isWithoutCmd">
+            <div class="navbar-top-item dark:text-red-500" v-if="localUser && premiumUser && currentRoute !== '/learning/homepage' && currentRoute !== '/learning/admin' && !isWithoutCmd">
                 <h1>8</h1>
                 <h1>Admin</h1>
             </div>
-            <div class="navbar-top-item text-red-500" v-if="localUser && isWithoutCmd">
+            <div class="navbar-top-item dark:text-red-500" v-if="localUser && isWithoutCmd">
                 <h1>Use ctrl + c</h1>
                 <h1>to go back</h1>
             </div>
@@ -107,12 +101,3 @@ onMounted(() => {
     setUser()
 })
 </script>
-
-<style>
-.rainbow-text {
-    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-}
-</style>

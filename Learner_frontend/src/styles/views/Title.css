@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    background-color: black
-}
+
 @layer components {
     .main-container {
         @apply relative top-16 font-mono mx-4;
@@ -19,9 +17,9 @@ body {
         @apply text-red-400 font-mono text-center mx-4 underline;
     }
     .title-ps-text {
-        @apply text-white text-sm mt-2 text-center mx-4 font-mono;
+        @apply dark:text-white text-black text-sm mt-2 text-center mx-4 font-mono;
     }
     .title-hr {
-        @apply mx-4 text-white mt-2
+        @apply mx-4 dark:border-white border-black mt-2
     }
 }

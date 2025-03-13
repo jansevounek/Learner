@@ -10,6 +10,8 @@ import LearningCreateLessonPage from '@/views/learning/LearningCreateLessonPage.
 import LessonPage from '@/views/learning/LessonPage.vue'
 import LessonSolutionsPage from '@/views/learning/LessonSolutionsPage.vue'
 import LearningCheckContainerPage from '@/views/learning/LearningCheckContainerPage.vue'
+import LoginPage from '@/views/auth/LoginPage.vue'
+import SignupPage from '@/views/auth/SignupPage.vue'
 
 let localUser;
 
@@ -20,6 +22,18 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomePage
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginPage,
+      meta: { requiresUnAuth: true },
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupPage,
+      meta: { requiresUnAuth: true },
     },
     {
       path: '/resetpassword',
