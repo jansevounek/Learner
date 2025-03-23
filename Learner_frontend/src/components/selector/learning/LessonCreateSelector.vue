@@ -216,8 +216,6 @@ function handleKeyDown(event) {
         displayDetails.value = false
         currentIndex.value = (currentIndex.value - 1 + listLength) % listLength;
         updateSelection(currentIndex.value);
-    } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 2) {
-        selectContainerOptions()
     } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 4) {
         selectTeamOptions()
     } else if (event.key === 'Enter' && event.ctrlKey && currentIndex.value == 5) {
@@ -235,14 +233,6 @@ function handleKeyDown(event) {
 
 function updateSelection(index) {
     currentIndex.value = index;
-}
-
-function selectContainerOptions() {
-    if (subIndex1.value === 0) {
-        networkSelected.value = !networkSelected.value
-    } else if (subIndex1.value === 1) {
-        sudoSelected.value = !sudoSelected.value
-    }
 }
 
 function selectTeamOptions() {

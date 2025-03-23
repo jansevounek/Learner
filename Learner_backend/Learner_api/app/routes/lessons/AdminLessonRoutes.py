@@ -22,7 +22,7 @@ def create_lesson():
 
     if (extra and limit):
         try:
-            response = supabase.table("lesson").select("*").eq("name", json["name"]).eq("creator_id", extra[0].get("id")).execute()
+            response = supabase.table("lesson").select("*").eq("name", json["name"]).execute()
         except Exception as e:
             print(f"Error during Supabase query (during checking for same lesson names): {e}")
             return jsonify({
@@ -72,7 +72,7 @@ def create_lesson():
         else:
             return jsonify({
                     "status": False,
-                    "msg": 'You already have a lesson with the same name created'
+                    "msg": 'A lesson with the same name already exists'
                 })
     else:
         return jsonify({
